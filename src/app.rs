@@ -122,9 +122,10 @@ pub enum Message {
     SearchQueryChanged(String, Id),
     KeyPressed(u32),
     HideWindow(Id),
-    _Nothing,
     RunShellCommand(String),
     ClearSearchResults,
+    WindowFocusChanged(Id, bool),
+    _Nothing,
 }
 
 #[derive(Debug, Clone)]
@@ -167,6 +168,7 @@ pub struct Tile {
     results: Vec<App>,
     options: Vec<App>,
     visible: bool,
+    focused: bool,
     frontmost: Option<Retained<NSRunningApplication>>,
 }
 
@@ -195,6 +197,7 @@ impl Tile {
                 options: apps,
                 visible: true,
                 frontmost: None,
+                focused: false,
             },
             Task::batch([open.map(|_| Message::OpenWindow)]),
         )
@@ -205,6 +208,7 @@ impl Tile {
             Message::OpenWindow => {
                 self.capture_frontmost();
                 focus_this_app();
+                self.focused = true;
                 Task::none()
             }
 
@@ -213,7 +217,14 @@ impl Tile {
                 self.query = input;
                 let prev_size = self.results.len();
                 if self.query_lc.is_empty() {
-                    return Task::none();
+                    self.results = vec![];
+                    return window::resize(
+                        id,
+                        iced::Size {
+                            width: WINDOW_WIDTH,
+                            height: DEFAULT_WINDOW_HEIGHT,
+                        },
+                    );
                 }
 
                 let filter_vec = if self.query_lc.starts_with(&self.prev_query_lc) {
@@ -284,11 +295,20 @@ impl Tile {
             Message::HideWindow(a) => {
                 self.restore_frontmost();
                 self.visible = false;
+                self.focused = false;
                 Task::batch([window::close(a), Task::done(Message::ClearSearchResults)])
             }
             Message::ClearSearchResults => {
                 self.results = vec![];
                 Task::none()
+            }
+            Message::WindowFocusChanged(wid, focused) => {
+                self.focused = focused;
+                if !focused {
+                    Task::done(Message::HideWindow(wid))
+                } else {
+                    Task::none()
+                }
             }
 
             Message::_Nothing => Task::none(),
@@ -344,6 +364,19 @@ impl Tile {
                     None
                 }
             }),
+            window::events()
+                .with(self.focused)
+                .filter_map(|(focused, (wid, event))| match event {
+                    window::Event::Unfocused => {
+                        if focused {
+                            Some(Message::WindowFocusChanged(wid, false))
+                        } else {
+                            None
+                        }
+                    }
+                    window::Event::Focused => Some(Message::WindowFocusChanged(wid, true)),
+                    _ => None,
+                }),
         ])
     }
 
