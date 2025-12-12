@@ -11,16 +11,16 @@
 ### Planned:
 
 - [ ] Tray Icon for quitting the app 12/12/2025
-- [ ] Image icons next to the text
-- [ ] Select the options using arrow keys
-- [ ] Scrollable options
-- [ ] Calculator
-- [ ] Popup note-taking
-- [ ] Clipboard History
-- [ ] Customisable themes:
+- [ ] Image icons next to the text 13/12/2025
+- [ ] Select the options using arrow keys 13/12/2025
+- [ ] Scrollable options 12/12/2025
+- [ ] Calculator 15/12/2025
+- [ ] Popup note-taking 18/12/2025
+- [ ] Clipboard History 20/12/2025
+- [ ] Customisable themes (21/12/2025)
   - [ ] Blur / transparent background
   - [ ] Configurable colours for selected option
-- [ ] Plugin Support
+- [ ] Plugin Support 31/12/2025
 
 ### Finished:
 
