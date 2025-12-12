@@ -6,6 +6,14 @@
 
 ![RustCast Demo PreRelease V1](docs/rustcast_v1_preview.png)
 
+## Installation:
+
+1. Go to the
+   [releases page](https://github.com/unsecretised/rustcast/releases/latest)
+2. Download the `.zip` file
+3. Open it, and if there is a "this app is damaged", run the command
+   `xattr -cr <RustCast.app directory here>`
+
 ## Feature list:
 
 ### Planned:
