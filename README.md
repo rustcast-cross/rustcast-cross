@@ -8,6 +8,20 @@
 
 ## Installation:
 
+### Via Homebrew (Recommended):
+
+> Requires Homebrew
+
+```
+brew tap unsecretised/tap
+brew install --cask rustcast
+```
+
+Then launch it via launchpad or spotlight (hopefully the last time you have to
+use spotlight :) Have fun!)
+
+### Via github releases
+
 1. Go to the
    [releases page](https://github.com/unsecretised/rustcast/releases/latest)
 2. Download the `.zip` file
