@@ -264,7 +264,6 @@ impl Tile {
             }
 
             Message::RunShellCommand(shell_command) => {
-                dbg!(&shell_command);
                 Command::new("sh")
                     .arg("-c")
                     .arg(shell_command.join(" "))
