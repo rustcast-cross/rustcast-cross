@@ -129,16 +129,14 @@ pub struct Shelly {
 impl Shelly {
     pub fn to_app(&self) -> App {
         let self_clone = self.clone();
-        let icon = self_clone
-            .icon_path
-            .and_then(|x| {
-                let x = x.replace("~", &std::env::var("HOME").unwrap());
-                if x.ends_with(".icns") {
-                    handle_from_icns(Path::new(&x))
-                } else {
-                    Some(Handle::from_path(Path::new(&x)))
-                }
-            });
+        let icon = self_clone.icon_path.and_then(|x| {
+            let x = x.replace("~", &std::env::var("HOME").unwrap());
+            if x.ends_with(".icns") {
+                handle_from_icns(Path::new(&x))
+            } else {
+                Some(Handle::from_path(Path::new(&x)))
+            }
+        });
         App {
             open_command: Function::RunShellCommand(self_clone.command),
             icons: icon,

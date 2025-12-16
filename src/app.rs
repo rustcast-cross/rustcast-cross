@@ -4,6 +4,7 @@ use crate::macos::{focus_this_app, transform_process_to_ui_element};
 use crate::{macos, utils::get_installed_apps};
 
 use global_hotkey::{GlobalHotKeyEvent, HotKeyState};
+use iced::futures::SinkExt;
 use iced::{
     Alignment, Element, Fill, Subscription, Task, Theme,
     alignment::Vertical,
@@ -26,6 +27,7 @@ use rayon::slice::ParallelSliceMut;
 use std::cmp::min;
 use std::process::Command;
 use std::time::Duration;
+use std::fs;
 
 pub const WINDOW_WIDTH: f32 = 500.;
 pub const DEFAULT_WINDOW_HEIGHT: f32 = 65.;
@@ -99,6 +101,7 @@ pub enum Message {
     ClearSearchResults,
     WindowFocusChanged(Id, bool),
     ClearSearchQuery,
+    ReloadConfig,
     _Nothing,
 }
 
@@ -239,6 +242,19 @@ impl Tile {
                 Task::none()
             }
 
+            Message::ReloadConfig => {
+                self.config = toml::from_str(
+                    &fs::read_to_string(
+                        std::env::var("HOME").unwrap_or("".to_owned())
+                            + "/.config/rustcast/config.toml",
+                    )
+                    .unwrap_or("".to_owned()),
+                )
+                .unwrap();
+
+                Task::none()
+            }
+
             Message::KeyPressed(hk_id) => {
                 if hk_id == self.open_hotkey_id {
                     self.visible = !self.visible;
@@ -324,9 +340,7 @@ impl Tile {
                     if self.results.is_empty() {
                         Message::_Nothing
                     } else {
-                        Message::RunFunction(
-                            self.results.first().unwrap().to_owned().open_command,
-                        )
+                        Message::RunFunction(self.results.first().unwrap().to_owned().open_command)
                     }
                 })
                 .id("query")
@@ -356,6 +370,7 @@ impl Tile {
     pub fn subscription(&self) -> Subscription<Message> {
         Subscription::batch([
             Subscription::run(handle_hotkeys),
+            Subscription::run(handle_hot_reloading),
             window::close_events().map(Message::HideWindow),
             keyboard::listen().filter_map(|event| {
                 if let keyboard::Event::KeyPressed { key, .. } = event {
@@ -424,6 +439,26 @@ impl Tile {
             app.activateWithOptions(NSApplicationActivationOptions::ActivateIgnoringOtherApps);
         }
     }
+}
+
+fn handle_hot_reloading() -> impl futures::Stream<Item = Message> {
+    stream::channel(100, async |mut output| {
+        let content = fs::read_to_string(
+            std::env::var("HOME").unwrap_or("".to_owned()) + "/.config/rustcast/config.toml",
+        )
+        .unwrap_or("".to_string());
+        loop {
+            let current_content = fs::read_to_string(
+                std::env::var("HOME").unwrap_or("".to_owned()) + "/.config/rustcast/config.toml",
+            )
+            .unwrap_or("".to_string());
+
+            if current_content != content {
+                output.send(Message::ReloadConfig).await.unwrap();
+            }
+            tokio::time::sleep(Duration::from_millis(10)).await;
+        }
+    })
 }
 
 fn handle_hotkeys() -> impl futures::Stream<Item = Message> {
