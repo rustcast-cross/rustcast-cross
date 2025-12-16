@@ -13,6 +13,7 @@ pub struct Config {
     pub buffer_rules: Buffer,
     pub theme: Theme,
     pub placeholder: String,
+    pub search_url: String,
     pub shells: Vec<Shelly>,
 }
 
@@ -24,6 +25,7 @@ impl Default for Config {
             buffer_rules: Buffer::default(),
             theme: Theme::default(),
             placeholder: String::from("Time to be productive!"),
+            search_url: "https://google.com/search?q=%s".to_string(),
             shells: vec![],
         }
     }

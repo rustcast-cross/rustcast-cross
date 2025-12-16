@@ -231,6 +231,17 @@ impl Tile {
                             height: 55. + DEFAULT_WINDOW_HEIGHT,
                         },
                     );
+                } else if self.query_lc.ends_with("?") {
+                    self.results = vec![App {
+                        open_command: Function::GoogleSearch(self.query.clone()),
+                        icons: None,
+                        name: format!("Search for: {}", self.query),
+                        name_lc: String::new(),
+                    }];
+                    return window::resize(
+                        id,
+                        iced::Size::new(WINDOW_WIDTH, 55. + DEFAULT_WINDOW_HEIGHT),
+                    );
                 }
 
                 self.handle_search_query_changed();
@@ -314,6 +325,18 @@ impl Tile {
                             .unwrap()
                             .set_text(var.to_string())
                             .unwrap_or(());
+                    }
+
+                    Function::GoogleSearch(query_string) => {
+                        let query_args = query_string.replace(" ", "+");
+                        let query = self.config.search_url.replace("%s", &query_args);
+                        NSWorkspace::new().openURL(
+                            &NSURL::URLWithString_relativeToURL(
+                                &objc2_foundation::NSString::from_str(&query),
+                                None,
+                            )
+                            .unwrap(),
+                        );
                     }
                     Function::Quit => std::process::exit(0),
                 }
