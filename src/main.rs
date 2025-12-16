@@ -22,7 +22,11 @@ fn main() -> iced::Result {
         Ok(a) => toml::from_str(&a).unwrap(),
         Err(_) => Config::default(),
     };
-    std::fs::write(&file_path, toml::to_string(&config).unwrap_or_else(|x| x.to_string())).unwrap();
+    std::fs::write(
+        &file_path,
+        toml::to_string(&config).unwrap_or_else(|x| x.to_string()),
+    )
+    .unwrap();
     let manager = GlobalHotKeyManager::new().unwrap();
 
     let show_hide = HotKey::new(
