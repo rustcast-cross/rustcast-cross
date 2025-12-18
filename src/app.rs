@@ -1,5 +1,6 @@
 use crate::commands::Function;
 use crate::config::Config;
+use crate::utils::get_config_file_path;
 use global_hotkey::{GlobalHotKeyEvent, HotKeyState};
 use iced::futures::SinkExt;
 use iced::{
@@ -316,11 +317,7 @@ impl Tile {
 
             Message::ReloadConfig => {
                 self.config = toml::from_str(
-                    &fs::read_to_string(
-                        std::env::var("HOME").unwrap_or("".to_owned())
-                            + "/.config/rustcast/config.toml",
-                    )
-                    .unwrap_or("".to_owned()),
+                    &fs::read_to_string(get_config_file_path()).unwrap_or("".to_owned()),
                 )
                 .unwrap();
 
