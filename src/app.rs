@@ -329,12 +329,29 @@ impl Tile {
                 if hk_id == self.open_hotkey_id {
                     self.visible = !self.visible;
                     if self.visible {
-                        Task::chain(
-                            window::open(default_settings())
-                                .1
-                                .map(|_| Message::OpenWindow),
-                            operation::focus("query"),
-                        )
+                        #[cfg(target_os = "windows")]
+                        {
+                            // get normal settings and modify position
+                            use crate::utils::open_on_focused_monitor;
+                            use iced::window::Position::Specific;
+                            let pos = open_on_focused_monitor();
+                            let mut settings = default_settings();
+                            settings.position = Specific(pos);
+                            Task::chain(
+                                window::open(settings).1.map(|_| Message::OpenWindow),
+                                operation::focus("query"),
+                            )
+                        }
+
+                        #[cfg(target_os = "macos")]
+                        {
+                            Task::chain(
+                                window::open(default_settings())
+                                    .1
+                                    .map(|_| Message::OpenWindow),
+                                operation::focus("query"),
+                            )
+                        }
                     } else {
                         let to_close = window::latest().map(|x| x.unwrap());
                         Task::batch([
