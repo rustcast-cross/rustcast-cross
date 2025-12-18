@@ -246,6 +246,7 @@ impl Tile {
                 {
                     focus_this_app();
                 }
+
                 self.focused = true;
                 Task::none()
             }
@@ -507,13 +508,13 @@ impl Tile {
         }
 
         #[cfg(target_os = "windows")]
-        {
-            if let Some(hwnd) = self.frontmost.take() {
-                unsafe {
-                    let _ = SetForegroundWindow(hwnd);
-                };
-            }
-        }
+           {
+               if let Some(handle) = self.frontmost {
+                   unsafe {
+                       let _ = SetForegroundWindow(handle);
+                   }
+               }
+
     }
 }
 
