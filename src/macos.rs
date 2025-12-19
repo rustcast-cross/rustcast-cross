@@ -10,6 +10,7 @@ use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator, ParallelIterato
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::exit;
+use crate::utils::index_dirs_from_config;
 
 #[cfg(target_os = "macos")]
 pub fn set_activation_policy_accessory() {
@@ -217,9 +218,14 @@ pub fn get_installed_macos_apps(config: &Config) -> Vec<App> {
         "/System/Applications/Utilities/".to_string(),
     ];
 
-    paths
+
+    let mut apps = paths
         .par_iter()
         .map(|path| get_installed_apps(path, store_icons))
         .flatten()
-        .collect()
+        .collect();
+    index_dirs_from_config(&mut apps);
+
+    apps
+
 }

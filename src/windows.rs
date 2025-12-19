@@ -119,7 +119,7 @@ fn get_windows_path(folder_id: &GUID) -> Option<String> {
     }
 }
 #[cfg(target_os = "windows")]
-pub fn get_installed_apps_windows() -> Vec<App> {
+pub fn get_installed_windows_apps() -> Vec<App> {
     let mut apps = Vec::new();
     get_apps_from_registry(&mut apps);
     get_apps_from_known_folder(&mut apps);

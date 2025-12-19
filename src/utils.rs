@@ -302,7 +302,7 @@ pub fn get_installed_apps(config: &Config) -> Vec<App> {
         use crate::macos::get_installed_macos_apps;
         get_installed_macos_apps(config)
     } else {
-        use crate::windows::get_installed_apps_windows;
-        get_installed_apps_windows()
+        use crate::windows::get_installed_windows_apps;
+        get_installed_windows_apps()
     }
 }
