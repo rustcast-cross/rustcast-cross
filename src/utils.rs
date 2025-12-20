@@ -187,6 +187,7 @@ pub fn get_config_installation_dir() -> String {
 
 pub fn get_config_file_path() -> String {
     let home = get_config_installation_dir();
+
     if cfg!(target_os = "windows") {
         home + "\\rustcast\\config.toml"
     } else {
@@ -229,7 +230,7 @@ pub fn create_config_file_if_not_exists(
     Ok(())
 }
 
-pub fn open_application(path: &String) {
+pub fn open_application(path: &str) {
     #[cfg(target_os = "windows")]
     {
         println!("Opening application: {}", path);

@@ -169,7 +169,7 @@ pub struct Tile {
 impl Tile {
     /// A base window
     pub fn new(keybind_id: u32, config: &Config) -> (Self, Task<Message>) {
-        let mut settings = default_settings();
+        let settings = default_settings();
         #[cfg(target_os = "windows")]
         {
             // get normal settings and modify position
