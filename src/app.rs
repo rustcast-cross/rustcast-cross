@@ -97,10 +97,7 @@ impl App {
         );
 
         tile = tile
-            .push(
-                container(Text::new(&self.desc))
-                    .padding(15),
-            )
+            .push(container(Text::new(&self.desc)).padding(15))
             .width(Fill);
 
         container(tile)
