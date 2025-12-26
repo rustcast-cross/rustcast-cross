@@ -144,6 +144,7 @@ impl Shelly {
                 self_clone.command,
                 self_clone.alias_lc.clone(),
             ),
+            desc: "Shell Command".to_string(),
             icons: icon,
             name: self_clone.alias,
             name_lc: self_clone.alias_lc,

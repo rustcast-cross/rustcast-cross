@@ -30,9 +30,12 @@ use std::time::Duration;
 pub const WINDOW_WIDTH: f32 = 500.;
 pub const DEFAULT_WINDOW_HEIGHT: f32 = 65.;
 
+pub const RUSTCAST_DESC_NAME: &str = "RustCast";
+
 #[derive(Debug, Clone)]
 pub struct App {
     pub open_command: Function,
+    pub desc: String,
     pub icons: Option<iced::widget::image::Handle>,
     pub name: String,
     pub name_lc: String,
@@ -43,12 +46,14 @@ impl App {
         vec![
             App {
                 open_command: Function::Quit,
+                desc: RUSTCAST_DESC_NAME.to_string(),
                 icons: None,
                 name: "Quit RustCast".to_string(),
                 name_lc: "quit".to_string(),
             },
             App {
                 open_command: Function::OpenPrefPane,
+                desc: RUSTCAST_DESC_NAME.to_string(),
                 icons: None,
                 name: "Open RustCast Preferences".to_string(),
                 name_lc: "settings".to_string(),
@@ -72,26 +77,32 @@ impl App {
             }
         }
 
+        tile = tile.push(
+            Button::new(
+                Text::new(&self.name)
+                    .height(Fill)
+                    .width(Fill)
+                    .align_y(Vertical::Center),
+            )
+            .on_press(Message::RunFunction(self.open_command.clone()))
+            .style(|_, _| iced::widget::button::Style {
+                background: Some(iced::Background::Color(
+                    Theme::KanagawaDragon.palette().background,
+                )),
+                text_color: Theme::KanagawaDragon.palette().text,
+                ..Default::default()
+            })
+            .width(Fill)
+            .height(55),
+        );
+
         tile = tile
             .push(
-                Button::new(
-                    Text::new(self.name.clone())
-                        .height(Fill)
-                        .width(Fill)
-                        .align_y(Vertical::Center),
-                )
-                .on_press(Message::RunFunction(self.open_command.clone()))
-                .style(|_, _| iced::widget::button::Style {
-                    background: Some(iced::Background::Color(
-                        Theme::KanagawaDragon.palette().background,
-                    )),
-                    text_color: Theme::KanagawaDragon.palette().text,
-                    ..Default::default()
-                })
-                .width(Fill)
-                .height(55),
+                container(Text::new(&self.desc))
+                    .padding(15),
             )
             .width(Fill);
+
         container(tile)
             .style(|_| iced::widget::container::Style {
                 text_color: Some(Theme::KanagawaDragon.palette().text),
@@ -228,6 +239,7 @@ impl Tile {
                     let rand_num = rand::random_range(0..100);
                     self.results = vec![App {
                         open_command: Function::RandomVar(rand_num),
+                        desc: "Easter egg".to_string(),
                         icons: None,
                         name: rand_num.to_string(),
                         name_lc: String::new(),
@@ -243,6 +255,7 @@ impl Tile {
                     self.results = vec![App {
                         open_command: Function::GoogleSearch(self.query.clone()),
                         icons: None,
+                        desc: "Search".to_string(),
                         name: format!("Search for: {}", self.query),
                         name_lc: String::new(),
                     }];
