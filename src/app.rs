@@ -25,8 +25,8 @@ use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use rayon::slice::ParallelSliceMut;
 
 use std::cmp::min;
-use std::fs;
 use std::time::Duration;
+use std::{fs, thread};
 
 pub const WINDOW_WIDTH: f32 = 500.;
 pub const DEFAULT_WINDOW_HEIGHT: f32 = 65.;
@@ -282,6 +282,7 @@ impl Tile {
                 let max_elem = min(5, new_length);
 
                 if prev_size != new_length {
+                    thread::sleep(Duration::from_millis(30));
                     window::resize(
                         id,
                         iced::Size {
