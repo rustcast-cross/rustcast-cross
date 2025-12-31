@@ -8,7 +8,7 @@ mod utils;
 
 use std::path::Path;
 
-use crate::{app::Tile, config::Config, utils::to_key_code};
+use crate::{app::tile::Tile, config::Config, utils::to_key_code};
 
 use global_hotkey::{
     GlobalHotKeyManager,

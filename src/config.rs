@@ -4,7 +4,7 @@ use std::{path::Path, sync::Arc};
 use iced::{theme::Custom, widget::image::Handle};
 use serde::{Deserialize, Serialize};
 
-use crate::{app::App, commands::Function, utils::handle_from_icns};
+use crate::{app::apps::App, commands::Function, utils::handle_from_icns};
 
 /// The main config struct (effectively the config file's "schema")
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -120,7 +120,7 @@ impl Theme {
 ///
 /// - clear_on_hide is whether the buffer should be cleared when the window is hidden
 /// - clear_on_enter is whether the buffer should be cleared when the user presses enter after
-/// searching
+///   searching
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(default)]
 pub struct Buffer {

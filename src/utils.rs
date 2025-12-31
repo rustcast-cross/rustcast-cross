@@ -12,7 +12,7 @@ use icns::IconFamily;
 use image::RgbaImage;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
-use crate::{app::App, commands::Function};
+use crate::{app::apps::App, commands::Function};
 
 /// The default error log path (works only on unix systems, and must be changed for windows
 /// support)
@@ -53,7 +53,7 @@ pub(crate) fn handle_from_icns(path: &Path) -> Option<Handle> {
 
 /// This gets all the installed apps in the given directory
 ///
-/// the directories are defined in [`crate::app::Tile::new`]
+/// the directories are defined in [`crate::app::tile::Tile::new`]
 pub(crate) fn get_installed_apps(dir: impl AsRef<Path>, store_icons: bool) -> Vec<App> {
     let entries: Vec<_> = fs::read_dir(dir.as_ref())
         .unwrap_or_else(|x| {
