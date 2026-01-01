@@ -29,13 +29,13 @@ pub fn new(keybind_id: u32, config: &Config) -> (Tile, Task<Message>) {
 
     let store_icons = config.theme.show_icons;
 
-    let user_local_path = std::env::var("home").unwrap() + "/applications/";
+    let user_local_path = std::env::var("HOME").unwrap() + "/Applications/";
 
     let paths = vec![
-        "/applications/",
+        "/Applications/",
         user_local_path.as_str(),
-        "/system/applications/",
-        "/system/applications/utilities/",
+        "/System/Applications/",
+        "/System/Applications/Utilities/",
     ];
 
     let mut options: Vec<App> = paths
