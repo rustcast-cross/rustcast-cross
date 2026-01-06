@@ -11,10 +11,19 @@ use iced::{
 };
 
 use crate::{
-    app::{Message, RUSTCAST_DESC_NAME},
+    app::{Message, Page, RUSTCAST_DESC_NAME},
     commands::Function,
     utils::handle_from_icns,
 };
+
+/// This tells each "App" what to do when it is clicked, whether it is a function, a message, or a display
+#[allow(dead_code)]
+#[derive(Debug, Clone, PartialEq)]
+pub enum AppCommand {
+    Function(Function),
+    Message(Message),
+    Display,
+}
 
 /// The main app struct, that represents an "App"
 ///
@@ -23,7 +32,7 @@ use crate::{
 /// "run" the app.
 #[derive(Debug, Clone, PartialEq)]
 pub struct App {
-    pub open_command: Function,
+    pub open_command: AppCommand,
     pub desc: String,
     pub icons: Option<iced::widget::image::Handle>,
     pub name: String,
@@ -37,37 +46,44 @@ impl App {
 
         vec![
             App {
-                open_command: Function::Quit,
+                open_command: AppCommand::Function(Function::Quit),
                 desc: RUSTCAST_DESC_NAME.to_string(),
                 icons: None,
                 name: "Quit RustCast".to_string(),
                 name_lc: "quit".to_string(),
             },
             App {
-                open_command: Function::OpenPrefPane,
+                open_command: AppCommand::Function(Function::OpenPrefPane),
                 desc: RUSTCAST_DESC_NAME.to_string(),
                 icons: None,
                 name: "Open RustCast Preferences".to_string(),
                 name_lc: "settings".to_string(),
             },
             App {
-                open_command: Function::Nothing,
+                open_command: AppCommand::Message(Message::SwitchToPage(Page::ClipboardHistory)),
                 desc: RUSTCAST_DESC_NAME.to_string(),
                 icons: None,
                 name: "Clipboard History".to_string(),
                 name_lc: "clipboard".to_string(),
             },
             App {
-                open_command: Function::Nothing,
+                open_command: AppCommand::Message(Message::ReloadConfig),
                 desc: RUSTCAST_DESC_NAME.to_string(),
                 icons: None,
-                name: format!("RustCast Version: {app_version}"),
+                name: "Reload RustCast".to_string(),
+                name_lc: "refresh".to_string(),
+            },
+            App {
+                open_command: AppCommand::Display,
+                desc: RUSTCAST_DESC_NAME.to_string(),
+                icons: None,
+                name: format!("Current RustCast Version: {app_version}"),
                 name_lc: "version".to_string(),
             },
             App {
-                open_command: Function::OpenApp(
+                open_command: AppCommand::Function(Function::OpenApp(
                     "/System/Library/CoreServices/Finder.app".to_string(),
-                ),
+                )),
                 desc: RUSTCAST_DESC_NAME.to_string(),
                 icons: handle_from_icns(Path::new(
                     "/System/Library/CoreServices/Finder.app/Contents/Resources/Finder.icns",
@@ -107,7 +123,13 @@ impl App {
                     .color(theme.text_color(1.))
                     .align_y(Vertical::Center),
             )
-            .on_press(Message::RunFunction(self.open_command.clone()))
+            .on_press_maybe({
+                match self.open_command.clone() {
+                    AppCommand::Function(func) => Some(Message::RunFunction(func)),
+                    AppCommand::Message(msg) => Some(msg),
+                    AppCommand::Display => None,
+                }
+            })
             .style(|_, _| iced::widget::button::Style {
                 background: Some(Background::Color(theme.bg_color())),
                 text_color: theme.text_color(1.),

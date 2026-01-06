@@ -18,7 +18,6 @@ pub enum Function {
     GoogleSearch(String),
     Calculate(Expression),
     OpenPrefPane,
-    Nothing,
     Quit,
 }
 
@@ -92,7 +91,6 @@ impl Function {
                     ));
                 });
             }
-            Function::Nothing => {}
             Function::Quit => std::process::exit(0),
         }
     }

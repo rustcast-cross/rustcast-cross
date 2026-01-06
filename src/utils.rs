@@ -11,7 +11,10 @@ use icns::IconFamily;
 use image::RgbaImage;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
-use crate::{app::apps::App, commands::Function};
+use crate::{
+    app::apps::{App, AppCommand},
+    commands::Function,
+};
 
 /// The default error log path (works only on unix systems, and must be changed for windows
 /// support)
@@ -161,7 +164,7 @@ pub(crate) fn get_installed_apps(dir: impl AsRef<Path>, store_icons: bool) -> Ve
 
             let name = file_name.strip_suffix(".app").unwrap().to_string();
             Some(App {
-                open_command: Function::OpenApp(path_str),
+                open_command: AppCommand::Function(Function::OpenApp(path_str)),
                 desc: "Application".to_string(),
                 icons,
                 name_lc: name.to_lowercase(),

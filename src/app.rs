@@ -24,7 +24,7 @@ pub enum Page {
 }
 
 /// The message type that iced uses for actions that can do something
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Message {
     OpenWindow,
     SearchQueryChanged(String, Id),
@@ -36,6 +36,7 @@ pub enum Message {
     WindowFocusChanged(Id, bool),
     ClearSearchQuery,
     ReloadConfig,
+    SwitchToPage(Page),
     ClipboardHistory(ClipBoardContentType),
 }
 

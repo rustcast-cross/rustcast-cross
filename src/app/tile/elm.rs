@@ -11,6 +11,20 @@ use rayon::{
     slice::ParallelSliceMut,
 };
 
+pub fn default_app_paths() -> Vec<String> {
+    let user_local_path = std::env::var("HOME").unwrap() + "/Applications/";
+
+    let paths = vec![
+        "/Applications/".to_string(),
+        user_local_path,
+        "/System/Applications/".to_string(),
+        "/System/Applications/Utilities/".to_string(),
+    ];
+
+    paths
+}
+
+use crate::app::apps::AppCommand;
 use crate::{
     app::{Message, Page, apps::App, default_settings, tile::Tile},
     config::Config,
@@ -30,14 +44,7 @@ pub fn new(keybind_id: u32, config: &Config) -> (Tile, Task<Message>) {
 
     let store_icons = config.theme.show_icons;
 
-    let user_local_path = std::env::var("HOME").unwrap() + "/Applications/";
-
-    let paths = vec![
-        "/Applications/",
-        user_local_path.as_str(),
-        "/System/Applications/",
-        "/System/Applications/Utilities/",
-    ];
+    let paths = default_app_paths();
 
     let mut options: Vec<App> = paths
         .par_iter()
@@ -76,9 +83,11 @@ pub fn view(tile: &Tile, wid: window::Id) -> Element<'_, Message> {
             .on_paste(move |a| Message::SearchQueryChanged(a, wid))
             .on_submit_maybe({
                 if !tile.results.is_empty() {
-                    Some(Message::RunFunction(
-                        tile.results.first().unwrap().to_owned().open_command,
-                    ))
+                    match tile.results.first().unwrap().to_owned().open_command {
+                        AppCommand::Function(func) => Some(Message::RunFunction(func)),
+                        AppCommand::Message(msg) => Some(msg),
+                        AppCommand::Display => None,
+                    }
                 } else {
                     None
                 }

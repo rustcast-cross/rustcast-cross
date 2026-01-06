@@ -6,14 +6,21 @@ use std::time::Duration;
 use iced::Task;
 use iced::widget::operation;
 use iced::window;
+use rayon::iter::IntoParallelRefIterator;
+use rayon::iter::ParallelIterator;
+use rayon::slice::ParallelSliceMut;
 
 use crate::app::DEFAULT_WINDOW_HEIGHT;
 use crate::app::RUSTCAST_DESC_NAME;
 use crate::app::WINDOW_WIDTH;
 use crate::app::apps::App;
+use crate::app::apps::AppCommand;
 use crate::app::default_settings;
+use crate::app::tile::elm::default_app_paths;
 use crate::calculator::Expression;
 use crate::commands::Function;
+use crate::config::Config;
+use crate::utils::get_installed_apps;
 use crate::{
     app::{Message, Page, tile::Tile},
     macos::focus_this_app,
@@ -44,7 +51,7 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
             } else if tile.query_lc == "randomvar" {
                 let rand_num = rand::random_range(0..100);
                 tile.results = vec![App {
-                    open_command: Function::RandomVar(rand_num),
+                    open_command: AppCommand::Function(Function::RandomVar(rand_num)),
                     desc: "Easter egg".to_string(),
                     icons: None,
                     name: rand_num.to_string(),
@@ -59,7 +66,7 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
                 );
             } else if tile.query_lc.ends_with("?") {
                 tile.results = vec![App {
-                    open_command: Function::GoogleSearch(tile.query.clone()),
+                    open_command: AppCommand::Function(Function::GoogleSearch(tile.query.clone())),
                     icons: None,
                     desc: "Search".to_string(),
                     name: format!("Search for: {}", tile.query),
@@ -81,7 +88,7 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
                 && let Some(res) = Expression::from_str(&tile.query)
             {
                 tile.results.push(App {
-                    open_command: Function::Calculate(res),
+                    open_command: AppCommand::Function(Function::Calculate(res)),
                     desc: RUSTCAST_DESC_NAME.to_string(),
                     icons: None,
                     name: res.eval().to_string(),
@@ -94,7 +101,9 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
 
             if tile.results
                 == vec![App {
-                    open_command: Function::Nothing,
+                    open_command: AppCommand::Message(Message::SwitchToPage(
+                        Page::ClipboardHistory,
+                    )),
                     desc: RUSTCAST_DESC_NAME.to_string(),
                     icons: None,
                     name: "Clipboard History".to_string(),
@@ -135,7 +144,7 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
         }
 
         Message::ReloadConfig => {
-            tile.config = toml::from_str(
+            let new_config: Config = toml::from_str(
                 &fs::read_to_string(
                     std::env::var("HOME").unwrap_or("".to_owned())
                         + "/.config/rustcast/config.toml",
@@ -143,6 +152,20 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
                 .unwrap_or("".to_owned()),
             )
             .unwrap();
+
+            let mut new_options: Vec<App> = default_app_paths()
+                .par_iter()
+                .map(|path| get_installed_apps(path, new_config.theme.show_icons))
+                .flatten()
+                .collect();
+
+            new_options.extend(new_config.shells.iter().map(|x| x.to_app()));
+            new_options.extend(App::basic_apps());
+            new_options.par_sort_by_key(|x| x.name.len());
+
+            tile.theme = new_config.theme.to_owned().into();
+            tile.config = new_config;
+            tile.options = new_options;
 
             Task::none()
         }
@@ -174,6 +197,11 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
             } else {
                 Task::none()
             }
+        }
+
+        Message::SwitchToPage(page) => {
+            tile.page = page;
+            Task::none()
         }
 
         Message::RunFunction(command) => {

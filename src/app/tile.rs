@@ -2,7 +2,8 @@
 mod elm;
 mod update;
 
-use crate::app::apps::App;
+use crate::app::apps::{App, AppCommand};
+use crate::app::tile::elm::default_app_paths;
 use crate::app::{Message, Page};
 use crate::clipboard::ClipBoardContentType;
 use crate::commands::Function;
@@ -24,6 +25,7 @@ use objc2_app_kit::NSRunningApplication;
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
 use std::fs;
+use std::path::PathBuf;
 use std::time::Duration;
 
 /// This is the base window, and its a "Tile"
@@ -98,9 +100,16 @@ impl Tile {
             Subscription::run(handle_clipboard_history),
             window::close_events().map(Message::HideWindow),
             keyboard::listen().filter_map(|event| {
-                if let keyboard::Event::KeyPressed { key, .. } = event {
+                if let keyboard::Event::KeyPressed { key, modifiers, .. } = event {
                     match key {
                         keyboard::Key::Named(Named::Escape) => Some(Message::KeyPressed(65598)),
+                        keyboard::Key::Character(chr) => {
+                            if modifiers.command() && chr.to_string().to_lowercase() == "r" {
+                                Some(Message::ReloadConfig)
+                            } else {
+                                None
+                            }
+                        }
                         _ => None,
                     }
                 } else {
@@ -141,7 +150,7 @@ impl Tile {
         let mut exact: Vec<App> = filter_vec
             .par_iter()
             .filter(|x| match &x.open_command {
-                Function::RunShellCommand(_, _) => x
+                &AppCommand::Function(Function::RunShellCommand(_, _)) => x
                     .name_lc
                     .starts_with(query.split_once(" ").unwrap_or((&query, "")).0),
                 _ => x.name_lc == query,
@@ -152,7 +161,7 @@ impl Tile {
         let mut prefix: Vec<App> = filter_vec
             .par_iter()
             .filter(|x| match x.open_command {
-                Function::RunShellCommand(_, _) => false,
+                AppCommand::Function(Function::RunShellCommand(_, _)) => false,
                 _ => x.name_lc != query && x.name_lc.starts_with(&query),
             })
             .cloned()
@@ -184,22 +193,52 @@ impl Tile {
 /// This is the subscription function that handles hot reloading of the config
 fn handle_hot_reloading() -> impl futures::Stream<Item = Message> {
     stream::channel(100, async |mut output| {
-        let content = fs::read_to_string(
+        let mut content = fs::read_to_string(
             std::env::var("HOME").unwrap_or("".to_owned()) + "/.config/rustcast/config.toml",
         )
         .unwrap_or("".to_string());
+
+        let paths = default_app_paths();
+        let mut total_files: usize = paths
+            .par_iter()
+            .map(|dir| count_dirs_in_dir(&dir.to_owned().into()))
+            .sum();
+
         loop {
             let current_content = fs::read_to_string(
                 std::env::var("HOME").unwrap_or("".to_owned()) + "/.config/rustcast/config.toml",
             )
             .unwrap_or("".to_string());
 
+            let current_total_files: usize = paths
+                .par_iter()
+                .map(|dir| count_dirs_in_dir(&dir.to_owned().into()))
+                .sum();
+
             if current_content != content {
+                content = current_content;
+                output.send(Message::ReloadConfig).await.unwrap();
+            } else if total_files != current_total_files {
+                total_files = current_total_files;
                 output.send(Message::ReloadConfig).await.unwrap();
             }
+
             tokio::time::sleep(Duration::from_millis(10)).await;
         }
     })
+}
+
+fn count_dirs_in_dir(dir: &PathBuf) -> usize {
+    // Read the directory; if it fails, treat as empty
+    let entries = match fs::read_dir(dir) {
+        Ok(e) => e,
+        Err(_) => return 0,
+    };
+
+    entries
+        .filter_map(|entry| entry.ok())
+        .filter(|entry| entry.file_type().map(|t| t.is_dir()).unwrap_or(false))
+        .count()
 }
 
 /// This is the subscription function that handles hotkeys for hiding / showing the window

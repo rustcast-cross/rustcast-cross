@@ -6,7 +6,11 @@ use global_hotkey::hotkey::Code;
 use iced::{theme::Custom, widget::image::Handle};
 use serde::{Deserialize, Serialize};
 
-use crate::{app::apps::App, commands::Function, utils::handle_from_icns};
+use crate::{
+    app::apps::{App, AppCommand},
+    commands::Function,
+    utils::handle_from_icns,
+};
 
 /// The main config struct (effectively the config file's "schema")
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -163,10 +167,10 @@ impl Shelly {
             }
         });
         App {
-            open_command: Function::RunShellCommand(
+            open_command: AppCommand::Function(Function::RunShellCommand(
                 self_clone.command,
                 self_clone.alias_lc.clone(),
-            ),
+            )),
             desc: "Shell Command".to_string(),
             icons: icon,
             name: self_clone.alias,
