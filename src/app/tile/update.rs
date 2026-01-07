@@ -64,6 +64,21 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
                         height: 55. + DEFAULT_WINDOW_HEIGHT,
                     },
                 );
+            } else if tile.query_lc == "67" {
+                tile.results = vec![App {
+                    open_command: AppCommand::Function(Function::RandomVar(67)),
+                    desc: "Easter egg".to_string(),
+                    icons: None,
+                    name: 67.to_string(),
+                    name_lc: String::new(),
+                }];
+                return window::resize(
+                    id,
+                    iced::Size {
+                        width: WINDOW_WIDTH,
+                        height: 55. + DEFAULT_WINDOW_HEIGHT,
+                    },
+                );
             } else if tile.query_lc.ends_with("?") {
                 tile.results = vec![App {
                     open_command: AppCommand::Function(Function::GoogleSearch(tile.query.clone())),
