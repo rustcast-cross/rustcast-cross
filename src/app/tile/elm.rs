@@ -6,6 +6,7 @@ use iced::widget::{Column, Scrollable, space};
 use iced::window;
 use iced::{Element, Task};
 use iced::{Length::Fill, widget::text_input};
+use objc2::MainThreadMarker;
 use rayon::{
     iter::{IntoParallelRefIterator, ParallelIterator},
     slice::ParallelSliceMut,
@@ -25,6 +26,7 @@ pub fn default_app_paths() -> Vec<String> {
 }
 
 use crate::app::apps::AppCommand;
+use crate::app::menubar::new_menu_icon;
 use crate::config::Theme;
 use crate::{
     app::{Message, Page, apps::App, default_settings, tile::Tile},
@@ -46,6 +48,9 @@ pub fn new(keybind_id: u32, config: &Config) -> (Tile, Task<Message>) {
     let store_icons = config.theme.show_icons;
 
     let paths = default_app_paths();
+
+    let mtm = MainThreadMarker::new().unwrap();
+    new_menu_icon(mtm);
 
     let mut options: Vec<App> = paths
         .par_iter()

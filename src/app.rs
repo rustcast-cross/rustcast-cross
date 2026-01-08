@@ -3,6 +3,7 @@ use crate::clipboard::ClipBoardContentType;
 use crate::commands::Function;
 
 pub mod apps;
+pub mod menubar;
 pub mod tile;
 
 use iced::window::{self, Id, Settings};
