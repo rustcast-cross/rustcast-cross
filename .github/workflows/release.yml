@@ -11,27 +11,17 @@ permissions:
 
 jobs:
   build-macos:
-    strategy:
-      matrix:
-        include:
-          - target: aarch64-apple-darwin
-            os: macos-14
-          - target: x86_64-apple-darwin
-            os: macos-14
-
-    runs-on: ${{ matrix.os }}
-
+    runs-on: macos-14
     env:
       APP_VERSION: ${{ github.ref_name }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Rust toolchain
+      - name: Install Rust toolchain (both macOS targets)
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.target }}
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
 
       - name: Install cargo-bundle
         run: cargo install cargo-bundle
@@ -52,23 +42,29 @@ jobs:
         uses: actions/cache@v4
         with:
           path: target
-          key: ${{ runner.os }}-${{ matrix.target }}-cargo-build-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-universal-cargo-build-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: Build release binary
-        run: cargo bundle --release --target ${{ matrix.target }}
+      - name: Build release bundles (aarch64 + x86_64)
+        run: |
+          cargo bundle --release --target aarch64-apple-darwin
+          cargo bundle --release --target x86_64-apple-darwin
 
       - name: Create artifacts directory
         run: mkdir -p artifacts
 
-      - name: Package app bundle
+      - name: Package app bundles
         run: |
-          cd target/${{ matrix.target }}/release/bundle/osx
-          zip -r ../../../../../artifacts/rustcast-${{ matrix.target }}.app.zip *.app
+          cd target/aarch64-apple-darwin/release/bundle/osx
+          zip -r ../../../../../artifacts/rustcast-aarch64-apple-darwin.app.zip *.app
+
+          cd - >/dev/null
+          cd target/x86_64-apple-darwin/release/bundle/osx
+          zip -r ../../../../../artifacts/rustcast-x86_64-apple-darwin.app.zip *.app
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: macos-${{ matrix.target }}
+          name: macos-bundles
           path: artifacts/*.zip
           retention-days: 7
 
@@ -76,7 +72,6 @@ jobs:
     needs: build-macos
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
-
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
