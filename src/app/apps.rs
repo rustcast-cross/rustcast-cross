@@ -7,6 +7,7 @@ use iced::{
     Alignment, Background,
     Length::Fill,
     alignment::Vertical,
+    border::Radius,
     widget::{Button, Row, Text, container, image::Viewer},
 };
 
@@ -105,7 +106,7 @@ impl App {
             && let Some(icon) = &self.icons
         {
             tile = tile
-                .push(Viewer::new(icon).height(35).width(35))
+                .push(container(Viewer::new(icon).height(35).width(35)).padding(5))
                 .align_y(Alignment::Center);
         }
 
@@ -149,8 +150,15 @@ impl App {
             .style(|_| iced::widget::container::Style {
                 text_color: Some(theme.text_color(1.)),
                 background: Some(Background::Color(theme.bg_color())),
+                border: iced::Border {
+                    color: theme.text_color(0.5),
+                    width: 0.1,
+                    radius: Radius::new(0),
+                },
                 ..Default::default()
             })
+            .max_height(55)
+            .padding(5)
             .width(Fill)
             .height(Fill)
     }
