@@ -52,10 +52,7 @@ fn get_image() -> DynamicImage {
         "../Resources/icon.png"
     };
 
-    let image = ImageReader::open(image_path)
-        .unwrap()
-        .decode()
-        .unwrap();
+    let image = ImageReader::open(image_path).unwrap().decode().unwrap();
 
     image
 }
