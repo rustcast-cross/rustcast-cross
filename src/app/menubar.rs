@@ -52,8 +52,6 @@ fn get_image() -> DynamicImage {
         "/Applications/Rustcast.app/Contents/Resources/icon.png"
     };
 
-    
-
     ImageReader::open(image_path).unwrap().decode().unwrap()
 }
 
