@@ -115,15 +115,13 @@ pub fn view(tile: &Tile, wid: window::Id) -> Element<'_, Message> {
         } else {
             Direction::Vertical(Scrollbar::hidden())
         };
-        let contents = match tile.page {
+        let results = match tile.page {
             Page::Main => {
                 let mut search_results = Column::new();
                 for result in &tile.results {
                     search_results = search_results.push(result.render(&tile.config.theme));
                 }
-
-                let scrollable = Scrollable::with_direction(search_results, scrollbar_direction);
-                Column::new().push(title_input).push(scrollable)
+                search_results
             }
             Page::ClipboardHistory => {
                 let mut clipboard_history = Column::new();
@@ -131,10 +129,11 @@ pub fn view(tile: &Tile, wid: window::Id) -> Element<'_, Message> {
                     clipboard_history = clipboard_history
                         .push(result.render_clipboard_item(tile.config.theme.clone()));
                 }
-                let scrollable = Scrollable::with_direction(clipboard_history, scrollbar_direction);
-                Column::new().push(title_input).push(scrollable)
+                clipboard_history
             }
         };
+        let scrollable = Scrollable::with_direction(results, scrollbar_direction);
+        let contents = Column::new().push(title_input).push(scrollable);
 
         container(contents)
             .style(|_| iced::widget::container::Style {

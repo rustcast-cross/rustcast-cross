@@ -28,36 +28,45 @@ impl ClipBoardContentType {
             ClipBoardContentType::Image(_) => "<img>",
         };
 
-        let bg_color = theme.bg_color();
-        let bg_color_clone = bg_color;
-
         let text_color = theme.text_color(1.);
         let text_color_clone = text_color;
 
         tile = tile.push(
-            Button::new(
-                Text::new(text.to_owned())
-                    .font(theme.font())
-                    .height(Fill)
-                    .width(Fill)
-                    .align_y(Vertical::Center),
+            container(
+                Button::new(
+                    Text::new(text.to_owned())
+                        .font(theme.font())
+                        .height(Fill)
+                        .width(Fill)
+                        .align_y(Vertical::Center),
+                )
+                .on_press(Message::RunFunction(Function::CopyToClipboard(
+                    self.to_owned(),
+                )))
+                .style(move |_, _| iced::widget::button::Style {
+                    background: None,
+                    text_color: text_color_clone,
+                    ..Default::default()
+                })
+                .width(Fill)
+                .height(55),
             )
-            .on_press(Message::RunFunction(Function::CopyToClipboard(
-                self.to_owned(),
-            )))
-            .style(move |_, _| iced::widget::button::Style {
-                background: Some(iced::Background::Color(bg_color_clone)),
-                text_color: text_color_clone,
+            .style(move |_| iced::widget::container::Style {
+                text_color: None,
+                background: None,
+                border: iced::Border {
+                    color: theme.text_color(0.5),
+                    width: 0.1,
+                    radius: iced::border::Radius::new(0),
+                },
                 ..Default::default()
-            })
-            .width(Fill)
-            .height(55),
+            }),
         );
 
         container(tile)
             .style(move |_| iced::widget::container::Style {
                 text_color: Some(text_color),
-                background: Some(iced::Background::Color(bg_color)),
+                background: None,
                 ..Default::default()
             })
             .width(Fill)
