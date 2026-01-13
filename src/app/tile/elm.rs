@@ -39,11 +39,7 @@ pub fn default_app_paths() -> Vec<String> {
 
     #[cfg(target_os = "windows")]
     {
-        let paths = vec![
-            "C:/Program Files".to_string(),
-            "C:/Program Files (x86)".to_string()
-        ];
-        paths
+        Vec::new()
     }
 }
 
@@ -67,13 +63,18 @@ pub fn new(
         settings.position = Position::Specific(pos);
     }
 
-    let (id, open) = window::open(settings);
+    
 
     #[cfg(target_os = "macos")]
-    let open = open.discard().chain(window::run(id, |handle| {
-        macos::macos_window_config(&handle.window_handle().expect("Unable to get window handle"));
-        transform_process_to_ui_element();
-    }));
+    {
+        let open = open.discard().chain(window::run(id, |handle| {
+            macos::macos_window_config(&handle.window_handle().expect("Unable to get window handle"));
+            transform_process_to_ui_element();
+        }));
+    }
+
+    #[cfg(target_os = "windows")]
+    let (id, open) = window::open(settings);
 
     let mut options: Vec<App> = get_installed_apps(&config);
 

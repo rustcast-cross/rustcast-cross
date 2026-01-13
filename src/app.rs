@@ -2,13 +2,6 @@
 use crate::commands::Function;
 use iced::window::{self, Id, Settings};
 
-#[cfg(target_os = "windows")]
-use {
-    crate::windows::open_on_focused_monitor,
-    iced::window::Position::Specific,
-    windows::Win32::Foundation::HWND,
-    windows::Win32::UI::WindowsAndMessaging::{GetForegroundWindow, SetForegroundWindow},
-};
 
 use crate::{app::tile::ExtSender, clipboard::ClipBoardContentType};
 

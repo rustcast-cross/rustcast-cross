@@ -1,12 +1,10 @@
 //! This handles the update logic for the tile (AKA rustcast's main window)
 use std::cmp::min;
 use std::fs;
-use std::path::Path;
 use std::time::Duration;
 
 use global_hotkey::hotkey::HotKey;
 use iced::Task;
-use iced::widget::image::Handle;
 use iced::widget::operation;
 use iced::window;
 use rayon::slice::ParallelSliceMut;
