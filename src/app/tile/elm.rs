@@ -18,20 +18,33 @@ use crate::utils::get_installed_apps;
 use crate::{
     app::{Message, Page, apps::App, default_settings, tile::Tile},
     config::Config,
-    macos::{self, transform_process_to_ui_element},
 };
 
+#[cfg(target_os = "macos")]
+use crate::macos::{self, transform_process_to_ui_element};
+
 pub fn default_app_paths() -> Vec<String> {
-    let user_local_path = std::env::var("HOME").unwrap() + "/Applications/";
+    #[cfg(target_os = "macos")]
+    {
+        let user_local_path = std::env::var("HOME").unwrap() + "/Applications/";
 
-    let paths = vec![
-        "/Applications/".to_string(),
-        user_local_path,
-        "/System/Applications/".to_string(),
-        "/System/Applications/Utilities/".to_string(),
-    ];
+        let paths = vec![
+            "/Applications/".to_string(),
+            user_local_path,
+            "/System/Applications/".to_string(),
+            "/System/Applications/Utilities/".to_string(),
+        ];
+        paths
+    }
 
-    paths
+    #[cfg(target_os = "windows")]
+    {
+        let paths = vec![
+            "C:/Program Files".to_string(),
+            "C:/Program Files (x86)".to_string()
+        ];
+        paths
+    }
 }
 
 /// Initialise the base window
@@ -46,12 +59,17 @@ pub fn new(
     #[cfg(target_os = "windows")]
     {
         // get normal settings and modify position
+
+        use iced::window::Position;
+
+        use crate::windows::open_on_focused_monitor;
         let pos = open_on_focused_monitor();
-        settings.position = Specific(pos);
+        settings.position = Position::Specific(pos);
     }
 
     let (id, open) = window::open(settings);
 
+    #[cfg(target_os = "macos")]
     let open = open.discard().chain(window::run(id, |handle| {
         macos::macos_window_config(&handle.window_handle().expect("Unable to get window handle"));
         transform_process_to_ui_element();

@@ -46,6 +46,8 @@ fn main() -> iced::Result {
         .register_all(&hotkeys)
         .expect("Unable to register hotkey");
 
+    println!("Starting");
+
     iced::daemon(
         move || Tile::new((modifier, key), show_hide.id(), &config),
         Tile::update,

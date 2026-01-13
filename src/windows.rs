@@ -1,12 +1,9 @@
 #[cfg(target_os = "windows")]
 use {
-    windows::Win32::System::Com::CoTaskMemFree,
-    windows::Win32::UI::Shell::{
+    crate::app::apps::App, windows::{Win32::{System::Com::CoTaskMemFree, UI::{Shell::{
         FOLDERID_LocalAppData, FOLDERID_ProgramFiles, FOLDERID_ProgramFilesX86, KF_FLAG_DEFAULT,
         SHGetKnownFolderPath,
-    },
-    windows::Win32::UI::WindowsAndMessaging::GetCursorPos,
-    windows::core::GUID,
+    }, WindowsAndMessaging::GetCursorPos}}, core::GUID}
 };
 
 #[cfg(target_os = "windows")]
@@ -50,11 +47,14 @@ fn get_apps_from_registry(apps: &mut Vec<App>) {
             }
 
             if !display_name.is_empty() {
+                use crate::{app::apps::AppCommand, commands::Function};
+
                 apps.push(App {
-                    open_command: Function::OpenApp(exe),
+                    open_command: AppCommand::Function(Function::OpenApp(exe)),
                     name: display_name.clone().into_string().unwrap(),
                     name_lc: display_name.clone().into_string().unwrap().to_lowercase(),
                     icons: None,
+                    desc: "TODO: Implement".to_string()
                 })
             }
         });
@@ -65,14 +65,18 @@ fn get_apps_from_known_folder(apps: &mut Vec<App>) {
     let paths = get_known_paths();
 
     for path in paths {
+        use walkdir::WalkDir;
+
         for entry in WalkDir::new(path)
             .follow_links(false)
             .into_iter()
             .filter_map(|e| e.ok())
             .filter(|e| e.path().extension().is_some_and(|ext| ext == "exe"))
         {
+            use crate::{app::apps::AppCommand, commands::Function};
+
             apps.push(App {
-                open_command: Function::OpenApp(entry.path().to_string_lossy().to_string()),
+                open_command: AppCommand::Function(Function::OpenApp(entry.path().to_string_lossy().to_string())),
                 name: entry
                     .clone()
                     .file_name()
@@ -87,6 +91,7 @@ fn get_apps_from_known_folder(apps: &mut Vec<App>) {
                     .to_lowercase()
                     .replace(".exe", ""),
                 icons: None,
+                desc: "TODO: Implement".to_string()
             });
         }
     }
@@ -115,6 +120,8 @@ fn get_windows_path(folder_id: &GUID) -> Option<String> {
 }
 #[cfg(target_os = "windows")]
 pub fn get_installed_windows_apps() -> Vec<App> {
+    use crate::utils::index_dirs_from_config;
+
     let mut apps = Vec::new();
     get_apps_from_registry(&mut apps);
     get_apps_from_known_folder(&mut apps);
@@ -128,6 +135,8 @@ pub fn open_on_focused_monitor() -> iced::Point {
     use windows::Win32::Graphics::Gdi::{
         GetMonitorInfoW, MONITOR_DEFAULTTONEAREST, MONITORINFO, MonitorFromPoint,
     };
+
+    use crate::app::{DEFAULT_WINDOW_HEIGHT, WINDOW_WIDTH};
     let mut point = POINT { x: 0, y: 0 };
     let mut monitor_info = MONITORINFO {
         cbSize: std::mem::size_of::<MONITORINFO>() as u32,
