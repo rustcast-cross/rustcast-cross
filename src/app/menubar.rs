@@ -50,7 +50,7 @@ pub fn menu_icon(hotkey: (Option<Modifiers>, Code), hotkey_id: u32, sender: ExtS
 }
 
 fn get_image() -> DynamicImage {
-    let image_path = if cfg!(debug_assertions) {
+    let image_path = if cfg!(debug_assertions) && cfg!(target_os = "macos") {
         "docs/icon.png"
     } else {
         "/Applications/Rustcast.app/Contents/Resources/icon.png"

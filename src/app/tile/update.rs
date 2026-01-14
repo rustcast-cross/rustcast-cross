@@ -137,7 +137,7 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
                     name: res.eval().to_string(),
                     name_lc: "".to_string(),
                 });
-            } else if let Err(_) = Url::parse(&tile.query)
+            } else if let Ok(_) = Url::parse(&tile.query)
                 && tile.results.is_empty()
             {
                 #[cfg(target_os = "macos")]
