@@ -3,6 +3,7 @@ use std::cmp::min;
 use std::fs;
 #[cfg(target_os = "macos")]
 use std::path::Path;
+use std::thread;
 use std::time::Duration;
 
 use global_hotkey::hotkey::HotKey;
@@ -10,11 +11,14 @@ use iced::Task;
 #[cfg(target_os = "macos")]
 use iced::widget::image::Handle;
 use iced::widget::operation;
+use iced::widget::operation::AbsoluteOffset;
 use iced::window;
 use rayon::slice::ParallelSliceMut;
 use url::Url;
 
+use crate::app::ArrowKey;
 use crate::app::DEFAULT_WINDOW_HEIGHT;
+use crate::app::Move;
 use crate::app::RUSTCAST_DESC_NAME;
 use crate::app::WINDOW_WIDTH;
 use crate::app::apps::App;
@@ -48,6 +52,14 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
             tile.visible = true;
             Task::none()
         }
+        Message::HideTrayIcon => {
+            tile.tray_icon = None;
+            tile.config.show_trayicon = false;
+            let home = std::env::var("HOME").unwrap();
+            let confg_str = toml::to_string(&tile.config).unwrap();
+            thread::spawn(move || fs::write(home + "/.config/rustcast/config.toml", confg_str));
+            Task::none()
+        }
 
         Message::SetSender(sender) => {
             tile.sender = Some(sender.clone());
@@ -59,6 +71,7 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
         }
 
         Message::SearchQueryChanged(input, id) => {
+            tile.focus_id = 0;
             #[cfg(target_os = "macos")]
             if tile.config.haptic_feedback {
                 perform_haptic(HapticPattern::Alignment);
@@ -112,7 +125,7 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
                     open_command: AppCommand::Function(Function::GoogleSearch(tile.query.clone())),
                     icons: None,
                     desc: "Web Search".to_string(),
-                    name: format!("Google for: {}", tile.query),
+                    name: format!("Search for: {}", tile.query),
                     name_lc: String::new(),
                 }];
                 return window::resize(
@@ -207,6 +220,35 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
             tile.query = String::new();
             Task::none()
         }
+
+        Message::ChangeFocus(key) => {
+            let u32_len = tile.results.len() as u32;
+            if u32_len > 0 {
+                match key {
+                    ArrowKey::ArrowDown => tile.focus_id = (tile.focus_id + 1) % u32_len,
+                    ArrowKey::ArrowUp => tile.focus_id = (tile.focus_id + u32_len - 1) % u32_len,
+                    _ => {}
+                }
+
+                operation::scroll_to(
+                    "results",
+                    AbsoluteOffset {
+                        x: None,
+                        y: Some(tile.focus_id as f32 * 55.),
+                    },
+                )
+            } else {
+                Task::none()
+            }
+        }
+
+        Message::OpenFocused => match tile.results.get(tile.focus_id as usize) {
+            Some(App {
+                open_command: AppCommand::Function(func),
+                ..
+            }) => Task::done(Message::RunFunction(func.to_owned())),
+            Some(_) | None => Task::none(),
+        },
 
         Message::ReloadConfig => {
             #[cfg(target_os = "macos")]
@@ -323,6 +365,26 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
         Message::ReturnFocus => {
             tile.restore_frontmost();
             Task::none()
+        }
+
+        Message::FocusTextInput(update_query_char) => {
+            match update_query_char {
+                Move::Forwards(query_char) => {
+                    tile.query += &query_char.clone();
+                    tile.query_lc += &query_char.clone().to_lowercase();
+                }
+                Move::Back => {
+                    tile.query.pop();
+                    tile.query_lc.pop();
+                }
+            }
+            let updated_query = tile.query.clone();
+            Task::batch([
+                operation::focus("query"),
+                window::latest()
+                    .map(|x| x.unwrap())
+                    .map(move |x| Message::SearchQueryChanged(updated_query.clone(), x)),
+            ])
         }
 
         Message::ClearSearchResults => {

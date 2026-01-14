@@ -10,7 +10,7 @@ use {
 
 use crate::app::apps::{App, AppCommand};
 use crate::app::tile::elm::default_app_paths;
-use crate::app::{Message, Page};
+use crate::app::{ArrowKey, Message, Move, Page};
 use crate::clipboard::ClipBoardContentType;
 use crate::commands::Function;
 use crate::config::Config;
@@ -67,6 +67,7 @@ impl Drop for ExtSender {
 #[derive(Clone)]
 pub struct Tile {
     theme: iced::Theme,
+    focus_id: u32,
     query: String,
     query_lc: String,
     prev_query_lc: String,
@@ -137,12 +138,26 @@ impl Tile {
                         keyboard::Key::Named(Named::Escape) => {
                             return Some(Message::KeyPressed(65598));
                         }
+                        keyboard::Key::Named(Named::ArrowUp) => {
+                            return Some(Message::ChangeFocus(ArrowKey::ArrowUp));
+                        }
+                        keyboard::Key::Named(Named::ArrowDown) => {
+                            return Some(Message::ChangeFocus(ArrowKey::ArrowDown));
+                        }
                         keyboard::Key::Character(chr) => {
                             if modifiers.command() && chr.to_string().to_lowercase() == "r" {
                                 return Some(Message::ReloadConfig);
                             } else if modifiers.command() && chr.to_string() == "," {
                                 open_settings();
+                            } else {
+                                return Some(Message::FocusTextInput(Move::Forwards(
+                                    chr.to_string(),
+                                )));
                             }
+                        }
+                        keyboard::Key::Named(Named::Enter) => return Some(Message::OpenFocused),
+                        keyboard::Key::Named(Named::Backspace) => {
+                            return Some(Message::FocusTextInput(Move::Back));
                         }
                         _ => {}
                     }

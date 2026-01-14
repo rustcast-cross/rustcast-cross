@@ -38,6 +38,7 @@ pub fn menu_icon(hotkey: (Option<Modifiers>, Code), hotkey_id: u32, sender: ExtS
         &get_help_item(),
         &PredefinedMenuItem::separator(),
         &open_settings_item(),
+        &hide_tray_icon(),
         &quit_item(),
     ])
     .unwrap();
@@ -71,6 +72,10 @@ fn init_event_handler(sender: ExtSender, hotkey_id: u32) {
                     sender.clone().try_send(Message::ReloadConfig).unwrap();
                 });
             }
+            "hide_tray_icon" => {
+                runtime
+                    .spawn(async move { sender.clone().try_send(Message::HideTrayIcon).unwrap() });
+            }
             "open_issue_page" => {
                 open_url("https://github.com/unsecretised/rustcast/issues/new");
             }
@@ -99,6 +104,10 @@ fn init_event_handler(sender: ExtSender, hotkey_id: u32) {
 fn version_item() -> MenuItem {
     let version = "Version: ".to_string() + option_env!("APP_VERSION").unwrap_or("Unknown");
     MenuItem::new(version, false, None)
+}
+
+fn hide_tray_icon() -> MenuItem {
+    MenuItem::with_id("hide_tray_icon", "Hide Tray Icon", true, None)
 }
 
 fn open_item(hotkey: (Option<Modifiers>, Code)) -> MenuItem {

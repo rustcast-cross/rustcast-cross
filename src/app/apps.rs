@@ -108,6 +108,8 @@ impl App {
     pub fn render<'a>(
         &'a self,
         theme: &'a crate::config::Theme,
+        id_num: u32,
+        focussed_id: u32,
     ) -> impl Into<iced::Element<'a, Message>> {
         let mut tile = Row::new().width(Fill).height(55);
 
@@ -115,7 +117,7 @@ impl App {
             && let Some(icon) = &self.icons
         {
             tile = tile
-                .push(container(Viewer::new(icon).height(35).width(35)).padding(5))
+                .push(container(Viewer::new(icon).height(35).width(35)))
                 .align_y(Alignment::Center);
         }
 
@@ -151,17 +153,24 @@ impl App {
                         .font(theme.font())
                         .color(theme.text_color(0.4)),
                 )
-                .padding(15),
+                .padding(12),
             )
             .width(Fill);
 
+        let (highlight_opacity, border_width) = if focussed_id == id_num {
+            (0.7, 0.55)
+        } else {
+            (0.5, 0.1)
+        };
+
         container(tile)
-            .style(|_| iced::widget::container::Style {
+            .id(format!("result-{}", id_num))
+            .style(move |_| iced::widget::container::Style {
                 text_color: Some(theme.text_color(1.)),
                 background: Some(Background::Color(theme.bg_color())),
                 border: iced::Border {
-                    color: theme.text_color(0.5),
-                    width: 0.1,
+                    color: theme.text_color(highlight_opacity),
+                    width: border_width,
                     radius: Radius::new(0),
                 },
                 ..Default::default()

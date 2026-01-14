@@ -24,22 +24,41 @@ pub enum Page {
     ClipboardHistory,
 }
 
+#[allow(dead_code)]
+#[derive(Debug, Clone)]
+pub enum ArrowKey {
+    ArrowUp,
+    ArrowDown,
+    ArrowLeft,
+    ArrowRight,
+}
+
+#[derive(Debug, Clone)]
+pub enum Move {
+    Back,
+    Forwards(String),
+}
+
 /// The message type that iced uses for actions that can do something
 #[derive(Debug, Clone)]
 pub enum Message {
     OpenWindow,
     SearchQueryChanged(String, Id),
     KeyPressed(u32),
+    FocusTextInput(Move),
     HideWindow(Id),
     RunFunction(Function),
+    OpenFocused,
     ReturnFocus,
     ClearSearchResults,
     WindowFocusChanged(Id, bool),
     ClearSearchQuery,
+    HideTrayIcon,
     ReloadConfig,
     SetSender(ExtSender),
     SwitchToPage(Page),
     ClipboardHistory(ClipBoardContentType),
+    ChangeFocus(ArrowKey),
 }
 
 /// The window settings for rustcast
