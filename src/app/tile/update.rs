@@ -9,6 +9,7 @@ use global_hotkey::hotkey::HotKey;
 use iced::Task;
 use iced::widget::image::Handle;
 use iced::widget::operation;
+use iced::widget::operation::AbsoluteOffset;
 use iced::window;
 use rayon::iter::IntoParallelRefIterator;
 use rayon::iter::ParallelIterator;
@@ -219,7 +220,13 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
                     _ => {}
                 }
 
-                operation::focus(format!("result-{}", tile.focus_id))
+                operation::scroll_to(
+                    "results",
+                    AbsoluteOffset {
+                        x: None,
+                        y: Some(tile.focus_id as f32 * 55.),
+                    },
+                )
             } else {
                 Task::none()
             }

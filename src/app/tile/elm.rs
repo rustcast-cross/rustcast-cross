@@ -112,12 +112,7 @@ pub fn view(tile: &Tile, wid: window::Id) -> Element<'_, Message> {
             .padding(20);
 
         let scrollbar_direction = if tile.config.theme.show_scroll_bar {
-            let anchor = if tile.focus_id > 4 {
-                Anchor::End
-            } else {
-                Anchor::Start
-            };
-            Direction::Vertical(Scrollbar::new().width(2).scroller_width(2).anchor(anchor))
+            Direction::Vertical(Scrollbar::new().width(2).scroller_width(2))
         } else {
             Direction::Vertical(Scrollbar::hidden())
         };
@@ -141,7 +136,7 @@ pub fn view(tile: &Tile, wid: window::Id) -> Element<'_, Message> {
                 clipboard_history
             }
         };
-        let scrollable = Scrollable::with_direction(results, scrollbar_direction);
+        let scrollable = Scrollable::with_direction(results, scrollbar_direction).id("results");
         let contents = Column::new().push(title_input).push(scrollable);
 
         container(contents)
