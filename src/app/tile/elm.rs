@@ -13,6 +13,7 @@ use iced::{Length::Fill, widget::text_input};
 use rayon::slice::ParallelSliceMut;
 
 use crate::app::apps::AppCommand;
+use crate::app::tile::AppIndex;
 use crate::config::Theme;
 use crate::utils::get_installed_apps;
 use crate::{
@@ -71,12 +72,12 @@ pub fn new(hotkey: HotKey, config: &Config) -> (Tile, Task<Message>) {
     options.extend(config.shells.iter().map(|x| x.to_app()));
     options.extend(App::basic_apps());
     options.par_sort_by_key(|x| x.name.len());
+    let options = AppIndex::from_apps(options);
 
     (
         Tile {
             query: String::new(),
             query_lc: String::new(),
-            prev_query_lc: String::new(),
             focus_id: 0,
             results: vec![],
             options,
@@ -131,11 +132,12 @@ pub fn view(tile: &Tile, wid: window::Id) -> Element<'_, Message> {
         let results = match tile.page {
             Page::Main => {
                 let mut search_results = Column::new();
-                let mut i = 0_u32;
-                for result in &tile.results {
-                    search_results =
-                        search_results.push(result.render(&tile.config.theme, i, tile.focus_id));
-                    i += 1;
+                for (i, result) in tile.results.iter().enumerate() {
+                    search_results = search_results.push(result.render(
+                        &tile.config.theme,
+                        i as u32,
+                        tile.focus_id,
+                    ));
                 }
                 search_results
             }

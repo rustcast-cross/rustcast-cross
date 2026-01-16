@@ -8,11 +8,10 @@ use {
     windows::Win32::UI::WindowsAndMessaging::{GetForegroundWindow, SetForegroundWindow},
 };
 
-use crate::app::apps::{App, AppCommand};
+use crate::app::apps::App;
 use crate::app::tile::elm::default_app_paths;
 use crate::app::{ArrowKey, Message, Move, Page};
 use crate::clipboard::ClipBoardContentType;
-use crate::commands::Function;
 use crate::config::Config;
 use crate::utils::open_settings;
 
@@ -36,6 +35,7 @@ use objc2_app_kit::NSRunningApplication;
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use tray_icon::TrayIcon;
 
+use std::collections::BTreeMap;
 use std::fs;
 use std::path::PathBuf;
 use std::time::Duration;
@@ -47,6 +47,29 @@ pub struct ExtSender(pub Sender<Message>);
 /// Disable dropping the sender
 impl Drop for ExtSender {
     fn drop(&mut self) {}
+}
+
+#[derive(Clone, Debug)]
+struct AppIndex {
+    by_name: BTreeMap<String, App>,
+}
+
+impl AppIndex {
+    fn search_prefix<'a>(&'a self, prefix: &'a str) -> impl Iterator<Item = &'a App> + 'a {
+        self.by_name
+            .range(prefix.to_string()..) // start at prefix
+            .take_while(move |(k, _)| k.starts_with(prefix))
+            .map(|(_, v)| v)
+    }
+
+    pub fn from_apps(options: Vec<App>) -> Self {
+        let mut bmap = BTreeMap::new();
+        for app in options {
+            bmap.insert(app.name_lc.clone(), app);
+        }
+
+        AppIndex { by_name: bmap }
+    }
 }
 
 /// This is the base window, and its a "Tile"
@@ -70,9 +93,8 @@ pub struct Tile {
     focus_id: u32,
     query: String,
     query_lc: String,
-    prev_query_lc: String,
     results: Vec<App>,
-    options: Vec<App>,
+    options: AppIndex,
     visible: bool,
     focused: bool,
     #[cfg(target_os = "macos")]
@@ -135,10 +157,10 @@ impl Tile {
                             return Some(Message::KeyPressed(65598));
                         }
                         keyboard::Key::Named(Named::ArrowUp) => {
-                            return Some(Message::ChangeFocus(ArrowKey::ArrowUp));
+                            return Some(Message::ChangeFocus(ArrowKey::Up));
                         }
                         keyboard::Key::Named(Named::ArrowDown) => {
-                            return Some(Message::ChangeFocus(ArrowKey::ArrowDown));
+                            return Some(Message::ChangeFocus(ArrowKey::Down));
                         }
                         keyboard::Key::Character(chr) => {
                             if modifiers.command() && chr.to_string().to_lowercase() == "r" {
@@ -184,37 +206,14 @@ impl Tile {
     /// should be separated out to make it easier to test. This function is called by the `update`
     /// function to handle the search query changed event.
     pub fn handle_search_query_changed(&mut self) {
-        let filter_vec: &Vec<App> = if self.query_lc.starts_with(&self.prev_query_lc) {
-            self.prev_query_lc = self.query_lc.to_owned();
-            &self.results
-        } else {
-            &self.options
-        };
-
         let query = self.query_lc.clone();
-
-        let mut exact: Vec<App> = filter_vec
-            .par_iter()
-            .filter(|x| match &x.open_command {
-                &AppCommand::Function(Function::RunShellCommand(_, _)) => x
-                    .name_lc
-                    .starts_with(query.split_once(" ").unwrap_or((&query, "")).0),
-                _ => x.name_lc == query,
-            })
-            .cloned()
+        let results: Vec<App> = self
+            .options
+            .search_prefix(&query)
+            .map(|x| x.to_owned())
             .collect();
 
-        let mut prefix: Vec<App> = filter_vec
-            .par_iter()
-            .filter(|x| match x.open_command {
-                AppCommand::Function(Function::RunShellCommand(_, _)) => false,
-                _ => x.name_lc != query && x.name_lc.starts_with(&query),
-            })
-            .cloned()
-            .collect();
-
-        exact.append(&mut prefix);
-        self.results = exact;
+        self.results = results;
     }
 
     /// Gets the frontmost application to focus later.
