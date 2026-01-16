@@ -23,6 +23,7 @@ use crate::app::apps::App;
 use crate::app::apps::AppCommand;
 use crate::app::default_settings;
 use crate::app::menubar::menu_icon;
+use crate::app::tile::AppIndex;
 use crate::app::tile::elm::default_app_paths;
 use crate::calculator::Expression;
 use crate::commands::Function;
@@ -263,8 +264,7 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
 
             tile.theme = new_config.theme.to_owned().into();
             tile.config = new_config;
-            tile.options = new_options;
-
+            tile.options = AppIndex::from_apps(new_options);
             Task::none()
         }
 

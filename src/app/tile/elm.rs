@@ -16,6 +16,7 @@ use rayon::{
 };
 
 use crate::app::apps::AppCommand;
+use crate::app::tile::AppIndex;
 use crate::config::Theme;
 use crate::{
     app::{Message, Page, apps::App, default_settings, tile::Tile},
@@ -59,12 +60,12 @@ pub fn new(hotkey: HotKey, config: &Config) -> (Tile, Task<Message>) {
     options.extend(config.shells.iter().map(|x| x.to_app()));
     options.extend(App::basic_apps());
     options.par_sort_by_key(|x| x.name.len());
+    let options = AppIndex::from_apps(options);
 
     (
         Tile {
             query: String::new(),
             query_lc: String::new(),
-            prev_query_lc: String::new(),
             focus_id: 0,
             results: vec![],
             options,
