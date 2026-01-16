@@ -26,10 +26,10 @@ pub enum Page {
 #[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub enum ArrowKey {
-    ArrowUp,
-    ArrowDown,
-    ArrowLeft,
-    ArrowRight,
+    Up,
+    Down,
+    Left,
+    Right,
 }
 
 #[derive(Debug, Clone)]
