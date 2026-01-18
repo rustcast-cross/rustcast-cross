@@ -102,6 +102,12 @@ All the people who starred my repo!!
 Those who sponsor me also get a free easter egg inside RustCast, so if you want
 a free easter egg, a dollar is all you need!
 
+And the updated list of contributors:
+
+<a href="https://github.com/unsecretised/rustcast/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=unsecretised/rustcast" />
+</a>
+
 ### Easter egg list:
 
 - Nazeofel (Random Variable on discord) -> led to the _randomvar_ easter egg

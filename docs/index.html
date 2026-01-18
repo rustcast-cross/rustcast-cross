@@ -1,108 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>RustCast – Open Source Raycast Alternative</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="icon" href="icon.png" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-iosevka@0.0.75/index.min.css" />
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-  <div class="floating-orbs">
-    <div class="orb"></div>
-    <div class="orb"></div>
-  </div>
-  <div class="organic-background"></div>
-  <div class="vignette"></div>
-  
-  <main class="page">
-    <section class="shell">
-      <header class="top-bar">
-        <div class="controls">
-          <span class="dot red"></span>
-          <span class="dot amber"></span>
-          <span class="dot green"></span>
-        </div>
-        <div class="logo-mark">
-          <div class="logo-square">
-            <img src="icon.png" height="20px" width="20px" id="logo-img" />
-          </div>
-          <span>RustCast</span>
-        </div>
-        <div class="pill">
-          <span class="pill-badge"></span>
-          <span>Open Source · Rust</span>
-        </div>
-      </header>
+  <head>
+    <meta charset="UTF-8" />
+    <title>RustCast – Open Source Raycast Alternative</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="icon.png" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/typeface-iosevka@0.0.75/index.min.css"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="floating-orbs">
+      <div class="orb"></div>
+      <div class="orb"></div>
+    </div>
+    <div class="organic-background"></div>
+    <div class="vignette"></div>
 
-      <section class="body">
-        <h1>
-          Popup command palette<br />
-          for <span>Peak Productivity</span>
-        </h1>
-        <p class="subtitle">
-          A blazing-fast, keyboard-first productivity launcher written in pure Rust. 
-          Privacy-focused, customizable, and open source alternative to Raycast.
-        </p>
-
-        <div class="features">
-          <div class="feature-tag">
-            <span>Lightning Fast</span>
+    <main class="page">
+      <section class="shell">
+        <header class="top-bar">
+          <div class="controls">
+            <span class="dot red"></span>
+            <span class="dot amber"></span>
+            <span class="dot green"></span>
           </div>
-          <div class="feature-tag">
-            <span>Privacy First</span>
+          <div class="logo-mark">
+            <div class="logo-square">
+              <img src="icon.png" height="20px" width="20px" id="logo-img" />
+            </div>
+            <span>RustCast</span>
           </div>
-          <div class="feature-tag">
-            <span>Customizable Themes</span>
+          <div class="pill">
+            <span class="pill-badge"></span>
+            <span>Open Source · Rust</span>
           </div>
-        </div>
+        </header>
 
-        <div class="actions">
-          <a href="https://github.com/unsecretised/rustcast/releases/latest/download/rustcast.dmg" class="btn btn-primary">
-            <span>Download for macOS</span>
-            <span class="arrow">↗</span>
-          </a>
-          <a href="https://github.com/unsecretised/rustcast" class="btn btn-secondary">
-            <span>Star on GitHub</span>
-            <svg class="star-icon" viewBox="0 0 16 16" aria-hidden="true">
-              <path d="M8 1.3L9.9 5l3.9.6-2.8 2.7.7 3.9L8 10.9 4.3 12.2l.7-3.9L2.2 5.6 6.1 5 8 1.3z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
-            </svg>
-          </a>
-        </div>
+        <section class="body">
+          <h1>
+            Popup command palette<br />
+            for <span>Peak Productivity</span>
+          </h1>
+          <p class="subtitle">
+            A blazing-fast, keyboard-first productivity launcher written in pure
+            Rust. Privacy-focused, customizable, and open source alternative to
+            Raycast.
+          </p>
 
-        <div class="meta">
-          <span>• MIT license</span>
-          <code onclick="navigator.clipboard.writeText(this.textContent)">brew tap unsecretised/tap && brew install --cask rustcast</code>
+          <div class="features">
+            <div class="feature-tag">
+              <span>Lightning Fast</span>
+            </div>
+            <div class="feature-tag">
+              <span>Privacy First</span>
+            </div>
+            <div class="feature-tag">
+              <span>Customizable Themes</span>
+            </div>
+          </div>
+
+          <div class="actions">
+            <a
+              href="https://github.com/unsecretised/rustcast/releases/latest/download/rustcast.dmg"
+              class="btn btn-primary"
+            >
+              <span>Download for macOS</span>
+              <span class="arrow">↗</span>
+            </a>
+            <a
+              href="https://github.com/unsecretised/rustcast"
+              class="btn btn-secondary"
+            >
+              <span>Star on GitHub</span>
+              <svg class="star-icon" viewBox="0 0 16 16" aria-hidden="true">
+                <path
+                  d="M8 1.3L9.9 5l3.9.6-2.8 2.7.7 3.9L8 10.9 4.3 12.2l.7-3.9L2.2 5.6 6.1 5 8 1.3z"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.2"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </a>
+          </div>
+
+          <div class="meta">
+            <span>• MIT license</span>
+            <code onclick="navigator.clipboard.writeText(this.textContent)"
+            >brew tap unsecretised/tap && brew install --cask rustcast</code>
+          </div>
+        </section>
+
+        <aside class="preview-wrap">
+          <div class="preview-frame">
+            <div class="preview-glow"></div>
+            <div class="preview-inner">
+              <img src="rustcast-v0-3-4.png" alt="RustCast Demo" />
+            </div>
+            <div class="ferris-tag">
+              <img
+                class="ferris-icon"
+                src="https://rustacean.net/assets/cuddlyferris.svg"
+                alt="Ferris"
+              />
+              <span>Powered by Rust</span>
+              <img
+                class="ferris-icon"
+                src="https://iced.rs/logo.svg"
+                alt="Iced"
+              />
+            </div>
+          </div>
+        </aside>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-label">100% Free</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Privacy first</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Blazing fast</div>
+          </div>
         </div>
       </section>
-
-      <aside class="preview-wrap">
-        <div class="preview-frame">
-          <div class="preview-glow"></div>
-          <div class="preview-inner">
-            <img src="rustcast-v0-3-4.png" alt="RustCast Demo" />
-          </div>
-          <div class="ferris-tag">
-            <img class="ferris-icon" src="https://rustacean.net/assets/cuddlyferris.svg" alt="Ferris" />
-            <span>Powered by Rust</span>
-            <img class="ferris-icon" src="https://iced.rs/logo.svg" alt="Iced" />
-          </div>
-        </div>
-      </aside>
-
-      <div class="stats">
-        <div class="stat">
-          <div class="stat-label">100% Free</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">Privacy first</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">Blazing fast</div>
-        </div>
-      </div>
-    </section>
-  </main>
-</body>
+    </main>
+  </body>
 </html>
