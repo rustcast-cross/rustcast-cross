@@ -5,6 +5,7 @@ mod commands;
 mod config;
 mod haptics;
 mod macos;
+mod styles;
 mod utils;
 
 use std::path::Path;

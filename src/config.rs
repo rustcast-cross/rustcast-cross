@@ -46,7 +46,6 @@ impl Default for Config {
 pub struct Theme {
     pub text_color: (f32, f32, f32),
     pub background_color: (f32, f32, f32),
-    pub background_opacity: f32,
     pub blur: bool,
     pub show_icons: bool,
     pub show_scroll_bar: bool,
@@ -57,8 +56,7 @@ impl Default for Theme {
     fn default() -> Self {
         Self {
             text_color: (0.95, 0.95, 0.96),
-            background_color: (0., 0., 0.),
-            background_opacity: 0.25,
+            background_color: (0.09, 0.09, 0.09),
             blur: false,
             show_icons: true,
             show_scroll_bar: true,
@@ -119,7 +117,7 @@ impl Theme {
             r: self.background_color.0,
             g: self.background_color.1,
             b: self.background_color.2,
-            a: self.background_opacity,
+            a: 0.,
         }
     }
 

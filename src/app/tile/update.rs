@@ -219,7 +219,7 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
                         id,
                         iced::Size {
                             width: WINDOW_WIDTH,
-                            height: ((max_elem * 55) + DEFAULT_WINDOW_HEIGHT as usize) as f32,
+                            height: ((max_elem * 70) + DEFAULT_WINDOW_HEIGHT as usize) as f32,
                         },
                     ),
                     Task::done(Message::ChangeFocus(ArrowKey::Left)),
@@ -230,7 +230,7 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
                     id,
                     iced::Size {
                         width: WINDOW_WIDTH,
-                        height: ((element_count * 55) + DEFAULT_WINDOW_HEIGHT as usize) as f32,
+                        height: ((element_count * 70) + DEFAULT_WINDOW_HEIGHT as usize) as f32,
                     },
                 )
             } else {
