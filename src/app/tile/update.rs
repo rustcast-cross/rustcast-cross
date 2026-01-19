@@ -30,6 +30,7 @@ use crate::utils::get_installed_apps;
 use crate::{haptics::HapticPattern, haptics::perform_haptic, macos::focus_this_app};
 
 pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
+    tracing::debug!("Handling update (message: {:?})", message);
     match message {
         Message::OpenWindow => {
             #[cfg(target_os = "macos")]

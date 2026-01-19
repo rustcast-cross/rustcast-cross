@@ -30,6 +30,7 @@ pub enum Function {
 impl Function {
     /// Run the command
     pub fn execute(&self, config: &Config, query: &str) {
+        tracing::debug!("Executing command: {:?}", self);
         match self {
             Function::OpenApp(path) => {
                 open_application(path);

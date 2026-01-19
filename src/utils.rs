@@ -25,23 +25,6 @@ use crate::{
     commands::Function,
 };
 
-/// The default error log path (works only on unix systems, and must be changed for windows
-/// support)
-const ERR_LOG_PATH: &str = "/tmp/rustscan-err.log";
-
-/// This logs an error to the error log file
-pub(crate) fn log_error(msg: &str) {
-    if let Ok(mut file) = File::options().create(true).append(true).open(ERR_LOG_PATH) {
-        let _ = file.write_all(msg.as_bytes()).ok();
-    }
-}
-
-/// This logs an error to the error log file, and exits the program
-pub(crate) fn log_error_and_exit(msg: &str) {
-    log_error(msg);
-    exit(-1)
-}
-
 /// This converts an icns file to an iced image handle
 pub(crate) fn handle_from_icns(path: &Path) -> Option<Handle> {
     let data = std::fs::read(path).ok()?;
@@ -90,6 +73,14 @@ pub fn get_config_installation_dir() -> String {
         std::env::var("LOCALAPPDATA").unwrap()
     } else {
         std::env::var("HOME").unwrap()
+    }
+}
+
+pub fn get_log_dir() -> String {
+    if cfg!(target_os = "windows") {
+        std::env::var("TEMP").unwrap() + "/rustcast"
+    } else {
+        todo!("problem for secretised")
     }
 }
 

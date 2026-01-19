@@ -111,7 +111,7 @@ fn get_installed_apps(dir: impl AsRef<Path>, store_icons: bool) -> Vec<App> {
         .into_par_iter()
         .filter_map(|x| {
             let file_type = x.file_type().unwrap_or_else(|e| {
-                log_error(&e.to_string());
+                tracing::error!("{}", e.to_string());
                 exit(-1)
             });
             if !file_type.is_dir() {
@@ -120,7 +120,7 @@ fn get_installed_apps(dir: impl AsRef<Path>, store_icons: bool) -> Vec<App> {
 
             let file_name_os = x.file_name();
             let file_name = file_name_os.into_string().unwrap_or_else(|e| {
-                log_error(e.to_str().unwrap_or(""));
+                tracing::error!("{}",e.to_string());
                 exit(-1)
             });
             if !file_name.ends_with(".app") {
@@ -129,7 +129,7 @@ fn get_installed_apps(dir: impl AsRef<Path>, store_icons: bool) -> Vec<App> {
 
             let path = x.path();
             let path_str = path.to_str().map(|x| x.to_string()).unwrap_or_else(|| {
-                log_error("Unable to get file_name");
+                tracing::error!("Unable to get file_name");
                 exit(-1)
             });
 

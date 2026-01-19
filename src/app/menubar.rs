@@ -60,6 +60,7 @@ fn get_image() -> DynamicImage {
 }
 
 fn init_event_handler(sender: ExtSender, hotkey_id: u32) {
+    tracing::debug!("Initing event handler");
     let runtime = Runtime::new().unwrap();
 
     MenuEvent::set_event_handler(Some(move |x: MenuEvent| {
