@@ -6,7 +6,7 @@ use arboard::Clipboard;
 use objc2_app_kit::NSWorkspace;
 use objc2_foundation::NSURL;
 
-use crate::{calculator::Expression, clipboard::ClipBoardContentType, config::Config};
+use crate::{calculator::Expr, clipboard::ClipBoardContentType, config::Config};
 
 /// The different functions that rustcast can perform
 #[derive(Debug, Clone, PartialEq)]
@@ -17,7 +17,7 @@ pub enum Function {
     RandomVar(i32), // Easter egg function
     CopyToClipboard(ClipBoardContentType),
     GoogleSearch(String),
-    Calculate(Expression),
+    Calculate(Expr),
     OpenPrefPane,
     Quit,
 }
@@ -86,7 +86,7 @@ impl Function {
             Function::Calculate(expr) => {
                 Clipboard::new()
                     .unwrap()
-                    .set_text(expr.eval().to_string())
+                    .set_text(expr.eval().map(|x| x.to_string()).unwrap_or("".to_string()))
                     .unwrap_or(());
             }
 

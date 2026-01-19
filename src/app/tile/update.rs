@@ -24,7 +24,7 @@ use crate::app::default_settings;
 use crate::app::menubar::menu_icon;
 use crate::app::tile::AppIndex;
 use crate::app::tile::elm::default_app_paths;
-use crate::calculator::Expression;
+use crate::calculator::Expr;
 use crate::clipboard::ClipBoardContentType;
 use crate::commands::Function;
 use crate::config::Config;
@@ -158,13 +158,13 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
             tile.handle_search_query_changed();
 
             if tile.results.is_empty()
-                && let Some(res) = Expression::from_str(&tile.query)
+                && let Some(res) = Expr::from_str(&tile.query).ok()
             {
                 tile.results.push(App {
-                    open_command: AppCommand::Function(Function::Calculate(res)),
+                    open_command: AppCommand::Function(Function::Calculate(res.clone())),
                     desc: RUSTCAST_DESC_NAME.to_string(),
                     icons: None,
-                    name: res.eval().to_string(),
+                    name: res.eval().map(|x| x.to_string()).unwrap_or("".to_string()),
                     name_lc: "".to_string(),
                 });
             } else if tile.results.is_empty()
