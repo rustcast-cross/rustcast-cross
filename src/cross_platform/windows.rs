@@ -33,14 +33,14 @@ fn get_apps_from_registry(apps: &mut Vec<App>) {
             // https://learn.microsoft.com/en-us/windows/win32/msi/uninstall-registry-key
             let name = key.unwrap();
             let key = reg.open_subkey(&name).unwrap();
-            let display_name = key.get_value("DisplayName").unwrap_or(OsString::new());
+            let display_name: OsString = key.get_value("DisplayName").unwrap_or_default();
 
             // they might be useful one day ?
             // let publisher = key.get_value("Publisher").unwrap_or(OsString::new());
             // let version = key.get_value("DisplayVersion").unwrap_or(OsString::new());
 
             // Trick, I saw on internet to point to the exe location..
-            let exe_path = key.get_value("DisplayIcon").unwrap_or(OsString::new());
+            let exe_path: OsString = key.get_value("DisplayIcon").unwrap_or_default();
             if exe_path.is_empty() {
                 return;
             }

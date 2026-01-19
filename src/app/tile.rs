@@ -343,8 +343,10 @@ fn handle_clipboard_history() -> impl futures::Stream<Item = Message> {
 fn handle_recipient() -> impl futures::Stream<Item = Message> {
     stream::channel(100, async |mut output| {
         let (sender, mut recipient) = channel(100);
+        let msg = Message::SetSender(ExtSender(sender));
+        tracing::debug!("Sending ExtSender ({msg:?})");
         output
-            .send(Message::SetSender(ExtSender(sender)))
+            .send(msg)
             .await
             .expect("Sender not sent");
         loop {
