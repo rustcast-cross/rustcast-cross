@@ -4,6 +4,8 @@
 > search bar that people can use to do many things, like opening apps,
 > calculators, quick-notes, etc.
 
+[RustCast community](https://discord.gg/bDfNYPbnC5)
+
 ![RustCast Demo PreRelease V1](./docs/rustcast-v0-4-5.png)
 
 ## Installation:
