@@ -54,5 +54,3 @@ info_plist_path = "bundling/Info.plist"
 [package.metadata.bundle.osx.info]
 LSUIElement = true
 NSHighResolutionCapable = true
-
-[profile.release]
