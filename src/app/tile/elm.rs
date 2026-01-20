@@ -68,7 +68,7 @@ pub fn new(hotkey: HotKey, config: &Config) -> (Tile, Task<Message>) {
         transform_process_to_ui_element();
     }));
 
-    let mut options: Vec<App> = get_installed_apps(&config);
+    let mut options: Vec<App> = get_installed_apps(config);
 
     options.extend(config.shells.iter().map(|x| x.to_app()));
     options.extend(App::basic_apps());

@@ -1,7 +1,7 @@
 //! This has the menubar icon logic for the app
 
 use global_hotkey::hotkey::{Code, HotKey, Modifiers};
-use image::{DynamicImage, ImageReader};
+use image::DynamicImage;
 use tray_icon::{
     Icon, TrayIcon, TrayIconBuilder,
     menu::{

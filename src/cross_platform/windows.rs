@@ -1,8 +1,6 @@
 use {
     crate::app::apps::App,
     rayon::prelude::*,
-    std::path::PathBuf,
-    tracing::Level,
     windows::{
         Win32::{
             System::Com::CoTaskMemFree,
@@ -115,7 +113,7 @@ fn get_known_paths() -> Vec<String> {
     let paths = vec![
         get_windows_path(&FOLDERID_ProgramFiles).unwrap_or_default(),
         get_windows_path(&FOLDERID_ProgramFilesX86).unwrap_or_default(),
-        String::from(get_windows_path(&FOLDERID_LocalAppData).unwrap_or_default() + "\\Programs\\"),
+        (get_windows_path(&FOLDERID_LocalAppData).unwrap_or_default() + "\\Programs\\"),
     ];
     paths
 }

@@ -333,11 +333,10 @@ fn parse_number_prefix(s: &str) -> Option<(&str, &str)> {
     }
 
     let mut chars = s.char_indices().peekable();
-    if let Some((_, c)) = chars.peek() {
-        if *c == '+' || *c == '-' {
+    if let Some((_, c)) = chars.peek()
+        && (*c == '+' || *c == '-') {
             chars.next();
         }
-    }
 
     let mut end = 0;
     let mut has_digit = false;
@@ -370,7 +369,7 @@ fn find_unit(token: &str) -> Option<&'static UnitDef> {
 
     UNITS
         .iter()
-        .find(|unit| unit.name == token || unit.aliases.iter().any(|alias| *alias == token))
+        .find(|unit| unit.name == token || unit.aliases.contains(&token))
 }
 
 fn to_base(value: f64, unit: &UnitDef) -> f64 {

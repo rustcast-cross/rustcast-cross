@@ -1,16 +1,13 @@
 //! This has all the utility functions that rustcast uses
 use std::{
-    fs::{self, File},
-    io::Write,
+    fs::{self},
     path::Path,
-    process::exit,
     thread,
 };
 
 use iced::widget::image::Handle;
 #[cfg(target_os = "macos")]
 use icns::IconFamily;
-use image::RgbaImage;
 
 #[cfg(target_os = "macos")]
 use {

@@ -13,19 +13,15 @@ use std::fs::File;
 
 // import from utils
 use crate::utils::{
-    create_config_file_if_not_exists, get_config_file_path, get_config_installation_dir,
+    create_config_file_if_not_exists, get_config_file_path,
     get_temp_dir, read_config_file,
 };
 
 use crate::app::tile::Tile;
 
-use global_hotkey::{
-    GlobalHotKeyManager,
-    hotkey::{HotKey, Modifiers},
-};
+use global_hotkey::GlobalHotKeyManager;
 use tracing::level_filters::LevelFilter;
 use tracing_subscriber::Layer;
-use tracing_subscriber::fmt::format::FmtSpan;
 use tracing_subscriber::layer::SubscriberExt;
 
 fn main() -> iced::Result {
