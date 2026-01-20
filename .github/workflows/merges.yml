@@ -3,6 +3,8 @@ name: Merge Checks
 on:
   push:
     branches: "*"
+  pull_request:
+    branches: ["**"]
 
 jobs:
   rust-checks:
