@@ -72,18 +72,17 @@ fn get_apps_from_registry(apps: &mut Vec<App>) {
         });
     });
 }
-fn get_apps_from_known_folder() -> impl ParallelIterator<Item = App> {
+fn get_apps_from_known_folder(apps: &mut Vec<App>) {
     let paths = get_known_paths();
     use crate::{app::apps::AppCommand, commands::Function};
     use walkdir::WalkDir;
 
-    paths
-        .into_par_iter()
+    let found_apps: Vec<App> = paths
+        .par_iter()
         .flat_map(|path| {
             WalkDir::new(path)
                 .follow_links(false)
                 .into_iter()
-                .par_bridge()
                 .filter_map(|e| e.ok())
                 .filter(|e| e.path().extension().is_some_and(|ext| ext == "exe"))
                 .map(|entry| {
@@ -104,7 +103,11 @@ fn get_apps_from_known_folder() -> impl ParallelIterator<Item = App> {
                         desc: "Application".to_string(),
                     }
                 })
+                .collect::<Vec<_>>()
         })
+        .collect();
+
+    apps.extend(found_apps);
 }
 fn get_known_paths() -> Vec<String> {
     let paths = vec![
@@ -135,7 +138,7 @@ pub fn get_installed_windows_apps() -> Vec<App> {
     get_apps_from_registry(&mut apps);
 
     tracing::debug!("Getting apps from known folder");
-    apps.par_extend(get_apps_from_known_folder());
+    get_apps_from_known_folder(&mut apps);
 
     tracing::debug!("Getting apps from config");
     index_dirs_from_config(&mut apps);
