@@ -4,8 +4,7 @@ pub mod update;
 
 #[cfg(target_os = "windows")]
 use {
-    windows::Win32::Foundation::HWND,
-    windows::Win32::UI::WindowsAndMessaging::SetForegroundWindow,
+    windows::Win32::Foundation::HWND, windows::Win32::UI::WindowsAndMessaging::SetForegroundWindow,
 };
 
 use crate::app::apps::App;

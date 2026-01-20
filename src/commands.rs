@@ -82,7 +82,7 @@ impl Function {
                 } else {
                     format!("https://{}", url)
                 };
-                
+
                 thread::spawn(move || {
                     NSWorkspace::new().openURL(
                         &NSURL::URLWithString_relativeToURL(
@@ -123,7 +123,7 @@ impl Function {
             }
 
             Function::Quit => std::process::exit(0),
-            _ => todo!("Actual handling for this situation")
+            _ => todo!("Actual handling for this situation"),
         }
     }
 }

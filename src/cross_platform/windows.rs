@@ -131,7 +131,7 @@ fn get_windows_path(folder_id: &GUID) -> Option<String> {
 }
 pub fn get_installed_windows_apps() -> Vec<App> {
     use crate::utils::index_dirs_from_config;
-    
+
     let mut apps = Vec::new();
 
     tracing::debug!("Getting apps from registry");

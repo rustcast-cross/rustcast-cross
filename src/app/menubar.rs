@@ -2,6 +2,7 @@
 
 use global_hotkey::hotkey::{Code, HotKey, Modifiers};
 use image::DynamicImage;
+use tokio::runtime::Runtime;
 use tray_icon::{
     Icon, TrayIcon, TrayIconBuilder,
     menu::{
@@ -9,11 +10,10 @@ use tray_icon::{
         accelerator::Accelerator,
     },
 };
-use tokio::runtime::Runtime;
 
 use crate::{
-    app::{Message, tile::ExtSender}, 
-    cross_platform::{open_url, open_settings}
+    app::{Message, tile::ExtSender},
+    cross_platform::{open_settings, open_url},
 };
 
 /// This creates a new menubar icon for the app
