@@ -1,7 +1,7 @@
 //! This has all the utility functions that rustcast uses
 use std::{
     fs::{self},
-    path::Path,
+    path::{Path, PathBuf},
     thread,
 };
 
@@ -72,34 +72,26 @@ pub fn open_url(url: &str) {
     });
 }
 
-pub fn get_config_installation_dir() -> String {
+pub fn get_config_installation_dir() -> PathBuf {
     if cfg!(target_os = "windows") {
-        std::env::var("LOCALAPPDATA").unwrap()
+        std::env::var("LOCALAPPDATA").unwrap().into()
     } else {
-        std::env::var("HOME").unwrap()
+        std::env::var("HOME").unwrap().into()
     }
 }
 
-pub fn get_temp_dir() -> String {
-    if cfg!(target_os = "windows") {
-        std::env::var("TEMP").unwrap() + "/rustcast"
-    } else {
-        todo!("problem for secretised")
-    }
-}
-
-pub fn get_config_file_path() -> String {
+pub fn get_config_file_path() -> PathBuf {
     let home = get_config_installation_dir();
 
     if cfg!(target_os = "windows") {
-        home + "\\rustcast\\config.toml"
+        home.join("rustcast/config.toml")
     } else {
-        home + "/.config/rustcast/config.toml"
+        home.join(".config/rustcast/config.toml")
     }
 }
 use crate::config::Config;
 
-pub fn read_config_file(file_path: &str) -> Result<Config, std::io::Error> {
+pub fn read_config_file(file_path: &Path) -> Result<Config, std::io::Error> {
     let config: Config = match std::fs::read_to_string(file_path) {
         Ok(a) => toml::from_str(&a).unwrap(),
         Err(_) => Config::default(),
@@ -109,7 +101,7 @@ pub fn read_config_file(file_path: &str) -> Result<Config, std::io::Error> {
 }
 
 pub fn create_config_file_if_not_exists(
-    file_path: &str,
+    file_path: &Path,
     config: &Config,
 ) -> Result<(), std::io::Error> {
     // check if file exists
@@ -119,13 +111,12 @@ pub fn create_config_file_if_not_exists(
         return Ok(());
     }
 
-    let path = Path::new(&file_path);
-    if let Some(parent) = path.parent() {
+    if let Some(parent) = file_path.parent() {
         std::fs::create_dir_all(parent).unwrap();
     }
 
     std::fs::write(
-        file_path,
+        &file_path,
         toml::to_string(&config).unwrap_or_else(|x| x.to_string()),
     )
     .unwrap();
@@ -164,7 +155,7 @@ pub fn open_application(path: &str) {
 #[allow(unused)]
 pub fn index_dirs_from_config(apps: &mut Vec<App>) -> bool {
     let path = get_config_file_path();
-    let config = read_config_file(&path);
+    let config = read_config_file(path.as_path());
 
     // if config is not valid return false otherwise unwrap config so it is usable
     let config = match config {

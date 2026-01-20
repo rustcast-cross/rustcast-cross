@@ -9,12 +9,12 @@ mod utils;
 
 mod cross_platform;
 
+use std::env::temp_dir;
 use std::fs::File;
 
 // import from utils
 use crate::utils::{
-    create_config_file_if_not_exists, get_config_file_path,
-    get_temp_dir, read_config_file,
+    create_config_file_if_not_exists, get_config_file_path, read_config_file,
 };
 
 use crate::app::tile::Tile;
@@ -33,8 +33,8 @@ fn main() -> iced::Result {
     create_config_file_if_not_exists(&file_path, &config).unwrap();
 
     {
-        let log_path = get_temp_dir() + "/log.log";
-        let vv_log_path = get_temp_dir() + "/vv_log.log";
+        let log_path    = temp_dir().join("rustcast/log.log");
+        let vv_log_path = temp_dir().join("rustcast/vv_log.log");
 
         create_config_file_if_not_exists(&log_path, &config).unwrap();
 
@@ -57,9 +57,9 @@ fn main() -> iced::Result {
 
         tracing::subscriber::set_global_default(subscriber).expect("Error initing tracing");
 
-        tracing::info!("Main log file at    : {}", &vv_log_path);
-        tracing::info!("Verbose log file at : {}", &log_path);
-        tracing::info!("Config file at      : {}", &file_path);
+        tracing::info!("Main log file at    : {}", &vv_log_path.display());
+        tracing::info!("Verbose log file at : {}", &log_path.display());
+        tracing::info!("Config file at      : {}", &file_path.display());
     }
 
     tracing::debug!("Loaded config data: {:#?}", &config);
