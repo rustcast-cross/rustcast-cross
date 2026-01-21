@@ -14,6 +14,11 @@ use {
     }
 };
 
+/// Loads apps from the registry keys `SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall` and
+/// `SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall`. `apps` has the relvant items
+/// appended to it.
+/// 
+/// Based on https://stackoverflow.com/questions/2864984
 fn get_apps_from_registry(apps: &mut Vec<App>) {
     use std::ffi::OsString;
     let hkey = winreg::RegKey::predef(winreg::enums::HKEY_LOCAL_MACHINE);
@@ -25,8 +30,6 @@ fn get_apps_from_registry(apps: &mut Vec<App>) {
             .unwrap(),
     ];
 
-    // where we can find installed applications
-    // src: https://stackoverflow.com/questions/2864984/how-to-programatically-get-the-list-of-installed-programs/2892848#2892848
     registers.iter().for_each(|reg| {
         reg.enum_keys().for_each(|key| {
             // Not debug only just because it doesn't run too often
@@ -70,6 +73,8 @@ fn get_apps_from_registry(apps: &mut Vec<App>) {
         });
     });
 }
+
+/// Recursively loads apps from a set of folders.
 fn get_apps_from_known_folder() -> impl ParallelIterator<Item = App> {
     let paths = get_known_paths();
     use crate::{app::apps::AppCommand, commands::Function};
@@ -102,6 +107,8 @@ fn get_apps_from_known_folder() -> impl ParallelIterator<Item = App> {
             })
     })
 }
+
+/** Returns the set of known paths */
 fn get_known_paths() -> Vec<PathBuf> {
     let paths = vec![
         get_windows_path(&FOLDERID_ProgramFiles).unwrap_or_default(),
@@ -110,6 +117,8 @@ fn get_known_paths() -> Vec<PathBuf> {
     ];
     paths
 }
+
+/** Wrapper around `SHGetKnownFolderPath` to get paths to known folders */
 fn get_windows_path(folder_id: &GUID) -> Option<PathBuf> {
     unsafe {
         let folder = SHGetKnownFolderPath(folder_id, KF_FLAG_DEFAULT, None);
@@ -122,6 +131,8 @@ fn get_windows_path(folder_id: &GUID) -> Option<PathBuf> {
         }
     }
 }
+
+/** Loads all installed windows apps */
 pub fn get_installed_windows_apps() -> Vec<App> {
     use crate::utils::index_dirs_from_config;
 
