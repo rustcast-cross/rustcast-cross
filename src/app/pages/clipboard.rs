@@ -1,6 +1,6 @@
 use iced::widget::{
     Scrollable,
-    scrollable::{self, Direction, Scrollbar},
+    scrollable::{Direction, Scrollbar},
 };
 
 use crate::{app::pages::prelude::*, clipboard::ClipBoardContentType};
@@ -45,7 +45,7 @@ pub fn clipboard_view(
         ))
         .padding(10)
         .style(move |_| result_row_container_style(&theme_clone, false))
-        .width(Length::Fill)
+        .width((WINDOW_WIDTH / 3.) * 2.)
         .height(7 * 55)
         .into(),
     ])

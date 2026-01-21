@@ -296,11 +296,8 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
             }
         }
 
-        Message::ClipboardHistory(_) => {
-            tile.clipboard_content.insert(
-                0,
-                ClipBoardContentType::Text(include_str!("../apps.rs").to_string()),
-            );
+        Message::ClipboardHistory(content) => {
+            tile.clipboard_content.insert(0, content);
             Task::none()
         }
 
