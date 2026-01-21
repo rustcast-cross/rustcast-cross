@@ -1,7 +1,5 @@
 use {
-    crate::app::apps::App,
-    rayon::prelude::*,
-    windows::{
+    crate::app::apps::App, rayon::prelude::*, std::path::PathBuf, windows::{
         Win32::{
             System::Com::CoTaskMemFree,
             UI::{
@@ -13,7 +11,7 @@ use {
             },
         },
         core::GUID,
-    },
+    }
 };
 
 fn get_apps_from_registry(apps: &mut Vec<App>) {
@@ -104,21 +102,21 @@ fn get_apps_from_known_folder() -> impl ParallelIterator<Item = App> {
             })
     })
 }
-fn get_known_paths() -> Vec<String> {
+fn get_known_paths() -> Vec<PathBuf> {
     let paths = vec![
         get_windows_path(&FOLDERID_ProgramFiles).unwrap_or_default(),
         get_windows_path(&FOLDERID_ProgramFilesX86).unwrap_or_default(),
-        (get_windows_path(&FOLDERID_LocalAppData).unwrap_or_default() + "\\Programs\\"),
+        (get_windows_path(&FOLDERID_LocalAppData).unwrap_or_default().join("Programs/")),
     ];
     paths
 }
-fn get_windows_path(folder_id: &GUID) -> Option<String> {
+fn get_windows_path(folder_id: &GUID) -> Option<PathBuf> {
     unsafe {
         let folder = SHGetKnownFolderPath(folder_id, KF_FLAG_DEFAULT, None);
         if let Ok(folder) = folder {
-            let path = folder.to_string().ok();
+            let path = folder.to_string().ok()?;
             CoTaskMemFree(Some(folder.0 as *mut _));
-            path
+            Some(path.into())
         } else {
             None
         }
