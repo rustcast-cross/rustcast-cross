@@ -21,7 +21,7 @@ use global_hotkey::{GlobalHotKeyEvent, HotKeyState};
 use iced::futures::SinkExt;
 use iced::futures::channel::mpsc::{Sender, channel};
 use iced::{
-    Element, Subscription, Task, Theme, futures,
+    Subscription, Theme, futures,
     keyboard::{self, key::Named},
     stream,
 };
@@ -115,24 +115,6 @@ pub struct Tile {
 }
 
 impl Tile {
-    /// Initialise the base window
-    pub fn new(hotkey: HotKey, config: &Config) -> (Self, Task<Message>) {
-        elm::new(hotkey, config)
-    }
-
-    /// This handles the iced's updates, which have all the variants of [Message]
-    pub fn update(&mut self, message: Message) -> Task<Message> {
-        update::handle_update(self, message)
-    }
-
-    /// This is the view of the window. It handles the rendering of the window
-    ///
-    /// The rendering of the window size (the resizing of the window) is handled by the
-    /// [`Tile::update`] function.
-    pub fn view(&self, wid: window::Id) -> Element<'_, Message> {
-        elm::view(self, wid)
-    }
-
     /// This returns the theme of the window
     pub fn theme(&self, _: window::Id) -> Option<Theme> {
         Some(self.theme.clone())
@@ -235,20 +217,20 @@ impl Tile {
     }
 
     // Unused, keeping it for now
-    // pub fn capture_frontmost(&mut self) {
-    //     #[cfg(target_os = "macos")]
-    //     {
-    //         use objc2_app_kit::NSWorkspace;
+    pub fn capture_frontmost(&mut self) {
+        #[cfg(target_os = "macos")]
+        {
+            use objc2_app_kit::NSWorkspace;
 
-    //         let ws = NSWorkspace::sharedWorkspace();
-    //         self.frontmost = ws.frontmostApplication();
-    //     };
+            let ws = NSWorkspace::sharedWorkspace();
+            self.frontmost = ws.frontmostApplication();
+        };
 
-    //     #[cfg(target_os = "windows")]
-    //     {
-    //         self.frontmost = Some(unsafe { GetForegroundWindow() });
-    //     }
-    // }
+        #[cfg(target_os = "windows")]
+        {
+            self.frontmost = Some(unsafe { GetForegroundWindow() });
+        }
+    }
 
     /// Restores the frontmost application.
     #[allow(deprecated)]

@@ -62,12 +62,14 @@ pub fn new(hotkey: HotKey, config: &Config) -> (Tile, Task<Message>) {
     #[cfg_attr(target_os = "windows", allow(unused))]
     let (id, open) = window::open(settings);
 
+    #[cfg(target_os = "windows")]
     let open: Task<iced::window::Id> = open.discard();
 
     #[cfg(target_os = "macos")]
-    open.chain(window::run(id, |handle| {
+    let open = open.discard().chain(window::run(id, |handle| {
         macos::macos_window_config(&handle.window_handle().expect("Unable to get window handle"));
         transform_process_to_ui_element();
+        Message::OpenWindow
     }));
 
     let mut options = get_installed_apps(config);
@@ -96,7 +98,7 @@ pub fn new(hotkey: HotKey, config: &Config) -> (Tile, Task<Message>) {
             sender: None,
             page: Page::Main,
         },
-        Task::batch([open.map(|_| Message::OpenWindow)]),
+        open,
     )
 }
 

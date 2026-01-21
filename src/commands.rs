@@ -123,7 +123,6 @@ impl Function {
             }
 
             Function::Quit => std::process::exit(0),
-            _ => todo!("Actual handling for this situation"),
         }
     }
 }

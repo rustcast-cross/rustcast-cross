@@ -52,6 +52,8 @@ pub fn menu_icon(hotkey: HotKey, sender: ExtSender) -> TrayIcon {
 fn get_image() -> DynamicImage {
     #[cfg(target_os = "macos")]
     {
+        use image::ImageReader;
+
         let image_path = if cfg!(debug_assertions) && !cfg!(target_os = "macos") {
             "docs/icon.png"
         } else {

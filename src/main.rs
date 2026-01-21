@@ -15,7 +15,7 @@ use std::fs::File;
 // import from utils
 use crate::utils::{create_config_file_if_not_exists, get_config_file_path, read_config_file};
 
-use crate::app::tile::Tile;
+use crate::app::tile::{self, Tile};
 
 use global_hotkey::GlobalHotKeyManager;
 use tracing::level_filters::LevelFilter;
@@ -93,9 +93,9 @@ fn main() -> iced::Result {
     tracing::info!("Starting.");
 
     iced::daemon(
-        move || Tile::new(show_hide, &config),
-        Tile::update,
-        Tile::view,
+        move || tile::elm::new(show_hide, &config),
+        tile::update::handle_update,
+        tile::elm::view,
     )
     .subscription(Tile::subscription)
     .theme(Tile::theme)

@@ -6,8 +6,8 @@ pub mod haptics;
 use crate::app::apps::{App, AppCommand};
 use crate::commands::Function;
 use crate::config::Config;
+use crate::utils::handle_from_icns;
 use crate::utils::index_dirs_from_config;
-use crate::utils::{handle_from_icns, log_error, log_error_and_exit};
 use {
     iced::wgpu::rwh::RawWindowHandle,
     iced::wgpu::rwh::WindowHandle,
@@ -16,12 +16,14 @@ use {
     objc2_app_kit::NSView,
     objc2_app_kit::{NSApp, NSApplicationActivationPolicy},
     objc2_app_kit::{NSFloatingWindowLevel, NSWindowCollectionBehavior},
+    objc2_foundation::NSURL,
 };
 
+use objc2_app_kit::NSWorkspace;
 use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator, ParallelIterator};
-use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::exit;
+use std::{fs, thread};
 
 /// This sets the activation policy of the app to Accessory, allowing rustcast to be visible ontop
 /// of fullscreen apps
@@ -101,7 +103,11 @@ pub fn transform_process_to_ui_element() -> u32 {
 fn get_installed_apps(dir: impl AsRef<Path>, store_icons: bool) -> Vec<App> {
     let entries: Vec<_> = fs::read_dir(dir.as_ref())
         .unwrap_or_else(|x| {
-            log_error_and_exit(&x.to_string());
+            tracing::error!(
+                "An error occurred while reading dir ({}) {}",
+                dir.as_ref().to_str().unwrap_or(""),
+                x
+            );
             exit(-1)
         })
         .filter_map(|x| x.ok())
@@ -120,7 +126,7 @@ fn get_installed_apps(dir: impl AsRef<Path>, store_icons: bool) -> Vec<App> {
 
             let file_name_os = x.file_name();
             let file_name = file_name_os.into_string().unwrap_or_else(|e| {
-                tracing::error!("Failed to to get file_name_os: {}", e.to_string());
+                tracing::error!("Failed to to get file_name_os: {}", e.to_string_lossy());
                 exit(-1)
             });
             if !file_name.ends_with(".app") {

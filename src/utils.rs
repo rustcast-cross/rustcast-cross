@@ -25,27 +25,26 @@ use crate::{
 };
 
 /// This converts an icns file to an iced image handle
+#[cfg(target_os = "macos")]
 pub(crate) fn handle_from_icns(path: &Path) -> Option<Handle> {
-    #[cfg(target_os = "macos")]
-    {
-        let data = std::fs::read(path).ok()?;
-        let family = IconFamily::read(std::io::Cursor::new(&data)).ok()?;
+    use image::RgbaImage;
 
-        let icon_type = family.available_icons();
+    let data = std::fs::read(path).ok()?;
+    let family = IconFamily::read(std::io::Cursor::new(&data)).ok()?;
 
-        let icon = family.get_icon_with_type(*icon_type.first()?).ok()?;
-        let image = RgbaImage::from_raw(
-            icon.width() as u32,
-            icon.height() as u32,
-            icon.data().to_vec(),
-        )?;
-        Some(Handle::from_rgba(
-            image.width(),
-            image.height(),
-            image.into_raw(),
-        ))
-    }
-    None
+    let icon_type = family.available_icons();
+
+    let icon = family.get_icon_with_type(*icon_type.first()?).ok()?;
+    let image = RgbaImage::from_raw(
+        icon.width() as u32,
+        icon.height() as u32,
+        icon.data().to_vec(),
+    )?;
+    return Some(Handle::from_rgba(
+        image.width(),
+        image.height(),
+        image.into_raw(),
+    ));
 }
 
 pub fn get_config_installation_dir() -> PathBuf {
