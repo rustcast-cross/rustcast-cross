@@ -169,13 +169,6 @@ pub fn index_dirs_from_config(apps: &mut Vec<App>) -> bool {
     true
 }
 
-pub fn parse_patterns(patterns: &[String]) -> Result<Vec<glob::Pattern>, glob::PatternError> {
-    patterns
-        .iter()
-        .map(|x| glob::Pattern::new(x))
-        .collect::<Result<_, _>>()
-}
-
 /// Use this to get installed apps
 pub fn get_installed_apps(config: &Config) -> Vec<App> {
     tracing::debug!("Indexing installed apps");
