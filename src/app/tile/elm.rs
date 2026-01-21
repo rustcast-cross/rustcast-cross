@@ -15,6 +15,8 @@ use rayon::{
     slice::ParallelSliceMut,
 };
 
+use crate::app::pages::clipboard::clipboard_view;
+use crate::app::pages::emoji::emoji_page;
 use crate::app::tile::AppIndex;
 use crate::styles::{contents_style, rustcast_text_input_style};
 use crate::{
@@ -100,8 +102,8 @@ pub fn view(tile: &Tile, wid: window::Id) -> Element<'_, Message> {
         let scrollbar_direction = if tile.config.theme.show_scroll_bar {
             Direction::Vertical(
                 Scrollbar::new()
-                    .width(2)
-                    .scroller_width(2)
+                    .width(10)
+                    .scroller_width(10)
                     .anchor(Anchor::Start),
             )
         } else {
@@ -109,21 +111,29 @@ pub fn view(tile: &Tile, wid: window::Id) -> Element<'_, Message> {
         };
 
         let results = if tile.page == Page::ClipboardHistory {
-            Column::from_iter(
-                tile.clipboard_content
-                    .iter()
-                    .enumerate()
-                    .map(|(i, content)| {
-                        content
-                            .to_app()
-                            .render(tile.config.theme.clone(), i as u32, tile.focus_id)
-                    }),
+            clipboard_view(
+                tile.clipboard_content.clone(),
+                tile.focus_id,
+                tile.config.theme.clone(),
+                tile.focus_id,
+            )
+        } else if tile.results.is_empty() {
+            space().into()
+        } else if tile.page == Page::EmojiSearch {
+            emoji_page(
+                tile.config.theme.clone(),
+                tile.emoji_apps
+                    .search_prefix(&tile.query_lc)
+                    .map(|x| x.to_owned())
+                    .collect(),
+                tile.focus_id,
             )
         } else {
             Column::from_iter(tile.results.iter().enumerate().map(|(i, app)| {
                 app.clone()
                     .render(tile.config.theme.clone(), i as u32, tile.focus_id)
             }))
+            .into()
         };
 
         let scrollable = Scrollable::with_direction(results, scrollbar_direction).id("results");
@@ -139,7 +149,7 @@ pub fn view(tile: &Tile, wid: window::Id) -> Element<'_, Message> {
                 ..Default::default()
             });
 
-        container(contents.clip(true))
+        container(contents.clip(false))
             .style(|_| contents_style(&tile.config.theme))
             .into()
     } else {
