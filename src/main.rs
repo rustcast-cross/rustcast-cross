@@ -27,7 +27,15 @@ fn main() -> iced::Result {
     cross_platform::macos::set_activation_policy_accessory();
 
     let file_path = get_config_file_path();
-    let config = read_config_file(&file_path).unwrap();
+
+    let config = read_config_file(&file_path);
+    if let Err(e) = config {
+        // Tracing isn't inited yet
+        eprintln!("Error parsing config: {}", e);
+        std::process::exit(1);
+    }
+
+    let config = config.unwrap();
     create_config_file_if_not_exists(&file_path, &config).unwrap();
 
     {

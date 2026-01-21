@@ -14,7 +14,7 @@ use rayon::slice::ParallelSliceMut;
 
 use crate::app::tile::AppIndex;
 use crate::styles::{contents_style, rustcast_text_input_style};
-use crate::utils::get_installed_apps;
+use crate::utils::{get_installed_apps, parse_patterns};
 use crate::{
     app::{Message, Page, apps::App, default_settings, tile::Tile},
     config::Config,
@@ -70,7 +70,7 @@ pub fn new(hotkey: HotKey, config: &Config) -> (Tile, Task<Message>) {
         transform_process_to_ui_element();
     }));
 
-    let mut options: Vec<App> = get_installed_apps(config);
+    let mut options = get_installed_apps(config);
 
     options.extend(config.shells.iter().map(|x| x.to_app()));
     options.extend(App::basic_apps());

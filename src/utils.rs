@@ -5,6 +5,7 @@ use std::{
     thread,
 };
 
+use glob::{GlobError, GlobResult};
 use iced::widget::image::Handle;
 #[cfg(target_os = "macos")]
 use icns::IconFamily;
@@ -66,13 +67,13 @@ pub fn get_config_file_path() -> PathBuf {
 }
 use crate::config::Config;
 
-pub fn read_config_file(file_path: &Path) -> Result<Config, std::io::Error> {
-    let config: Config = match std::fs::read_to_string(file_path) {
-        Ok(a) => toml::from_str(&a).unwrap(),
-        Err(_) => Config::default(),
-    };
 
-    Ok(config)
+
+pub fn read_config_file(file_path: &Path) -> anyhow::Result<Config> {
+    Ok(match std::fs::read_to_string(file_path) {
+        Ok(a) => toml::from_str(&a)?,
+        Err(_) => Config::default(),
+    })
 }
 
 pub fn create_config_file_if_not_exists(
@@ -186,6 +187,14 @@ pub fn index_dirs_from_config(apps: &mut Vec<App>) -> bool {
     true
 }
 
+pub fn parse_patterns(patterns: &[String]) -> Result<Vec<glob::Pattern>, glob::PatternError>{
+    Ok(patterns
+        .iter()
+        .map(|x| glob::Pattern::new(x))
+        .collect::<Result<_,_>>()?
+    )
+}
+
 /// Use this to get installed apps
 pub fn get_installed_apps(config: &Config) -> Vec<App> {
     tracing::debug!("Indexing installed apps");
@@ -197,20 +206,13 @@ pub fn get_installed_apps(config: &Config) -> Vec<App> {
 
     #[cfg(target_os = "windows")]
     {
-        let exclude_patterns: Vec<_> = config.index_exclude_patterns
-            .iter()
-            .map(|x| glob::Pattern::new(x).unwrap()) // TODO: remove unwrap
-            .collect();
+        tracing::debug!("Exclude patterns: {:?}", &config.index_exclude_patterns);
+        tracing::debug!("Include patterns: {:?}", &config.index_include_patterns);
 
-        let include_patterns: Vec<_> = config.index_include_patterns
-            .iter()
-            .map(|x| glob::Pattern::new(x).unwrap()) // TODO: remove unwrap
-            .collect();
-
-        tracing::debug!("Exclude patterns: {:?}", &exclude_patterns);
-        tracing::debug!("Include patterns: {:?}", &include_patterns);
-
-        get_installed_windows_apps(&exclude_patterns, &include_patterns)
+        get_installed_windows_apps(
+            &config.index_exclude_patterns,
+            &config.index_include_patterns
+        )
     }
 }
 

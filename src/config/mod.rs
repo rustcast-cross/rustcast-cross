@@ -10,6 +10,8 @@ use crate::{
     utils::handle_from_icns,
 };
 
+mod patterns;
+
 /// The main config struct (effectively the config file's "schema")
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(default)]
@@ -25,8 +27,11 @@ pub struct Config {
     pub shells: Vec<Shelly>,
     pub index_dirs: Vec<String>,
 
-    pub index_exclude_patterns: Vec<String>,
-    pub index_include_patterns: Vec<String>
+    #[serde(with = "patterns")]
+    pub index_exclude_patterns: Vec<glob::Pattern>,
+    
+    #[serde(with = "patterns")]
+    pub index_include_patterns: Vec<glob::Pattern>
 }
 
 impl Default for Config {
