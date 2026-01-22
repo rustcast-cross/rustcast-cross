@@ -242,17 +242,6 @@ pub fn get_installed_macos_apps(config: &Config) -> Vec<App> {
     apps
 }
 
-/// Opens a provided URL
-pub fn open_url(url: &str) {
-    let url = url.to_owned();
-    thread::spawn(move || {
-        NSWorkspace::new().openURL(
-            &NSURL::URLWithString_relativeToURL(&objc2_foundation::NSString::from_str(&url), None)
-                .unwrap(),
-        );
-    });
-}
-
 /// Open the settings file with the system default editor
 pub fn open_settings() {
     thread::spawn(move || {

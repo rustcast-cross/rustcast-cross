@@ -8,13 +8,6 @@ pub mod macos;
 #[cfg(target_os = "windows")]
 pub mod windows;
 
-/// Opens a URL in the browser
-#[allow(unused_variables)]
-pub fn open_url(url: &str) {
-    #[cfg(target_os = "macos")]
-    macos::open_url(url)
-}
-
 /// Opens the settings file
 pub fn open_settings() {
     #[cfg(target_os = "macos")]
