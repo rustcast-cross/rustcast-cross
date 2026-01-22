@@ -82,7 +82,8 @@ impl Function {
                     format!("https://{}", url)
                 };
 
-                open::that(open_url);
+                // Should never get here without it being validated first
+                open::that(open_url).unwrap();
             }
 
             Function::Calculate(expr) => {
