@@ -148,6 +148,8 @@ pub fn index_dirs_from_config(apps: &mut Vec<App>) -> bool {
 /// Use this to get installed apps
 pub fn get_installed_apps(config: &Config) -> Vec<App> {
     tracing::debug!("Indexing installed apps");
+    tracing::debug!("Exclude patterns: {:?}", &config.index_exclude_patterns);
+    tracing::debug!("Include patterns: {:?}", &config.index_include_patterns);
 
     #[cfg(target_os = "macos")]
     {
@@ -168,9 +170,6 @@ pub fn get_installed_apps(config: &Config) -> Vec<App> {
     {
         use std::time;
         use crate::cross_platform::windows::app_finding::get_installed_windows_apps;
-
-        tracing::debug!("Exclude patterns: {:?}", &config.index_exclude_patterns);
-        tracing::debug!("Include patterns: {:?}", &config.index_include_patterns);
 
         let start = time::Instant::now();
 
