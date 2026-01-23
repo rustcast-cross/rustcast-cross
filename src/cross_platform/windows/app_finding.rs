@@ -80,7 +80,7 @@ pub fn get_known_paths() -> Vec<PathBuf> {
         get_windows_path(&FOLDERID_ProgramFilesX86).unwrap_or_default(),
         (get_windows_path(&FOLDERID_LocalAppData)
             .unwrap_or_default()
-            .join("Programs/")),
+            .join("Programs")),
     ];
     paths
 }
