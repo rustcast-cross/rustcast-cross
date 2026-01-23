@@ -165,7 +165,7 @@ pub fn index_installed_apps(config: &Config) -> anyhow::Result<Vec<App>> {
                 search_dir(
                     x,
                     &config.index_exclude_patterns,
-                    &config.index_exclude_patterns,
+                    &config.index_include_patterns,
                     3,
                 )
             })
