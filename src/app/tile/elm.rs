@@ -73,6 +73,10 @@ pub fn new(hotkey: HotKey, config: &Config) -> (Tile, Task<Message>) {
             emoji_apps: AppIndex::from_apps(App::emoji_apps()),
             hotkey,
             visible: true,
+            clipboard_hotkey: config
+                .clipboard_hotkey
+                .clone()
+                .and_then(|x| x.parse::<HotKey>().ok()),
             frontmost: None,
             focused: false,
             config: config.clone(),

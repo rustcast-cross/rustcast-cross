@@ -98,6 +98,7 @@ pub struct Tile {
     pub config: Config,
     /// The opening hotkey
     hotkey: HotKey,
+    clipboard_hotkey: Option<HotKey>,
     clipboard_content: Vec<ClipBoardContentType>,
     tray_icon: Option<TrayIcon>,
     sender: Option<ExtSender>,

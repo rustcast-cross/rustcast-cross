@@ -199,29 +199,39 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
         }
 
         Message::KeyPressed(hk_id) => {
-            if hk_id == tile.hotkey.id {
-                tile.visible = !tile.visible;
-                if tile.visible {
-                    Task::chain(
-                        window::open(default_settings())
-                            .1
-                            .map(|_| Message::OpenWindow),
-                        operation::focus("query"),
-                    )
-                } else {
-                    let clear_search_query = if tile.config.buffer_rules.clear_on_hide {
-                        Task::done(Message::ClearSearchQuery)
-                    } else {
-                        Task::none()
-                    };
+            let is_clipboard_hotkey = tile
+                .clipboard_hotkey
+                .map(|hotkey| hotkey.id == hk_id)
+                .unwrap_or(true);
+            let is_open_hotkey = hk_id == tile.hotkey.id;
 
-                    let to_close = window::latest().map(|x| x.unwrap());
-                    Task::batch([
-                        to_close.map(Message::HideWindow),
-                        clear_search_query,
-                        Task::done(Message::ReturnFocus),
-                    ])
+            let clipboard_page_task = if is_clipboard_hotkey {
+                Task::done(Message::SwitchToPage(Page::ClipboardHistory))
+            } else if is_open_hotkey {
+                Task::done(Message::SwitchToPage(Page::Main))
+            } else {
+                Task::none()
+            };
+
+            if is_open_hotkey || is_clipboard_hotkey {
+                if !tile.visible {
+                    return Task::batch([open_window(), clipboard_page_task]);
                 }
+
+                tile.visible = !tile.visible;
+
+                let clear_search_query = if tile.config.buffer_rules.clear_on_hide {
+                    Task::done(Message::ClearSearchQuery)
+                } else {
+                    Task::none()
+                };
+
+                let to_close = window::latest().map(|x| x.unwrap());
+                Task::batch([
+                    to_close.map(Message::HideWindow),
+                    clear_search_query,
+                    Task::done(Message::ReturnFocus),
+                ])
             } else {
                 Task::none()
             }
@@ -477,4 +487,13 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
             }
         }
     }
+}
+
+fn open_window() -> Task<Message> {
+    Task::chain(
+        window::open(default_settings())
+            .1
+            .map(|_| Message::OpenWindow),
+        operation::focus("query"),
+    )
 }
