@@ -15,6 +15,7 @@ use global_hotkey::{GlobalHotKeyEvent, HotKeyState};
 
 use iced::futures::SinkExt;
 use iced::futures::channel::mpsc::{Sender, channel};
+use iced::keyboard::Modifiers;
 use iced::{
     Subscription, Theme, futures,
     keyboard::{self, key::Named},
@@ -122,10 +123,20 @@ impl Tile {
     /// - Window focus changes
     pub fn subscription(&self) -> Subscription<Message> {
         let keyboard = event::listen_with(|event, _, id| match event {
-            event::Event::Keyboard(keyboard::Event::KeyPressed {
+            iced::Event::Keyboard(keyboard::Event::KeyPressed {
                 key: keyboard::Key::Named(keyboard::key::Named::Escape),
                 ..
             }) => Some(Message::EscKeyPressed(id)),
+            iced::Event::Keyboard(keyboard::Event::KeyPressed {
+                key: keyboard::Key::Character(cha),
+                modifiers: Modifiers::LOGO,
+                ..
+            }) => {
+                if cha.to_string() == "," {
+                    open_settings();
+                }
+                None
+            }
             _ => None,
         });
         Subscription::batch([
