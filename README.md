@@ -1,13 +1,39 @@
-# Rustcast - an alternative to Raycast thats open source and in rust
+<!-- Header -->
+<p align="center">
+  <img src="docs/icon.png" width="128" height="128" alt="RustCast icon" />
+</p>
 
-> Rustcast, Raycast and PowerToys are productivity tools. They provide a popup
+<h1 align="center">RustCast</h1>
+
+<p align="center">
+  An open-source, Rust-powered alternative to Raycast/PowerToys — a fast popup launcher for apps, utilities, and workflows.
+</p>
+
+<p align="center">
+  <a href="https://github.com/unsecretised/rustcast/releases/latest">
+    <img alt="Latest release" src="https://img.shields.io/github/v/release/unsecretised/rustcast?display_name=tag&sort=semver&style=flat-square" />
+  </a>
+  <a href="https://github.com/unsecretised/rustcast/releases">
+    <img alt="Downloads" src="https://img.shields.io/github/downloads/unsecretised/rustcast/total?style=flat-square" />
+  </a>
+  <a href="https://discord.gg/bDfNYPbnC5">
+    <img alt="Discord" src="https://img.shields.io/discord/1463119282459119844?label=Discord&logo=discord&logoColor=white&style=flat-square" />
+  </a>
+  <a href="https://github.com/unsecretised/rustcast/stargazers">
+    <img alt="Stars" src="https://img.shields.io/github/stars/unsecretised/rustcast?style=flat-square" />
+  </a>
+  <a href="https://github.com/unsecretised/rustcast/blob/main/LICENSE">
+    <img alt="License" src="https://img.shields.io/github/license/unsecretised/rustcast?style=flat-square" />
+  </a>
+</p>
+
+> RustCast, Raycast and PowerToys are productivity tools. They provide a popup
 > search bar that people can use to do many things, like opening apps,
 > calculators, quick-notes, etc.
 
-[RustCast community](https://discord.gg/bDfNYPbnC5)
+**Community:** https://discord.gg/bDfNYPbnC5
 
-![RustCast Demo PreRelease V1](./docs/rustcast-v0-4-5.png)
-
+![RustCast Demo PreRelease V1](./docs/rustcast-v0-5-0.png)
 ## Installation:
 
 ### Via Homebrew:

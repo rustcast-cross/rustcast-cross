@@ -20,6 +20,7 @@ use global_hotkey::{GlobalHotKeyEvent, HotKeyState};
 
 use iced::futures::SinkExt;
 use iced::futures::channel::mpsc::{Sender, channel};
+use iced::keyboard::Modifiers;
 use iced::{
     Subscription, Theme, futures,
     keyboard::{self, key::Named},
@@ -108,6 +109,7 @@ pub struct Tile {
     pub config: Config,
     /// The opening hotkey
     hotkey: HotKey,
+    clipboard_hotkey: Option<HotKey>,
     clipboard_content: Vec<ClipBoardContentType>,
     tray_icon: Option<TrayIcon>,
     sender: Option<ExtSender>,
@@ -131,10 +133,20 @@ impl Tile {
     /// - Window focus changes
     pub fn subscription(&self) -> Subscription<Message> {
         let keyboard = event::listen_with(|event, _, id| match event {
-            event::Event::Keyboard(keyboard::Event::KeyPressed {
+            iced::Event::Keyboard(keyboard::Event::KeyPressed {
                 key: keyboard::Key::Named(keyboard::key::Named::Escape),
                 ..
             }) => Some(Message::EscKeyPressed(id)),
+            iced::Event::Keyboard(keyboard::Event::KeyPressed {
+                key: keyboard::Key::Character(cha),
+                modifiers: Modifiers::LOGO,
+                ..
+            }) => {
+                if cha.to_string() == "," {
+                    open_settings();
+                }
+                None
+            }
             _ => None,
         });
         Subscription::batch([
@@ -152,6 +164,12 @@ impl Tile {
                         }
                         keyboard::Key::Named(Named::ArrowUp) => {
                             return Some(Message::ChangeFocus(ArrowKey::Up));
+                        }
+                        keyboard::Key::Named(Named::ArrowLeft) => {
+                            return Some(Message::ChangeFocus(ArrowKey::Left));
+                        }
+                        keyboard::Key::Named(Named::ArrowRight) => {
+                            return Some(Message::ChangeFocus(ArrowKey::Right));
                         }
                         keyboard::Key::Named(Named::ArrowDown) => {
                             return Some(Message::ChangeFocus(ArrowKey::Down));

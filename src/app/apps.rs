@@ -6,7 +6,7 @@ use std::path::Path;
 use iced::{
     Alignment,
     Length::Fill,
-    widget::{Button, Row, Text, container, image::Viewer},
+    widget::{Button, Row, Text, container, image::Viewer, text::Wrapping},
 };
 
 use crate::{
@@ -53,7 +53,7 @@ impl App {
     /// A vec of all the emojis as App structs
     pub fn emoji_apps() -> Vec<App> {
         emojis::iter()
-            .filter(|x| x.unicode_version() < emojis::UnicodeVersion::new(13, 0))
+            .filter(|x| x.unicode_version() < emojis::UnicodeVersion::new(17, 13))
             .map(|x| App {
                 icons: None,
                 name: x.to_string(),
@@ -154,6 +154,7 @@ impl App {
                 Text::new(self.name)
                     .font(theme.font())
                     .size(16)
+                    .wrapping(Wrapping::WordOrGlyph)
                     .color(theme.text_color(1.0)),
             )
             .push(
