@@ -14,7 +14,11 @@ use core::{
     mem,
     ptr::{self, NonNull},
 };
-use std::sync::LazyLock;
+use std::{
+    env,
+    path::{Path, PathBuf},
+    sync::LazyLock,
+};
 
 use objc2_core_foundation::{CFArray, CFRetained, CFURL};
 use objc2_foundation::{NSBundle, NSNumber, NSString, NSURL, ns_string};
@@ -148,6 +152,32 @@ fn registered_app_urls() -> Option<CFRetained<CFArray<CFURL>>> {
     Some(unsafe { CFRetained::from_raw(url_ptr) })
 }
 
+/// Directories that contain user-facing applications.
+/// Apps in these directories are included by default (after LSUIElement check).
+static USER_APP_DIRECTORIES: LazyLock<&'static [&'static Path]> = LazyLock::new(|| {
+    // These strings live for the lifetime of the program, so are safe to leak.
+    let items = [
+        Path::new("/Applications/"),
+        Path::new("/System/Applications/"),
+    ];
+
+    let Some(home) = env::var_os("HOME") else {
+        return Box::leak(Box::new(items));
+    };
+
+    let home_apps = Path::new(&home).join("Applications/");
+    let home_apps = PathBuf::leak(home_apps);
+
+    Box::leak(Box::new([items[0], items[1], home_apps]))
+});
+
+/// Checks if an app path is in a trusted user-facing application directory.
+fn is_in_user_app_directory(path: &Path) -> bool {
+    USER_APP_DIRECTORIES
+        .iter()
+        .any(|directory| path.starts_with(directory))
+}
+
 /// Extracts application metadata from a bundle URL.
 ///
 /// Queries the bundle's `Info.plist` for display name and icon, with the
@@ -187,6 +217,15 @@ fn query_app(url: impl AsRef<NSURL>, store_icons: bool) -> Option<App> {
 
     // Filter out background-only apps (daemons, agents, internal system apps)
     if is_truthy(ns_string!("LSUIElement")) || is_truthy(ns_string!("LSBackgroundOnly")) {
+        return None;
+    }
+
+    // For apps outside trusted directories, require LSApplicationCategoryType to be set.
+    // This filters out internal system apps (SCIM, ShortcutsActions, etc.) while keeping
+    // user-facing apps like Finder that happen to live in /System/Library/CoreServices/.
+    if !is_in_user_app_directory(&path)
+        && get_string(ns_string!("LSApplicationCategoryType")).is_none()
+    {
         return None;
     }
 
