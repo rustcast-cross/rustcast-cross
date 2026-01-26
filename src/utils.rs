@@ -13,6 +13,7 @@ const ERR_LOG_PATH: &str = "/tmp/rustscan-err.log";
 
 /// This logs an error to the error log file
 pub(crate) fn log_error(msg: &str) {
+    eprintln!("{msg}");
     if let Ok(mut file) = File::options().create(true).append(true).open(ERR_LOG_PATH) {
         let _ = file.write_all(msg.as_bytes()).ok();
     }

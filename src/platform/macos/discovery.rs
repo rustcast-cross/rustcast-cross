@@ -46,27 +46,62 @@ type LSCopyAllApplicationURLsFn = unsafe extern "C" fn(out: *mut *const CFArray<
 const LAUNCHSERVICES_PATH: &CStr =
     c"/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/LaunchServices";
 
+/// Logs the last `dlerror` message with a prefix.
+///
+/// # Safety
+///
+/// Must be called immediately after a failed `dlopen`/`dlsym` call,
+/// before any other dl* functions are invoked.
+unsafe fn log_dlerror(prefix: &str) {
+    let error = unsafe { libc::dlerror() };
+    let message = if error.is_null() {
+        "unknown error".into()
+    } else {
+        unsafe { CStr::from_ptr(error) }.to_string_lossy()
+    };
+
+    log_error(&format!("{prefix}: {message}"));
+}
+
 /// Dynamically loads `LSCopyAllApplicationURLs` from the LaunchServices framework.
 ///
 /// This function is called once and cached via `LazyLock`. We use dynamic loading
 /// because the symbol is undocumented and not present in Apple's `.tbd` stub files,
 /// which prevents static linking on modern macOS.
 ///
+/// The library handle is intentionally kept open for the process lifetime since
+/// we cache the function pointer.
+///
 /// # Returns
+///
 /// The function pointer if successfully loaded, `None` otherwise.
 fn load_symbol() -> Option<LSCopyAllApplicationURLsFn> {
     // SAFETY: We pass a valid null-terminated path string to dlopen.
-    // RTLD_LAZY defers symbol resolution until first use.
-    let lib = unsafe { libc::dlopen(LAUNCHSERVICES_PATH.as_ptr(), libc::RTLD_LAZY) };
+    // RTLD_NOW resolves symbols immediately; RTLD_LOCAL keeps them private.
+    let lib = unsafe {
+        libc::dlopen(
+            LAUNCHSERVICES_PATH.as_ptr(),
+            libc::RTLD_NOW | libc::RTLD_LOCAL,
+        )
+    };
+
     let Some(lib) = NonNull::new(lib) else {
-        log_error("failed to load LaunchServices framework");
+        // SAFETY: dlopen has returned a null pointer, indicating failure.
+        unsafe { log_dlerror("failed to load LaunchServices framework") };
         return None;
     };
+
+    // Clear any prior error before checking dlsym result.
+    unsafe { libc::dlerror() };
 
     // SAFETY: We pass a valid library handle and null-terminated symbol name.
     let sym = unsafe { libc::dlsym(lib.as_ptr(), c"_LSCopyAllApplicationURLs".as_ptr()) };
     let Some(sym) = NonNull::new(sym) else {
-        log_error("failed to find symbol `LSCopyAllApplicationURLs`");
+        // SAFETY: dlsym has returned a null pointer, indicating failure.
+        unsafe { log_dlerror("failed to find symbol `LSCopyAllApplicationURLs`") };
+
+        // SAFETY: lib is a valid handle from successful dlopen.
+        unsafe { libc::dlclose(lib.as_ptr()) };
         return None;
     };
 
@@ -103,7 +138,10 @@ fn registered_app_urls() -> Option<CFRetained<CFArray<CFURL>>> {
         return None;
     }
 
-    let url_ptr = NonNull::new(urls_ptr.cast_mut())?;
+    let Some(url_ptr) = NonNull::new(urls_ptr.cast_mut()) else {
+        log_error("LSCopyAllApplicationURLs returned null on success");
+        return None;
+    };
 
     // SAFETY: LSCopyAllApplicationURLs returns a +1 retained CFArray on success.
     // We transfer ownership to CFRetained which will call CFRelease when dropped.
