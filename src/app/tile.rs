@@ -2,12 +2,11 @@
 pub mod elm;
 pub mod update;
 
-use crate::app::apps::App;
-use crate::app::tile::elm::default_app_paths;
 use crate::app::{ArrowKey, Message, Move, Page};
 use crate::clipboard::ClipBoardContentType;
 use crate::config::Config;
 use crate::utils::open_settings;
+use crate::{app::apps::App, platform::default_app_paths};
 
 use arboard::Clipboard;
 use global_hotkey::hotkey::HotKey;
@@ -25,7 +24,7 @@ use iced::{event, window};
 
 use objc2::rc::Retained;
 use objc2_app_kit::NSRunningApplication;
-use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
+use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator, ParallelIterator};
 use tray_icon::TrayIcon;
 
 use std::collections::BTreeMap;
@@ -251,10 +250,10 @@ fn handle_hot_reloading() -> impl futures::Stream<Item = Message> {
         )
         .unwrap_or("".to_string());
 
-        let paths = default_app_paths();
+        let paths: Vec<String> = default_app_paths().into_par_iter().collect();
         let mut total_files: usize = paths
             .par_iter()
-            .map(|dir| count_dirs_in_dir(&dir.to_owned().into()))
+            .map(|dir| count_dirs_in_dir(&PathBuf::from(dir)))
             .sum();
 
         loop {
@@ -265,7 +264,7 @@ fn handle_hot_reloading() -> impl futures::Stream<Item = Message> {
 
             let current_total_files: usize = paths
                 .par_iter()
-                .map(|dir| count_dirs_in_dir(&dir.to_owned().into()))
+                .map(|dir| count_dirs_in_dir(&PathBuf::from(dir)))
                 .sum();
 
             if current_content != content {

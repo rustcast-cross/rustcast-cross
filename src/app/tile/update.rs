@@ -9,29 +9,25 @@ use iced::widget::image::Handle;
 use iced::widget::operation;
 use iced::widget::operation::AbsoluteOffset;
 use iced::window;
-use rayon::iter::IntoParallelRefIterator;
-use rayon::iter::ParallelIterator;
 use rayon::slice::ParallelSliceMut;
 
-use crate::app::RUSTCAST_DESC_NAME;
 use crate::app::WINDOW_WIDTH;
 use crate::app::apps::App;
 use crate::app::apps::AppCommand;
 use crate::app::default_settings;
 use crate::app::menubar::menu_icon;
 use crate::app::tile::AppIndex;
-use crate::app::tile::elm::default_app_paths;
 use crate::app::{Message, Page, tile::Tile};
 use crate::calculator::Expr;
 use crate::clipboard::ClipBoardContentType;
 use crate::commands::Function;
 use crate::config::Config;
 use crate::unit_conversion;
-use crate::utils::get_installed_apps;
 use crate::utils::is_valid_url;
 use crate::{app::ArrowKey, platform::focus_this_app};
 use crate::{app::DEFAULT_WINDOW_HEIGHT, platform::perform_haptic};
 use crate::{app::Move, platform::HapticPattern};
+use crate::{app::RUSTCAST_DESC_NAME, platform::get_installed_apps};
 
 pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
     match message {
@@ -177,12 +173,7 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
                 Err(_) => return Task::none(),
             };
 
-            let mut new_options: Vec<App> = default_app_paths()
-                .par_iter()
-                .map(|path| get_installed_apps(path, new_config.theme.show_icons))
-                .flatten()
-                .collect();
-
+            let mut new_options = get_installed_apps(new_config.theme.show_icons);
             new_options.extend(new_config.shells.iter().map(|x| x.to_app()));
             new_options.extend(App::basic_apps());
             new_options.par_sort_by_key(|x| x.name.len());

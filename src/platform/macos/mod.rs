@@ -1,8 +1,10 @@
 //! Macos specific logic, such as window settings, etc.
+mod discovery;
 mod haptics;
 
 use iced::wgpu::rwh::WindowHandle;
 
+pub(super) use self::discovery::get_installed_apps;
 pub(super) use self::haptics::perform_haptic;
 
 /// This sets the activation policy of the app to Accessory, allowing rustcast to be visible ontop

@@ -2301,9 +2301,9 @@ dependencies = [
 
 [[package]]
 name = "libc"
-version = "0.2.178"
+version = "0.2.180"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "37c93d8daa9d8a012fd8ab92f088405fb202ea0b6ab73ee2482ae66af4f42091"
+checksum = "bcc35a38544a891a5f7c865aca548a982ccb3b8650a5b06d0fd33a10283c56fc"
 
 [[package]]
 name = "libfuzzer-sys"
@@ -2962,6 +2962,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "objc2-core-services"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "583300ad934cba24ff5292aee751ecc070f7ca6b39a574cc21b7b5e588e06a0b"
+dependencies = [
+ "bitflags 2.10.0",
+ "block2 0.6.2",
+ "dispatch2",
+ "libc",
+ "objc2 0.6.3",
+ "objc2-core-foundation",
+ "objc2-security",
+]
+
+[[package]]
 name = "objc2-core-text"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3075,6 +3090,17 @@ dependencies = [
  "bitflags 2.10.0",
  "objc2 0.6.3",
  "objc2-foundation 0.3.2",
+]
+
+[[package]]
+name = "objc2-security"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "709fe137109bd1e8b5a99390f77a7d8b2961dafc1a1c5db8f2e60329ad6d895a"
+dependencies = [
+ "bitflags 2.10.0",
+ "objc2 0.6.3",
+ "objc2-core-foundation",
 ]
 
 [[package]]
@@ -3747,10 +3773,12 @@ dependencies = [
  "iced",
  "icns",
  "image",
+ "libc",
  "objc2 0.6.3",
  "objc2-app-kit 0.3.2",
  "objc2-application-services",
  "objc2-core-foundation",
+ "objc2-core-services",
  "objc2-foundation 0.3.2",
  "once_cell",
  "rand",

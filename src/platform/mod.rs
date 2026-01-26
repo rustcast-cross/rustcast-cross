@@ -1,5 +1,9 @@
 use iced::wgpu::rwh::WindowHandle;
 
+pub use self::cross::default_app_paths;
+use crate::app::apps::App;
+
+mod cross;
 #[cfg(target_os = "macos")]
 mod macos;
 
@@ -38,6 +42,16 @@ pub fn perform_haptic(pattern: HapticPattern) -> bool {
 }
 
 #[cfg(not(target_os = "macos"))]
-pub fn perform_haptic(_pattern: HapticPattern) -> bool {
+pub fn perform_haptic(_: HapticPattern) -> bool {
     false
+}
+
+#[cfg(target_os = "macos")]
+pub fn get_installed_apps(store_icons: bool) -> Vec<App> {
+    self::macos::get_installed_apps(store_icons)
+}
+
+#[cfg(not(target_os = "macos"))]
+pub fn get_installed_apps(store_icons: bool) -> Vec<App> {
+    self::cross::get_installed_apps(store_icons)
 }
