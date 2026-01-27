@@ -103,33 +103,14 @@ fn get_installed_apps(path: &Path, store_icons: bool) -> Vec<App> {
 }
 
 pub fn handle_from_png(path: &Path) -> Option<Handle> {
-    let img = ImageReader::open(path);
-    let img = match img {
-        Err(e) => { dbg!(e); return None; },
-        Ok(i) => i,
-    };
-    let img = img.decode();
-    let img = match img {
-        Err(e) => { dbg!(e); return None; },
-        Ok(i) => i,
-    };
-    let img = img.to_rgba8();
-    if img.width() == 0 || img.height() == 0 || img.as_bytes().is_empty() {
-        panic!("Image not loaded correctly!");
-    }
-
-    let image = RgbaImage::from_raw(img.width(), img.height(), img.to_vec());
-    match image {
-        Some(image) => {
-            Some(Handle::from_rgba(
-                    image.width(),
-                    image.height(),
-                    image.into_raw(),
-            ))
-        }
-        None => panic!()
-    }
-    }
+    let img = ImageReader::open(path).ok()?.decode().ok()?.to_rgba8();
+    let image = RgbaImage::from_raw(img.width(), img.height(), img.to_vec())?;
+    Some(Handle::from_rgba(
+        image.width(),
+        image.height(),
+        image.into_raw(),
+    ))
+}
 
 fn find_icon_handle(name: &str) -> Option<Handle> {
     let paths = default_app_paths();
