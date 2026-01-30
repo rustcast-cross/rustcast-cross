@@ -9,49 +9,30 @@ use {
     windows::Win32::Foundation::HWND, windows::Win32::UI::WindowsAndMessaging::SetForegroundWindow,
 };
 
-use std::{
-    collections::BTreeMap,
-    fs,
-    ops::Bound,
-    path::PathBuf,
-    time::Duration
-};
+use std::{collections::BTreeMap, fs, ops::Bound, path::PathBuf, time::Duration};
 
 use iced::{
-    Subscription, Theme, futures,
+    Subscription, Theme, event, futures,
     futures::{
         SinkExt,
-        channel::mpsc::{
-            Sender, 
-            channel
-        }
+        channel::mpsc::{Sender, channel},
     },
-    keyboard::{self, key::Named, Modifiers},
-    stream,
-    event, 
-    window
+    keyboard::{self, Modifiers, key::Named},
+    stream, window,
 };
 
-use global_hotkey::{
-    hotkey::HotKey,
-    GlobalHotKeyEvent, 
-    HotKeyState
-};
+use global_hotkey::{GlobalHotKeyEvent, HotKeyState, hotkey::HotKey};
 
 use crate::{
-    config::Config,
+    app::{ArrowKey, Message, Move, Page, apps::App, tile::elm::default_app_paths},
     clipboard::ClipBoardContentType,
+    config::Config,
     cross_platform::open_settings,
-    app::{
-        apps::App,
-        ArrowKey, Message, Move, Page,
-        tile::elm::default_app_paths
-    }
 };
 
+use arboard::Clipboard;
 use rayon::prelude::*;
 use tray_icon::TrayIcon;
-use arboard::Clipboard;
 
 #[cfg(target_os = "macos")]
 use objc2::rc::Retained;

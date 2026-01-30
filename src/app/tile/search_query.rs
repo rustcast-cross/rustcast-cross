@@ -1,9 +1,8 @@
-use std::cmp;
-
 use iced::{
     Task,
     window::{self, Id},
 };
+use std::{cmp, path::Path};
 
 use super::Tile;
 use crate::{
@@ -16,6 +15,9 @@ use crate::{
     commands::Function,
     unit_conversion,
 };
+
+#[cfg(target_os = "macos")]
+use crate::cross_platform::macos::haptics::{HapticPattern, perform_haptic};
 
 pub(super) fn handle_change(tile: &mut Tile, input: &str, id: Id) -> iced::Task<Message> {
     tile.focus_id = 0;
@@ -147,7 +149,7 @@ pub(super) fn handle_change(tile: &mut Tile, input: &str, id: Id) -> iced::Task<
         tile.results.push(App {
             open_command: AppCommand::Display,
             desc: "Easter Egg".to_string(),
-            icons: Some(Handle::from_path(Path::new(
+            icons: Some(iced::widget::image::Handle::from_path(Path::new(
                 "/Applications/Rustcast.app/Contents/Resources/lemon.png",
             ))),
             name: "Lemon".to_string(),

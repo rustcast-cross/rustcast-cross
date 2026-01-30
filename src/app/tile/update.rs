@@ -3,36 +3,22 @@ use std::fs;
 use std::thread;
 
 use iced::Task;
-use iced::widget::{
-    operation,
-    operation::AbsoluteOffset
-};
+use iced::widget::{operation, operation::AbsoluteOffset};
 use iced::window;
 use rayon::slice::ParallelSliceMut;
 
 use crate::app::{
-    ArrowKey,
-    DEFAULT_WINDOW_HEIGHT,
-    Move,
-    WINDOW_WIDTH,
-    apps::App,
-    apps::AppCommand,
-    default_settings,
-    menubar::menu_icon,
-    tile::AppIndex,
+    ArrowKey, DEFAULT_WINDOW_HEIGHT, Message, Move, Page, WINDOW_WIDTH, apps::App,
+    apps::AppCommand, default_settings, menubar::menu_icon, tile::AppIndex, tile::Tile,
     tile::search_query,
-    Message, Page, tile::Tile
 };
+
+#[cfg(target_os = "macos")]
+use crate::cross_platform::macos;
 
 use crate::commands::Function;
 use crate::config::Config;
 use crate::utils::index_installed_apps;
-
-#[cfg(target_os = "macos")]
-use crate::{
-    cross_platform::macos::focus_this_app,
-    cross_platform::macos::haptics::{HapticPattern, perform_haptic},
-};
 
 pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
     tracing::trace!("Handling update (message: {:?})", message);
@@ -42,7 +28,7 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
             #[cfg(target_os = "macos")]
             {
                 tile.capture_frontmost();
-                focus_this_app();
+                macos::focus_this_app();
             }
             tile.focused = true;
             tile.visible = true;
