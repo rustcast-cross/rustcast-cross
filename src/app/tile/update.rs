@@ -1,5 +1,4 @@
 //! This handles the update logic for the tile (AKA rustcast's main window)
-use std::cmp::min;
 use std::fs;
 #[cfg(target_os = "macos")]
 use std::path::Path;
@@ -16,7 +15,6 @@ use rayon::slice::ParallelSliceMut;
 use crate::app::ArrowKey;
 use crate::app::DEFAULT_WINDOW_HEIGHT;
 use crate::app::Move;
-use crate::app::RUSTCAST_DESC_NAME;
 use crate::app::WINDOW_WIDTH;
 use crate::app::apps::App;
 use crate::app::apps::AppCommand;
@@ -26,11 +24,8 @@ use crate::app::tile::AppIndex;
 use crate::app::tile::search_query;
 use crate::app::{Message, Page, tile::Tile};
 
-use crate::calculator::Expr;
-use crate::clipboard::ClipBoardContentType;
 use crate::commands::Function;
 use crate::config::Config;
-use crate::unit_conversion;
 use crate::utils::index_installed_apps;
 
 #[cfg(target_os = "macos")]
@@ -190,8 +185,8 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
             let mut options = Vec::new();
 
             match index_installed_apps(&new_config) {
-                Ok(x)  => options.extend(x),
-                Err(e) => tracing::error!("Error indexing apps: {e}")
+                Ok(x) => options.extend(x),
+                Err(e) => tracing::error!("Error indexing apps: {e}"),
             }
 
             options.extend(new_config.shells.iter().map(|x| x.to_app()));
@@ -323,7 +318,7 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
             Task::none()
         }
 
-        Message::SearchQueryChanged(input, id) => search_query::handle_change(tile, &input, id)
+        Message::SearchQueryChanged(input, id) => search_query::handle_change(tile, &input, id),
     }
 }
 

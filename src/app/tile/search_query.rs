@@ -1,20 +1,21 @@
 use std::cmp;
 
-use iced::{Task, window::{self, Id}};
+use iced::{
+    Task,
+    window::{self, Id},
+};
 
+use super::Tile;
 use crate::{
     app::{
-        DEFAULT_WINDOW_HEIGHT, RUSTCAST_DESC_NAME, WINDOW_WIDTH,
-        Message, Page, 
+        ArrowKey, DEFAULT_WINDOW_HEIGHT, Message, Page, RUSTCAST_DESC_NAME, WINDOW_WIDTH,
         apps::{App, AppCommand},
-        ArrowKey
-    }, 
-    clipboard::ClipBoardContentType, 
-    commands::Function, 
-    unit_conversion,
+    },
     calculator::Expr,
+    clipboard::ClipBoardContentType,
+    commands::Function,
+    unit_conversion,
 };
-use super::Tile;
 
 pub(super) fn handle_change(tile: &mut Tile, input: &str, id: Id) -> iced::Task<Message> {
     tile.focus_id = 0;
@@ -54,19 +55,19 @@ pub(super) fn handle_change(tile: &mut Tile, input: &str, id: Id) -> iced::Task<
     } else {
         if tile.query_lc == "67" {
             tile.results = vec![App {
-            open_command: AppCommand::Function(Function::RandomVar(67)),
-            desc: "Easter egg".to_string(),
-            icons: None,
-            name: 67.to_string(),
-            name_lc: String::new(),
-        }];
+                open_command: AppCommand::Function(Function::RandomVar(67)),
+                desc: "Easter egg".to_string(),
+                icons: None,
+                name: 67.to_string(),
+                name_lc: String::new(),
+            }];
             return window::resize(
-            id,
-            iced::Size {
-                width: WINDOW_WIDTH,
-                height: 55. + DEFAULT_WINDOW_HEIGHT,
-            },
-        );
+                id,
+                iced::Size {
+                    width: WINDOW_WIDTH,
+                    height: 55. + DEFAULT_WINDOW_HEIGHT,
+                },
+            );
         }
         if tile.query_lc.ends_with("?") {
             tile.results = vec![App {
@@ -125,7 +126,7 @@ pub(super) fn handle_change(tile: &mut Tile, input: &str, id: Id) -> iced::Task<
                 }
             })
             .collect();
-    } else if tile.results.is_empty() && url::Url::parse(&input).is_ok() {
+    } else if tile.results.is_empty() && url::Url::parse(input).is_ok() {
         tile.results.push(App {
             open_command: AppCommand::Function(Function::OpenWebsite(tile.query.clone())),
             desc: "Web Browsing".to_string(),
