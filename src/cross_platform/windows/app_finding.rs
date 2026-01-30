@@ -4,15 +4,10 @@ use {
         commands::Function,
         cross_platform::windows::get_acp,
     },
-    lnk::{
-        Encoding,
-        encoding::{UTF_16LE, WINDOWS_1252},
-    },
-    std::{io, path::PathBuf},
+    std::path::PathBuf,
     walkdir::WalkDir,
     windows::{
         Win32::{
-            Globalization::GetACP,
             System::Com::CoTaskMemFree,
             UI::Shell::{
                 FOLDERID_LocalAppData, FOLDERID_ProgramFiles, FOLDERID_ProgramFilesX86,

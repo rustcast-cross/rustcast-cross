@@ -25,9 +25,6 @@ use crate::app::menubar::menu_icon;
 use crate::app::tile::AppIndex;
 use crate::app::{Message, Page, tile::Tile};
 
-#[cfg(target_os = "windows")]
-use crate::utils::get_config_installation_dir;
-
 use crate::calculator::Expr;
 use crate::clipboard::ClipBoardContentType;
 use crate::commands::Function;
