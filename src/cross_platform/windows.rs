@@ -1,6 +1,7 @@
 use {
     crate::app::apps::App,
     rayon::prelude::*,
+    std::{process::Command, thread},
     windows::{
         Win32::{
             System::Com::CoTaskMemFree,
@@ -14,10 +15,6 @@ use {
         },
         core::GUID,
     },
-    std::{
-        process::Command,
-        thread
-    }
 };
 
 fn get_apps_from_registry(apps: &mut Vec<App>) {

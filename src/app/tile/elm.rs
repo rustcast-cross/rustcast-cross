@@ -130,7 +130,7 @@ pub fn new(
             sender: None,
             page: Page::Main,
 
-            #[cfg(not(target_os = "windows"))]
+            #[cfg(target_os = "macos")]
             frontmost: None,
 
             #[cfg(target_os = "windows")]
