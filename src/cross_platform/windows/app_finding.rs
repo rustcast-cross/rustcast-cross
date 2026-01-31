@@ -56,7 +56,7 @@ pub fn get_apps_from_registry(apps: &mut Vec<App>) {
             // if there is something, it will be in the form of
             // "C:\Program Files\Microsoft Office\Office16\WINWORD.EXE",0
             let exe_path = exe_path.to_string_lossy().to_string();
-            let exe = exe_path.split(",").next().unwrap().to_string();
+            let exe = PathBuf::from(exe_path.split(",").next().unwrap());
 
             // make sure it ends with .exe
             if !exe.ends_with(".exe") {
@@ -66,7 +66,7 @@ pub fn get_apps_from_registry(apps: &mut Vec<App>) {
             if !display_name.is_empty() {
                 use crate::{app::apps::AppCommand, commands::Function};
 
-                let icon = get_first_icon(PathBuf::from(&exe))
+                let icon = get_first_icon(&exe)
                     .inspect_err(|e| tracing::error!("Error getting icons: {e}"))
                     .ok()
                     .flatten();
@@ -139,15 +139,14 @@ pub fn index_start_menu() -> Vec<App> {
 
                     match target {
                         Some(target) => {
-                            let icon = get_first_icon(PathBuf::from(&target))
+                            let target = PathBuf::from(target);
+                            let icon = get_first_icon(&target)
                                 .inspect_err(|e| tracing::error!("Error getting icons: {e}"))
                                 .ok()
                                 .flatten();
 
                             Some(App {
-                                open_command: AppCommand::Function(Function::OpenApp(
-                                    target.clone(),
-                                )),
+                                open_command: AppCommand::Function(Function::OpenApp(target)),
                                 desc: "".to_string(),
                                 icons: icon,
                                 name: entry.file_name().to_string_lossy().to_string(),

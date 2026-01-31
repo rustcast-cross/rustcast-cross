@@ -1,7 +1,7 @@
 //! This modules handles the logic for each "app" that rustcast can load
 //!
 //! An "app" is effectively, one of the results that rustcast returns when you search for something
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use iced::{
     Alignment,
@@ -125,9 +125,9 @@ impl App {
                 name_lc: "version".to_string(),
             },
             App {
-                open_command: AppCommand::Function(Function::OpenApp(
-                    "/System/Library/CoreServices/Finder.app".to_string(),
-                )),
+                open_command: AppCommand::Function(Function::OpenApp(PathBuf::from(
+                    "/System/Library/CoreServices/Finder.app",
+                ))),
                 desc: "Application".to_string(),
                 icons: get_img_handle(Path::new(
                     "/System/Library/CoreServices/Finder.app/Contents/Resources/Finder.icns",

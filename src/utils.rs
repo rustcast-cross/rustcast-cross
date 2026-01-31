@@ -73,9 +73,7 @@ fn search_dir(
             tracing::trace!("Executable loaded  [kfolder]: {:?}", path.to_str());
 
             Some(App {
-                open_command: AppCommand::Function(Function::OpenApp(
-                    path.to_string_lossy().to_string(),
-                )),
+                open_command: AppCommand::Function(Function::OpenApp(path.to_path_buf())),
                 name: name.clone(),
                 name_lc: name.to_lowercase(),
                 icons: None,
@@ -101,16 +99,14 @@ pub fn read_config_file(file_path: &Path) -> anyhow::Result<Config> {
     }
 }
 
-pub fn open_application(path: &str) {
-    let path_string = path.to_string();
+pub fn open_application(path: PathBuf) {
     thread::spawn(move || {
-        let path = &path_string;
         #[cfg(target_os = "windows")]
         {
-            println!("Opening application: {}", path);
+            println!("Opening application: {}", &path.display());
 
             Command::new("powershell")
-                .arg(format!("Start-Process '{}'", path))
+                .arg(format!("Start-Process '{}'", &path.to_string_lossy()))
                 .status()
                 .ok();
         }
