@@ -72,13 +72,26 @@ fn search_dir(
             #[cfg(debug_assertions)]
             tracing::trace!("Executable loaded  [kfolder]: {:?}", path.to_str());
 
+            #[cfg(target_os = "windows")]
+            let icon = {
+                use crate::cross_platform::windows::appicon::get_first_icon;
+
+                get_first_icon(path)
+                    .inspect_err(|e| {
+                        tracing::error!("Error getting icon for {}: {e}", path.display())
+                    })
+                    .ok()
+                    .flatten()
+            };
+
+            #[cfg(not(target_os = "windows"))]
+            let icon = None;
+
             Some(App {
-                open_command: AppCommand::Function(Function::OpenApp(
-                    path.to_string_lossy().to_string(),
-                )),
+                open_command: AppCommand::Function(Function::OpenApp(path.to_path_buf())),
                 name: name.clone(),
                 name_lc: name.to_lowercase(),
-                icons: None,
+                icons: icon,
                 desc: "Application".to_string(),
             })
         })
@@ -101,16 +114,14 @@ pub fn read_config_file(file_path: &Path) -> anyhow::Result<Config> {
     }
 }
 
-pub fn open_application(path: &str) {
-    let path_string = path.to_string();
+pub fn open_application(path: PathBuf) {
     thread::spawn(move || {
-        let path = &path_string;
         #[cfg(target_os = "windows")]
         {
-            println!("Opening application: {}", path);
+            println!("Opening application: {}", &path.display());
 
             Command::new("powershell")
-                .arg(format!("Start-Process '{}'", path))
+                .arg(format!("Start-Process '{}'", &path.to_string_lossy()))
                 .status()
                 .ok();
         }
@@ -198,5 +209,49 @@ pub fn index_installed_apps(config: &Config) -> anyhow::Result<Vec<App>> {
         );
 
         Ok(res)
+    }
+}
+
+/// Converts a slice of BGRA data to RGBA using SIMD
+///
+/// Stolen from https://stackoverflow.com/a/78190249/
+#[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+pub fn bgra_to_rgba(data: &mut [u8]) {
+    use std::arch::x86_64::__m128i;
+    use std::arch::x86_64::_mm_loadu_si128;
+    use std::arch::x86_64::_mm_setr_epi8;
+    use std::arch::x86_64::_mm_storeu_si128;
+
+    #[cfg(target_arch = "x86")]
+    use std::arch::x86::_mm_shuffle_epi8;
+    #[cfg(target_arch = "x86_64")]
+    use std::arch::x86_64::_mm_shuffle_epi8;
+    //
+    // The shuffle mask for converting BGRA -> RGBA
+    let mask: __m128i = unsafe {
+        _mm_setr_epi8(
+            2, 1, 0, 3, // First pixel
+            6, 5, 4, 7, // Second pixel
+            10, 9, 8, 11, // Third pixel
+            14, 13, 12, 15, // Fourth pixel
+        )
+    };
+    // For each 16-byte chunk in your data
+    for chunk in data.chunks_exact_mut(16) {
+        let mut vector = unsafe { _mm_loadu_si128(chunk.as_ptr() as *const __m128i) };
+        vector = unsafe { _mm_shuffle_epi8(vector, mask) };
+        unsafe { _mm_storeu_si128(chunk.as_mut_ptr() as *mut __m128i, vector) };
+    }
+}
+
+// Fallback for non x86/x86_64 devices (not like that'll ever be used, but why not)
+/// Converts a slice of BGRA data to RGBA
+#[cfg(not(any(target_arch = "x86", target_arch = "x86_64")))]
+pub fn bgra_to_rgba(data: &mut [u8]) {
+    for i in (0..data.len()).step_by(4) {
+        let r = data[i + 2];
+
+        data[i + 2] = data[i];
+        data[i] = r;
     }
 }

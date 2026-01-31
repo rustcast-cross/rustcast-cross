@@ -2,7 +2,7 @@ use {
     crate::{
         app::apps::{App, AppCommand},
         commands::Function,
-        cross_platform::windows::get_acp,
+        cross_platform::windows::{appicon::get_first_icon, get_acp},
     },
     std::path::PathBuf,
     walkdir::WalkDir,
@@ -56,7 +56,7 @@ pub fn get_apps_from_registry(apps: &mut Vec<App>) {
             // if there is something, it will be in the form of
             // "C:\Program Files\Microsoft Office\Office16\WINWORD.EXE",0
             let exe_path = exe_path.to_string_lossy().to_string();
-            let exe = exe_path.split(",").next().unwrap().to_string();
+            let exe = PathBuf::from(exe_path.split(",").next().unwrap());
 
             // make sure it ends with .exe
             if !exe.ends_with(".exe") {
@@ -66,11 +66,16 @@ pub fn get_apps_from_registry(apps: &mut Vec<App>) {
             if !display_name.is_empty() {
                 use crate::{app::apps::AppCommand, commands::Function};
 
+                let icon = get_first_icon(&exe)
+                    .inspect_err(|e| tracing::error!("Error getting icons: {e}"))
+                    .ok()
+                    .flatten();
+
                 apps.push(App {
                     open_command: AppCommand::Function(Function::OpenApp(exe)),
                     name: display_name.clone().into_string().unwrap(),
                     name_lc: display_name.clone().into_string().unwrap().to_lowercase(),
-                    icons: None,
+                    icons: icon,
                     desc: "Application".to_string(),
                 })
             }
@@ -108,34 +113,59 @@ pub fn index_start_menu() -> Vec<App> {
     WalkDir::new(r"C:\ProgramData\Microsoft\Windows\Start Menu\Programs")
         .into_iter()
         .filter_map(|x| x.ok())
-        .filter_map(|path| {
-            let lnk = lnk::ShellLink::open(path.path(), get_acp());
+        .filter_map(|entry| {
+            let ext = entry.path().extension();
+            let path = entry.path();
+
+            if ext.is_none() {
+                tracing::trace!("{} has no extension (maybe a dir)", path.display());
+                return None;
+            }
+
+            if let Some(ext) = ext
+                && ext != "lnk"
+            {
+                tracing::trace!("{} not a .lnk file, skipping", path.display());
+                return None;
+            }
+
+            let lnk = lnk::ShellLink::open(path, get_acp());
 
             match lnk {
                 Ok(x) => {
                     let target = x.link_target();
 
+                    tracing::trace!("Link at {} loaded (target: {:?})", path.display(), &target);
+
                     match target {
-                        Some(target) => Some(App {
-                            open_command: AppCommand::Function(Function::OpenApp(target.clone())),
-                            desc: "".to_string(),
-                            icons: None,
-                            name: path.file_name().to_string_lossy().to_string(),
-                            name_lc: path.file_name().to_string_lossy().to_string(),
-                        }),
+                        Some(target) => {
+                            let target = PathBuf::from(target);
+                            let icon = get_first_icon(&target)
+                                .inspect_err(|e| tracing::error!("Error getting icons: {e}"))
+                                .ok()
+                                .flatten();
+
+                            Some(App {
+                                open_command: AppCommand::Function(Function::OpenApp(target)),
+                                desc: "".to_string(),
+                                icons: icon,
+                                name: entry.file_name().to_string_lossy().to_string(),
+                                name_lc: entry.file_name().to_string_lossy().to_string(),
+                            })
+                        }
                         None => {
-                            tracing::debug!(
+                            tracing::trace!(
                                 "Link at {} has no target, skipped",
-                                path.path().to_string_lossy()
+                                entry.path().to_string_lossy()
                             );
                             None
                         }
                     }
                 }
                 Err(e) => {
-                    tracing::debug!(
+                    tracing::trace!(
                         "Error opening link {} ({e}), skipped",
-                        path.path().to_string_lossy()
+                        entry.path().to_string_lossy()
                     );
                     None
                 }

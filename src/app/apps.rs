@@ -110,10 +110,11 @@ impl App {
                 name: format!("Current RustCast Version: {app_version}"),
                 name_lc: "version".to_string(),
             },
+            #[cfg(target_os = "macos")]
             App {
-                open_command: AppCommand::Function(Function::OpenApp(
-                    "/System/Library/CoreServices/Finder.app".to_string(),
-                )),
+                open_command: AppCommand::Function(Function::OpenApp(PathBuf::from(
+                    "/System/Library/CoreServices/Finder.app",
+                ))),
                 desc: "Application".to_string(),
                 icons: Some(crate::icon::iced_img_handle::icon_256()),
                 name: "Finder".to_string(),
