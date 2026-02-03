@@ -161,9 +161,14 @@ fn get_icon_bitmap(icon_info: ICONINFOEXW) -> Result<(BITMAPINFO, Vec<u8>), wind
         )
     };
 
-    if gdib_result == 0 {
-        return Err(windows::core::Error::from_win32());
-    }
+    // It's just stored here because it should still go through to the cleanup code
+    let val = if gdib_result == 0 { 
+        Err(windows::core::Error::from_win32())
+    } else {
+        bgra_to_rgba(buffer.as_mut_slice());
+        Ok((bmp_info, buffer))
+    };
+
     // cleanup
     unsafe {
         SelectObject(hdc_mem, hbm_old);
@@ -173,6 +178,5 @@ fn get_icon_bitmap(icon_info: ICONINFOEXW) -> Result<(BITMAPINFO, Vec<u8>), wind
         DeleteObject(icon_info.hbmMask).ok()?;
     }
 
-    bgra_to_rgba(buffer.as_mut_slice());
-    Ok((bmp_info, buffer))
+    val
 }
