@@ -29,7 +29,7 @@ use crate::utils::bgra_to_rgba;
 ///
 /// - If the path contains a NUL byte before the end
 /// - Any internal win32 error
-pub fn extract_icons(path: impl AsRef<Path>) -> anyhow::Result<Vec<widget::image::Handle>> {
+pub fn get_first_icon(path: impl AsRef<Path>) -> anyhow::Result<Option<widget::image::Handle>> {
     let path = path.as_ref();
 
     let path_cstr = U16CString::from_os_str(path.as_os_str())?;
@@ -39,7 +39,7 @@ pub fn extract_icons(path: impl AsRef<Path>) -> anyhow::Result<Vec<widget::image
 
     // Don't bother doing the rest
     if icon_count == 0 {
-        return Ok(Vec::new());
+        return Ok(None)
     }
 
     let mut large_icons = vec![HICON::default(); icon_count as usize];
@@ -60,38 +60,17 @@ pub fn extract_icons(path: impl AsRef<Path>) -> anyhow::Result<Vec<widget::image
         path.display()
     );
 
-    let image_handles: Vec<_> = large_icons
+    let hicon = large_icons
         .iter()
         .chain(small_icons.iter())
-        .map(|icon| {
-            let res = hicon_to_imghandle(*icon);
-            unsafe { DestroyIcon(*icon) }?;
-            res
-        })
-        .filter_map(|r| match r {
-            Ok(img) => Some(img),
-            Err(e) => {
-                tracing::error!("Failed to convert HICON to RgbaImage: {:?}", e);
-                None
-            }
-        })
-        .collect();
+        .next();
 
-    Ok(image_handles)
-}
-
-/// Wrapper around [`extract_icons`] to get the first icon. Returns `Ok(None)` if no icon was
-/// found.
-///
-/// # Errors
-///
-/// The same as [`extract_icons`]
-pub fn get_first_icon(path: impl AsRef<Path>) -> anyhow::Result<Option<widget::image::Handle>> {
-    let mut icons = extract_icons(path)?;
-
-    if !icons.is_empty() {
-        Ok(Some(icons.remove(0))) // .remove is needed, since I want it to be moved out
-    } else {
+    if let Some(hicon) = hicon {
+        let res = hicon_to_imghandle(*hicon);
+        unsafe { DestroyIcon(*hicon) }?;   
+        Ok(Some(res?)) // Error only gets propogated down here, so that hicon is always destroyed
+    } 
+    else { 
         Ok(None)
     }
 }
