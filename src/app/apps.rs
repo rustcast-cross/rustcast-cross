@@ -53,7 +53,7 @@ pub enum AppData {
 #[derive(Clone, Debug)]
 pub struct App {
     pub name: String,
-    pub name_lc: String,
+    pub alias: String,
     pub desc: String,
     pub app_data: AppData,
 
@@ -71,7 +71,7 @@ impl App {
         static ID: AtomicUsize = AtomicUsize::new(0);
 
         Self {
-            name_lc: name_lc.to_string(),
+            alias: name_lc.to_string(),
             name: name.to_string(),
             desc: desc.to_string(),
             id: ID.fetch_add(1, Ordering::Relaxed),
