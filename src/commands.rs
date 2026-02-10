@@ -33,8 +33,7 @@ impl Function {
     pub fn execute(&self, config: &Config, query: &str) {
         tracing::debug!("Executing command: {:?}", self);
         match self {
-            Function::OpenApp(path) => 
-                open_application(path.clone()), // I think the clone is necessary
+            Function::OpenApp(path) => open_application(path.clone()), // I think the clone is necessary
             Function::RunShellCommand(command, alias) => {
                 let query = query.to_string();
                 let final_command =

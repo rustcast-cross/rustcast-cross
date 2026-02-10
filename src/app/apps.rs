@@ -36,7 +36,7 @@ impl PartialEq for AppCommand {
         match (&self, &other) {
             (Self::Function(a), Self::Function(b)) => a == b,
             (Self::Display, Self::Display) => true,
-            _ => false
+            _ => false,
         }
     }
 }
@@ -86,7 +86,7 @@ pub struct App {
     pub app_data: AppData,
 
     /// A unique ID generated for each instance of an App.
-    /// 
+    ///
     /// This is made by atomically incrementing a counter every time a new instance of the struct
     /// is made. The implementation of [`PartialEq`] uses this.
     id: usize,
@@ -94,14 +94,15 @@ pub struct App {
 
 impl PartialEq for App {
     fn eq(&self, other: &Self) -> bool {
-        self.app_data == other.app_data &&
-            self.name == other.name
+        self.app_data == other.app_data && self.name == other.name
     }
 }
 
 impl App {
     /// Get the internal id
-    pub fn id(&self) -> usize { self.id }
+    pub fn id(&self) -> usize {
+        self.id
+    }
 
     /// Creates a new instance
     pub fn new(name: &str, name_lc: &str, desc: &str, data: AppData) -> Self {
@@ -117,14 +118,14 @@ impl App {
     }
 
     /// Creates a new instance of the type [`AppData::Builtin`].
-    /// 
+    ///
     /// This is mainly for convenience.
     pub fn new_builtin(name: &str, name_lc: &str, desc: &str, command: AppCommand) -> Self {
         Self::new(name, name_lc, desc, AppData::Builtin { command })
     }
 
     /// Creates a new instance of the type [`AppData::Executable`].
-    /// 
+    ///
     /// This is mainly for convenience.
     pub fn new_executable(
         name: &str,
@@ -292,9 +293,7 @@ impl App {
                 command: AppCommand::Display,
                 ..
             } => None,
-            AppData::Executable { path, .. } => Some(Message::RunFunction(Function::OpenApp(
-                path
-            ))),
+            AppData::Executable { path, .. } => Some(Message::RunFunction(Function::OpenApp(path))),
             AppData::Command { command, alias, .. } => Some(Message::RunFunction(
                 Function::RunShellCommand(command, alias),
             )),

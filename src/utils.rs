@@ -2,7 +2,6 @@
 use std::{
     io,
     path::{Path, PathBuf},
-    thread,
     time::Instant,
 };
 
