@@ -1,10 +1,9 @@
 use {
     crate::{
-        app::apps::{App, AppCommand},
-        commands::Function,
+        app::apps::App,
         cross_platform::windows::{appicon::get_first_icon, get_acp},
     },
-    std::{ffi::OsStr, path::PathBuf},
+    std::path::PathBuf,
     walkdir::WalkDir,
     windows::{
         Win32::{
@@ -59,7 +58,7 @@ pub fn get_apps_from_registry(apps: &mut Vec<App>) {
             let exe = PathBuf::from(exe_path.split(",").next().unwrap());
 
             // make sure it ends with .exe
-            if !(exe.extension() == Some(&OsString::from("exe"))) {
+            if exe.extension() != Some(&OsString::from("exe")) {
                 return;
             }
 
@@ -74,7 +73,7 @@ pub fn get_apps_from_registry(apps: &mut Vec<App>) {
                     &display_name.clone().to_string_lossy().to_lowercase(),
                     "Application",
                     exe,
-                    icon
+                    icon,
                 ))
             }
         });
@@ -134,7 +133,7 @@ pub fn index_start_menu() -> Vec<App> {
                     let target = x.link_target();
 
                     tracing::trace!("Link at {} loaded (target: {:?})", path.display(), &target);
-                    
+
                     match target {
                         Some(target) => {
                             let target = PathBuf::from(target);
@@ -148,14 +147,11 @@ pub fn index_start_menu() -> Vec<App> {
                                 &target.to_string_lossy().to_lowercase(),
                                 "Shortcut",
                                 &target,
-                                icon
+                                icon,
                             ))
                         }
                         None => {
-                            tracing::trace!(
-                                "Link at {} has no target, skipped",
-                                path.display()
-                            );
+                            tracing::trace!("Link at {} has no target, skipped", path.display());
                             None
                         }
                     }
