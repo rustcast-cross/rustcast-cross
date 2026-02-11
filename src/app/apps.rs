@@ -14,10 +14,7 @@ use iced::{
 };
 
 use crate::{
-    app::{Message, Page, RUSTCAST_DESC_NAME},
-    clipboard::ClipBoardContentType,
-    commands::Function,
-    styles::{result_button_style, result_row_container_style},
+    app::{Message, Page, RUSTCAST_DESC_NAME}, clipboard::ClipBoardContentType, commands::Function, icon::{iced_icon, iced_img_handle}, styles::{result_button_style, result_row_container_style}
 };
 
 #[cfg(target_os = "macos")]
@@ -249,8 +246,15 @@ impl App {
             .spacing(10)
             .height(50);
 
+        let icon = match &self.app_data {
+            AppData::Builtin { .. } => Some(&iced_img_handle::icon_256()),
+            AppData::Command { icon, .. } |
+            AppData::Executable { icon, .. } 
+                => icon.as_ref()
+        };
+
         if theme.show_icons
-            && let Some(icon) = &self.icons
+            && let Some(icon) = icon
         {
             const IMG_SIZE: u32 = 32;
 

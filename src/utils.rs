@@ -93,7 +93,7 @@ fn search_dir(
                 &name.to_lowercase(),
                 "Application",
                 path,
-                None,
+                icon,
             ))
         })
 }

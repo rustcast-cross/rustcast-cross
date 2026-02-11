@@ -4,7 +4,7 @@ use {
         commands::Function,
         cross_platform::windows::{appicon::get_first_icon, get_acp},
     },
-    std::path::PathBuf,
+    std::{ffi::OsStr, path::PathBuf},
     walkdir::WalkDir,
     windows::{
         Win32::{
@@ -59,25 +59,23 @@ pub fn get_apps_from_registry(apps: &mut Vec<App>) {
             let exe = PathBuf::from(exe_path.split(",").next().unwrap());
 
             // make sure it ends with .exe
-            if !exe_string.ends_with(".exe") {
+            if !(exe.extension() == Some(&OsString::from("exe"))) {
                 return;
             }
 
             if !display_name.is_empty() {
-                use crate::{app::apps::AppCommand, commands::Function};
-
                 let icon = get_first_icon(&exe)
                     .inspect_err(|e| tracing::error!("Error getting icons: {e}"))
                     .ok()
                     .flatten();
 
-                apps.push(App {
-                    open_command: AppCommand::Function(Function::OpenApp(exe)),
-                    name: display_name.clone().into_string().unwrap(),
-                    name_lc: display_name.clone().into_string().unwrap().to_lowercase(),
-                    icons: icon,
-                    desc: "Application".to_string(),
-                })
+                apps.push(App::new_executable(
+                    &display_name.clone().to_string_lossy(),
+                    &display_name.clone().to_string_lossy().to_lowercase(),
+                    "Application",
+                    exe,
+                    icon
+                ))
             }
         });
     });
@@ -136,8 +134,7 @@ pub fn index_start_menu() -> Vec<App> {
                     let target = x.link_target();
 
                     tracing::trace!("Link at {} loaded (target: {:?})", path.display(), &target);
-                    let file_name = path.file_name().to_string_lossy().to_string();
-
+                    
                     match target {
                         Some(target) => {
                             let target = PathBuf::from(target);
@@ -146,18 +143,18 @@ pub fn index_start_menu() -> Vec<App> {
                                 .ok()
                                 .flatten();
 
-                            Some(App {
-                                open_command: AppCommand::Function(Function::OpenApp(target)),
-                                desc: "".to_string(),
-                                icons: icon,
-                                name: entry.file_name().to_string_lossy().to_string(),
-                                name_lc: entry.file_name().to_string_lossy().to_string(),
-                            })
+                            Some(App::new_executable(
+                                &target.to_string_lossy(),
+                                &target.to_string_lossy().to_lowercase(),
+                                "Shortcut",
+                                &target,
+                                icon
+                            ))
                         }
                         None => {
                             tracing::trace!(
                                 "Link at {} has no target, skipped",
-                                path.path().display()
+                                path.display()
                             );
                             None
                         }

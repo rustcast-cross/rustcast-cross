@@ -1,7 +1,6 @@
 //! This handles all the different commands that rustcast can perform, such as opening apps,
 //! copying to clipboard, etc.
 use std::path::PathBuf;
-use std::path::PathBuf;
 use std::process::Command;
 #[cfg(target_os = "macos")]
 use std::thread;
@@ -18,7 +17,6 @@ use crate::{calculator::Expr, clipboard::ClipBoardContentType, config::Config};
 /// The different functions that rustcast can perform
 #[derive(Debug, Clone, PartialEq)]
 pub enum Function {
-    OpenApp(PathBuf),
     OpenApp(PathBuf),
     RunShellCommand(String, String),
     OpenWebsite(String),
