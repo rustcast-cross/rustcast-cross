@@ -119,8 +119,8 @@ pub struct Tile {
 
 impl Tile {
     /// This returns the theme of the window
-    pub fn theme(&self, _: window::Id) -> Option<Theme> {
-        Some(self.theme.clone())
+    pub fn theme(&self, _: window::Id) -> Theme {
+        self.theme.clone()
     }
 
     /// This handles the subscriptions of the window
@@ -328,10 +328,7 @@ fn handle_hot_reloading() -> impl futures::Stream<Item = Message> {
 
 fn count_dirs_in_dir(dir: &PathBuf) -> usize {
     // Read the directory; if it fails, treat as empty
-    let entries = match fs::read_dir(dir) {
-        Ok(e) => e,
-        Err(_) => return 0,
-    };
+    let Ok(entries) = fs::read_dir(dir) else { return 0 };
 
     entries
         .filter_map(std::result::Result::ok)

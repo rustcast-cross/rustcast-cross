@@ -192,36 +192,38 @@ pub fn view(tile: &Tile, wid: window::Id) -> Element<'_, Message> {
 
         let results = if tile.page == Page::ClipboardHistory {
             clipboard_view(
-                tile.clipboard_content.clone(),
+                &tile.clipboard_content,
                 tile.focus_id,
-                tile.config.theme.clone(),
+                &tile.config.theme,
                 tile.focus_id,
             )
         } else if tile.results.is_empty() {
             space().into()
         } else if tile.page == Page::EmojiSearch {
-            emoji_page(
-                tile.config.theme.clone(),
-                tile.emoji_apps
+            let results: Vec<_> = tile.emoji_apps
                     .search_prefix(&tile.query_lc)
                     .map(std::borrow::ToOwned::to_owned)
-                    .collect(),
+                    .collect();
+            
+            emoji_page(
+                tile.config.theme.clone(),
+                &results,
                 tile.focus_id,
             )
         } else {
-            container(Column::from_iter(tile.results.iter().enumerate().map(
+            container(tile.results.iter().enumerate().map(
                 |(i, app)| {
+                    #[allow(clippy::cast_possible_truncation)]
                     app.clone()
                         .render(tile.config.theme.clone(), i as u32, tile.focus_id)
-                },
-            )))
+                }
+            ).collect::<Column<_>>())
             .into()
         };
 
         let results_count = match &tile.page {
-            Page::Main => tile.results.len(),
             Page::ClipboardHistory => tile.clipboard_content.len(),
-            Page::EmojiSearch => tile.results.len(),
+            Page::Main | Page::EmojiSearch => tile.results.len(),
         };
 
         let height = if tile.page == Page::ClipboardHistory {
@@ -230,6 +232,7 @@ pub fn view(tile: &Tile, wid: window::Id) -> Element<'_, Message> {
             std::cmp::min(tile.results.len() * 60, 290)
         };
 
+        #[allow(clippy::cast_possible_truncation)]
         let scrollable = Scrollable::with_direction(results, scrollbar_direction)
             .id("results")
             .height(height as u32);

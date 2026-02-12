@@ -27,7 +27,7 @@ pub fn menu_icon(#[cfg(not(target_os = "linux"))] hotkey: HotKey, sender: ExtSen
 
     let menu = Menu::with_items(&[
         &version_item(),
-        &about_item(image),
+        &about_item(&image),
         &open_github_item(),
         &PredefinedMenuItem::separator(),
         &refresh_item(),
@@ -196,7 +196,7 @@ fn quit_item() -> PredefinedMenuItem {
     PredefinedMenuItem::quit(Some("Quit"))
 }
 
-fn about_item(image: DynamicImage) -> PredefinedMenuItem {
+fn about_item(image: &DynamicImage) -> PredefinedMenuItem {
     let about_metadata_builder = AboutMetadataBuilder::new()
         .name(Some("RustCast"))
         .version(Some(

@@ -30,46 +30,47 @@ pub fn get_apps_from_registry(apps: &mut Vec<App>) {
             .unwrap(),
     ];
 
-    registers.iter().for_each(|reg| {
-        reg.enum_keys().for_each(|key| {
-            // Not debug only just because it doesn't run too often
-            tracing::trace!("App added [reg]: {:?}", key);
+    for (key, reg) in registers
+        .iter()
+        .flat_map(|reg| reg.enum_keys().zip(std::iter::repeat(reg)))
+    {
+        // Not debug only just because it doesn't run too often
+        tracing::trace!("App added [reg]: {:?}", key);
 
-            // https://learn.microsoft.com/en-us/windows/win32/msi/uninstall-registry-key
-            let name = key.unwrap();
-            let key = reg.open_subkey(&name).unwrap();
-            let display_name: OsString = key.get_value("DisplayName").unwrap_or_default();
+        // https://learn.microsoft.com/en-us/windows/win32/msi/uninstall-registry-key
+        let name = key.unwrap();
+        let key = reg.open_subkey(&name).unwrap();
+        let display_name: OsString = key.get_value("DisplayName").unwrap_or_default();
 
-            // they might be useful one day ?
-            // let publisher = key.get_value("Publisher").unwrap_or(OsString::new());
-            // let version = key.get_value("DisplayVersion").unwrap_or(OsString::new());
+        // they might be useful one day ?
+        // let publisher = key.get_value("Publisher").unwrap_or(OsString::new());
+        // let version = key.get_value("DisplayVersion").unwrap_or(OsString::new());
 
-            // Trick, I saw on internet to point to the exe location..
-            let exe_path: OsString = key.get_value("DisplayIcon").unwrap_or_default();
-            if exe_path.is_empty() {
-                return;
-            }
-            // if there is something, it will be in the form of
-            // "C:\Program Files\Microsoft Office\Office16\WINWORD.EXE",0
-            let exe_string = exe_path.to_string_lossy();
-            let exe_string = exe_string.split(',').next().unwrap();
+        // Trick, I saw on internet to point to the exe location..
+        let exe_path: OsString = key.get_value("DisplayIcon").unwrap_or_default();
+        if exe_path.is_empty() {
+            return;
+        }
+        // if there is something, it will be in the form of
+        // "C:\Program Files\Microsoft Office\Office16\WINWORD.EXE",0
+        let exe_string = exe_path.to_string_lossy();
+        let exe_string = exe_string.split(',').next().unwrap();
 
-            // make sure it ends with .exe
-            if !exe_string.ends_with(".exe") {
-                return;
-            }
+        // make sure it ends with .exe
+        if !exe_string.ends_with(".exe") {
+            return;
+        }
 
-            if !display_name.is_empty() {
-                apps.push(App::new_executable(
-                    &display_name.clone().to_string_lossy(),
-                    &display_name.clone().to_string_lossy().to_lowercase(),
-                    "Application",
-                    exe_path,
-                    None,
-                ));
-            }
-        });
-    });
+        if !display_name.is_empty() {
+            apps.push(App::new_executable(
+                &display_name.clone().to_string_lossy(),
+                &display_name.clone().to_string_lossy().to_lowercase(),
+                "Application",
+                exe_path,
+                None,
+            ));
+        }
+    }
 }
 
 /// Returns the set of known paths

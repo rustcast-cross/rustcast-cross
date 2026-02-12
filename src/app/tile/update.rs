@@ -21,6 +21,7 @@ use crate::commands::Function;
 use crate::config::Config;
 use crate::utils::index_installed_apps;
 
+#[allow(clippy::too_many_lines)]
 pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
     tracing::trace!("Handling update (message: {:?})", message);
 
@@ -95,10 +96,11 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
         }
 
         Message::ChangeFocus(key) => {
+            #[allow(clippy::cast_possible_truncation)] // No, there won't be more than 2^32-1 items in a list
             let len = match tile.page {
                 Page::ClipboardHistory => tile.clipboard_content.len() as u32,
                 Page::EmojiSearch => tile.emoji_apps.search_prefix(&tile.query_lc).count() as u32, // or tile.results.len()
-                _ => tile.results.len() as u32,
+                Page::Main => tile.results.len() as u32,
             };
 
             let old_focus_id = tile.focus_id;
@@ -139,6 +141,7 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
                 Page::EmojiSearch => 5.,
             };
 
+            #[allow(clippy::cast_precision_loss)]
             Task::batch([
                 task,
                 operation::scroll_to(
@@ -154,7 +157,7 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
         Message::OpenFocused => match tile
             .results
             .get(tile.focus_id as usize)
-            .map(|x| &x.app_data)
+            .map(|x| &x.data)
         {
             Some(AppData::Builtin {
                 command: AppCommand::Function(func),

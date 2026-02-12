@@ -27,6 +27,7 @@ use tracing_subscriber::layer::SubscriberExt;
 #[cfg(target_os = "linux")]
 const SOCKET_PATH: &str = "/tmp/rustcast.sock";
 
+#[allow(clippy::too_many_lines)] // Not reasonably splittable without being less readable
 fn main() -> iced::Result {
     #[cfg(target_os = "macos")]
     cross_platform::macos::set_activation_policy_accessory();

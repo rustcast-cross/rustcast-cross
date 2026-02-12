@@ -3,6 +3,7 @@ use windows::Win32::{Globalization::GetACP, UI::WindowsAndMessaging::GetCursorPo
 
 pub mod app_finding;
 
+#[allow(clippy::cast_precision_loss)]
 pub fn open_on_focused_monitor() -> iced::Point {
     use windows::Win32::Foundation::POINT;
     use windows::Win32::Graphics::Gdi::{
@@ -11,6 +12,8 @@ pub fn open_on_focused_monitor() -> iced::Point {
 
     use crate::app::{DEFAULT_WINDOW_HEIGHT, WINDOW_WIDTH};
     let mut point = POINT { x: 0, y: 0 };
+
+    #[allow(clippy::cast_possible_truncation)]
     let mut monitor_info = MONITORINFO {
         cbSize: std::mem::size_of::<MONITORINFO>() as u32,
         ..Default::default()
@@ -33,6 +36,7 @@ pub fn open_on_focused_monitor() -> iced::Point {
 
 /// Wrapper over `GetACP` that defaults to `WINDOWS_1252` if the ACP isn't found
 pub fn get_acp() -> Encoding {
+    #[allow(clippy::cast_possible_truncation)]
     unsafe { codepage::to_encoding(GetACP() as u16) }.unwrap_or_else(|| {
         tracing::warn!(
             "ACP not found, falling back to WINDOWS_1252 as the default shortcut encoding"
