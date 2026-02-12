@@ -57,14 +57,15 @@ pub fn get_apps_from_registry(apps: &mut Vec<App>) {
         let exe_string = exe_string.split(',').next().unwrap();
 
         // make sure it ends with .exe
-        if !exe_string.ends_with(".exe") {
+        if !exe_string.to_lowercase().ends_with(".exe"){
             return;
         }
 
+        let display_name = display_name.to_string_lossy();
         if !display_name.is_empty() {
             apps.push(App::new_executable(
-                &display_name.clone().to_string_lossy(),
-                &display_name.clone().to_string_lossy().to_lowercase(),
+                &display_name,
+                &display_name,
                 "Application",
                 exe_path,
                 None,
