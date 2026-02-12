@@ -57,7 +57,7 @@ pub fn get_apps_from_registry(apps: &mut Vec<App>) {
         let exe_string = exe_string.split(',').next().unwrap();
 
         // make sure it ends with .exe
-        if !exe_string.to_lowercase().ends_with(".exe"){
+        if !exe_string.to_lowercase().ends_with(".exe") {
             return;
         }
 
@@ -112,17 +112,16 @@ pub fn index_start_menu() -> Vec<App> {
                     let target = x.link_target();
                     let file_name = path.file_name().to_string_lossy().to_string();
 
-                    if let Some(target) = target { Some(App::new_executable(
-                        &file_name,
-                        &file_name,
-                        "",
-                        PathBuf::from(target.clone()),
-                        None,
-                    )) } else {
-                        tracing::debug!(
-                            "Link at {} has no target, skipped",
-                            path.path().display()
-                        );
+                    if let Some(target) = target {
+                        Some(App::new_executable(
+                            &file_name,
+                            &file_name,
+                            "",
+                            PathBuf::from(target.clone()),
+                            None,
+                        ))
+                    } else {
+                        tracing::debug!("Link at {} has no target, skipped", path.path().display());
                         None
                     }
                 }

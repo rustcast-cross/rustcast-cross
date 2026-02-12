@@ -328,7 +328,9 @@ fn handle_hot_reloading() -> impl futures::Stream<Item = Message> {
 
 fn count_dirs_in_dir(dir: &PathBuf) -> usize {
     // Read the directory; if it fails, treat as empty
-    let Ok(entries) = fs::read_dir(dir) else { return 0 };
+    let Ok(entries) = fs::read_dir(dir) else {
+        return 0;
+    };
 
     entries
         .filter_map(std::result::Result::ok)

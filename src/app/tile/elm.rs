@@ -200,24 +200,25 @@ pub fn view(tile: &Tile, wid: window::Id) -> Element<'_, Message> {
         } else if tile.results.is_empty() {
             space().into()
         } else if tile.page == Page::EmojiSearch {
-            let results: Vec<_> = tile.emoji_apps
-                    .search_prefix(&tile.query_lc)
-                    .map(std::borrow::ToOwned::to_owned)
-                    .collect();
-            
-            emoji_page(
-                tile.config.theme.clone(),
-                &results,
-                tile.focus_id,
-            )
+            let results: Vec<_> = tile
+                .emoji_apps
+                .search_prefix(&tile.query_lc)
+                .map(std::borrow::ToOwned::to_owned)
+                .collect();
+
+            emoji_page(tile.config.theme.clone(), &results, tile.focus_id)
         } else {
-            container(tile.results.iter().enumerate().map(
-                |(i, app)| {
-                    #[allow(clippy::cast_possible_truncation)]
-                    app.clone()
-                        .render(tile.config.theme.clone(), i as u32, tile.focus_id)
-                }
-            ).collect::<Column<_>>())
+            container(
+                tile.results
+                    .iter()
+                    .enumerate()
+                    .map(|(i, app)| {
+                        #[allow(clippy::cast_possible_truncation)]
+                        app.clone()
+                            .render(tile.config.theme.clone(), i as u32, tile.focus_id)
+                    })
+                    .collect::<Column<_>>(),
+            )
             .into()
         };
 

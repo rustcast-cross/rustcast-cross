@@ -241,7 +241,9 @@ pub fn is_url_like(s: &str) -> bool {
     }
     let mut parts = s.split('.');
 
-    let Some(tld) = parts.next_back() else { return false };
+    let Some(tld) = parts.next_back() else {
+        return false;
+    };
 
     if tld.is_empty() || tld.len() > 63 || !tld.chars().all(|c| c.is_ascii_alphabetic()) {
         return false;

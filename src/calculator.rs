@@ -49,8 +49,8 @@ pub enum BinOp {
 
 impl Expr {
     pub fn eval(&self) -> Option<f64> {
-        use BinOp::{Add, Sub, Mul, Div, Pow};
-        use UnaryOp::{Plus, Minus};
+        use BinOp::{Add, Div, Mul, Pow, Sub};
+        use UnaryOp::{Minus, Plus};
         match self {
             Expr::Number(x) => Some(*x),
 
@@ -151,7 +151,9 @@ impl<'a> Lexer<'a> {
 
     fn next_token(&mut self) -> Result<Token, String> {
         self.skip_ws();
-        let Some(c) = self.peek_char() else { return Ok(Token::End) };
+        let Some(c) = self.peek_char() else {
+            return Ok(Token::End);
+        };
 
         // single-char tokens
         let tok = match c {

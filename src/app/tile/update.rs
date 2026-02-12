@@ -96,7 +96,8 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
         }
 
         Message::ChangeFocus(key) => {
-            #[allow(clippy::cast_possible_truncation)] // No, there won't be more than 2^32-1 items in a list
+            #[allow(clippy::cast_possible_truncation)]
+            // No, there won't be more than 2^32-1 items in a list
             let len = match tile.page {
                 Page::ClipboardHistory => tile.clipboard_content.len() as u32,
                 Page::EmojiSearch => tile.emoji_apps.search_prefix(&tile.query_lc).count() as u32, // or tile.results.len()
@@ -154,11 +155,7 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
             ])
         }
 
-        Message::OpenFocused => match tile
-            .results
-            .get(tile.focus_id as usize)
-            .map(|x| &x.data)
-        {
+        Message::OpenFocused => match tile.results.get(tile.focus_id as usize).map(|x| &x.data) {
             Some(AppData::Builtin {
                 command: AppCommand::Function(func),
                 ..
@@ -177,8 +174,7 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
         Message::ReloadConfig => {
             let new_config: Config = match toml::from_str(
                 &fs::read_to_string(
-                    std::env::var("HOME").unwrap_or_default()
-                        + "/.config/rustcast/config.toml",
+                    std::env::var("HOME").unwrap_or_default() + "/.config/rustcast/config.toml",
                 )
                 .unwrap_or_default(),
             ) {
@@ -314,8 +310,7 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
             if focused {
                 Task::none()
             } else if cfg!(target_os = "macos") {
-                Task::done(Message::HideWindow(wid))
-                    .chain(Task::done(Message::ClearSearchQuery))
+                Task::done(Message::HideWindow(wid)).chain(Task::done(Message::ClearSearchQuery))
             } else {
                 // linux seems to not wanna unfocus it on start making it not show
                 Task::none()

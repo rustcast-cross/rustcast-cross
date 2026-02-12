@@ -163,7 +163,11 @@ pub(super) fn handle_change(tile: &mut Tile, input: &str, id: Id) -> iced::Task<
     let max_elem = cmp::min(5, new_length);
 
     if prev_size != new_length && tile.page != Page::ClipboardHistory {
-        #[allow(clippy::cast_precision_loss, clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+        #[allow(
+            clippy::cast_precision_loss,
+            clippy::cast_possible_truncation,
+            clippy::cast_sign_loss
+        )]
         Task::batch([
             window::resize(
                 id,
@@ -175,7 +179,11 @@ pub(super) fn handle_change(tile: &mut Tile, input: &str, id: Id) -> iced::Task<
             Task::done(Message::ChangeFocus(ArrowKey::Left)),
         ])
     } else if tile.page == Page::ClipboardHistory {
-        #[allow(clippy::cast_precision_loss, clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+        #[allow(
+            clippy::cast_precision_loss,
+            clippy::cast_possible_truncation,
+            clippy::cast_sign_loss
+        )]
         Task::batch([
             window::resize(
                 id,
