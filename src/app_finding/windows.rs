@@ -33,11 +33,7 @@ pub fn get_apps_from_registry(apps: &mut Vec<App>) {
     registers.iter().for_each(|reg| {
         reg.enum_keys().for_each(|key| {
             // Not debug only just because it doesn't run too often
-            tracing::trace!(
-                target: "reg_app_search",
-                "App added: {:?}",
-                key
-            );
+            tracing::trace!("App added [reg]: {:?}", key);
 
             // https://learn.microsoft.com/en-us/windows/win32/msi/uninstall-registry-key
             let name = key.unwrap();
@@ -115,23 +111,15 @@ pub fn index_start_menu() -> Vec<App> {
                     let file_name = path.file_name().to_string_lossy().to_string();
 
                     match target {
-                        Some(target) => {
-                            tracing::trace!(
-                                target: "smenu_app_search",
-                                "Link at {} added",
-                                path.path().display()
-                            );
-                            Some(App::new_executable(
-                                &file_name,
-                                &file_name,
-                                "",
-                                PathBuf::from(target.clone()),
-                                None,
-                            ))
-                        },
+                        Some(target) => Some(App::new_executable(
+                            &file_name,
+                            &file_name,
+                            "",
+                            PathBuf::from(target.clone()),
+                            None,
+                        )),
                         None => {
-                            tracing::trace!(
-                                target: "smenu_app_search",
+                            tracing::debug!(
                                 "Link at {} has no target, skipped",
                                 path.path().display()
                             );
@@ -140,8 +128,7 @@ pub fn index_start_menu() -> Vec<App> {
                     }
                 }
                 Err(e) => {
-                    tracing::trace!(
-                        target: "smenu_app_search",
+                    tracing::debug!(
                         "Error opening link {} ({e}), skipped",
                         path.path().to_string_lossy()
                     );
