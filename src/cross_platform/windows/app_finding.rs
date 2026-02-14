@@ -2,7 +2,11 @@ use {
     crate::{
         app::apps::App,
         cross_platform::windows::{appicon::get_first_icon, get_acp},
-    }, lnk::ShellLink, std::path::{Path, PathBuf}, walkdir::WalkDir, windows::{
+    },
+    lnk::ShellLink,
+    std::path::{Path, PathBuf},
+    walkdir::WalkDir,
+    windows::{
         Win32::{
             System::Com::CoTaskMemFree,
             UI::Shell::{
@@ -11,7 +15,7 @@ use {
             },
         },
         core::GUID,
-    }
+    },
 };
 
 /// Loads apps from the registry keys `SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall` and
@@ -120,7 +124,11 @@ fn parse_link(lnk: ShellLink, link_path: impl AsRef<Path>) -> Option<App> {
     };
     let target = PathBuf::from(target);
 
-    tracing::trace!("Link at {} loaded (target: {:?})", link_path.display(), &target);
+    tracing::trace!(
+        "Link at {} loaded (target: {:?})",
+        link_path.display(),
+        &target
+    );
 
     let Some(file_name) = target.file_name() else {
         tracing::trace!(
