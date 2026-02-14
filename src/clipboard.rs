@@ -2,7 +2,7 @@
 use arboard::ImageData;
 
 use crate::{
-    app::apps::{App, AppCommand},
+    app::apps::{SimpleApp, AppCommand},
     commands::Function,
 };
 
@@ -16,7 +16,7 @@ pub enum ClipBoardContentType {
 impl ClipBoardContentType {
     /// Returns the iced element for rendering the clipboard item, and the entire content since the
     /// display name is only the first line
-    pub fn to_app(&self) -> App {
+    pub fn to_app(&self) -> SimpleApp {
         let mut name = match self {
             ClipBoardContentType::Image(_) => "<img>".to_string(),
             ClipBoardContentType::Text(a) => a.to_owned(),
@@ -28,7 +28,7 @@ impl ClipBoardContentType {
         // only get the first line from the contents
         name = name.lines().next().unwrap_or("").to_string();
 
-        App::new_builtin(
+        SimpleApp::new_builtin(
             &name,
             &name_lc,
             "Clipboard Item",

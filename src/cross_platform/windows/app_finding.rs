@@ -1,6 +1,6 @@
 use {
     crate::{
-        app::apps::App,
+        app::apps::SimpleApp,
         cross_platform::windows::{appicon::get_first_icon, get_acp},
     },
     lnk::ShellLink,
@@ -23,7 +23,7 @@ use {
 /// appended to it.
 ///
 /// Based on <https://stackoverflow.com/questions/2864984>
-pub fn get_apps_from_registry(apps: &mut Vec<App>) {
+pub fn get_apps_from_registry(apps: &mut Vec<SimpleApp>) {
     use std::ffi::OsString;
     let hkey = winreg::RegKey::predef(winreg::enums::HKEY_LOCAL_MACHINE);
 
@@ -75,7 +75,7 @@ pub fn get_apps_from_registry(apps: &mut Vec<App>) {
                 .ok()
                 .flatten();
 
-            apps.push(App::new_executable(
+            apps.push(SimpleApp::new_executable(
                 &display_name.clone().to_string_lossy(),
                 &display_name.clone().to_string_lossy().to_lowercase(),
                 "Application",
@@ -112,7 +112,7 @@ fn get_windows_path(folder_id: &GUID) -> Option<PathBuf> {
     }
 }
 
-fn parse_link(lnk: ShellLink, link_path: impl AsRef<Path>) -> Option<App> {
+fn parse_link(lnk: ShellLink, link_path: impl AsRef<Path>) -> Option<SimpleApp> {
     let link_path = link_path.as_ref();
 
     let Some(target) = lnk.link_target() else {
@@ -146,7 +146,7 @@ fn parse_link(lnk: ShellLink, link_path: impl AsRef<Path>) -> Option<App> {
         link_path.display()
     );
 
-    Some(App::new_executable(
+    Some(SimpleApp::new_executable(
         &file_name.to_string_lossy(),
         &file_name.to_string_lossy().to_lowercase(),
         "Shortcut",
@@ -155,7 +155,7 @@ fn parse_link(lnk: ShellLink, link_path: impl AsRef<Path>) -> Option<App> {
     ))
 }
 
-pub fn index_start_menu() -> Vec<App> {
+pub fn index_start_menu() -> Vec<SimpleApp> {
     WalkDir::new(r"C:\ProgramData\Microsoft\Windows\Start Menu\Programs")
         .into_iter()
         .filter_map(|x| x.ok())

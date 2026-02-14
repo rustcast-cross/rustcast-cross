@@ -23,7 +23,7 @@ use crate::config::Theme;
 use crate::styles::{contents_style, rustcast_text_input_style, tint, with_alpha};
 use crate::utils::index_installed_apps;
 use crate::{
-    app::{Message, Page, apps::App, default_settings, tile::Tile},
+    app::{Message, Page, apps::SimpleApp, default_settings, tile::Tile},
     config::Config,
 };
 
@@ -122,7 +122,7 @@ pub fn new(
     let mut options = options.unwrap_or_default();
 
     options.extend(config.shells.iter().map(crate::config::Shelly::to_app));
-    options.extend(App::basic_apps());
+    options.extend(SimpleApp::basic_apps());
     options.par_sort_by_key(|x| x.name.len());
     let options = AppIndex::from_apps(options);
 
@@ -133,7 +133,7 @@ pub fn new(
             focus_id: 0,
             results: vec![],
             options,
-            emoji_apps: AppIndex::from_apps(App::emoji_apps()),
+            emoji_apps: AppIndex::from_apps(SimpleApp::emoji_apps()),
             visible: true,
             focused: false,
             config: config.clone(),

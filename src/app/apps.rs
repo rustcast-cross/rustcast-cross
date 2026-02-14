@@ -72,7 +72,7 @@ pub enum AppData {
 /// the data needed to search for the app, to display the app in search results, and to actually
 /// run the app.
 #[derive(Clone, Debug)]
-pub struct App {
+pub struct SimpleApp {
     /// The app name
     pub name: String,
 
@@ -90,13 +90,13 @@ pub struct App {
     id: usize,
 }
 
-impl PartialEq for App {
+impl PartialEq for SimpleApp {
     fn eq(&self, other: &Self) -> bool {
         self.data == other.data && self.name == other.name
     }
 }
 
-impl App {
+impl SimpleApp {
     /// Get the numeric id of an app
     #[allow(unused)]
     pub fn id(&self) -> usize {
@@ -145,11 +145,11 @@ impl App {
     }
 
     /// A vec of all the emojis as App structs
-    pub fn emoji_apps() -> Vec<App> {
+    pub fn emoji_apps() -> Vec<SimpleApp> {
         emojis::iter()
             .filter(|x| x.unicode_version() < emojis::UnicodeVersion::new(17, 13))
             .map(|x| {
-                App::new_builtin(
+                SimpleApp::new_builtin(
                     x.name(),
                     x.name(),
                     "emoji",
@@ -161,7 +161,7 @@ impl App {
             .collect()
     }
     /// This returns the basic apps that rustcast has, such as quiting rustcast and opening preferences
-    pub fn basic_apps() -> Vec<App> {
+    pub fn basic_apps() -> Vec<SimpleApp> {
         let app_version = option_env!("APP_VERSION").unwrap_or("Unknown Version");
 
         vec![

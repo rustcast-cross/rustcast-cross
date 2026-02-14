@@ -16,7 +16,7 @@ use crate::cross_platform::linux::get_installed_linux_apps;
 #[cfg(any(target_os = "windows", target_os = "linux"))]
 use std::process::Command;
 
-use crate::app::apps::App;
+use crate::app::apps::SimpleApp;
 
 pub fn get_config_installation_dir() -> PathBuf {
     if cfg!(target_os = "windows") {
@@ -45,7 +45,7 @@ fn search_dir(
     exclude_patterns: &[glob::Pattern],
     include_patterns: &[glob::Pattern],
     max_depth: usize,
-) -> impl ParallelIterator<Item = App> {
+) -> impl ParallelIterator<Item = SimpleApp> {
     use walkdir::WalkDir;
 
     WalkDir::new(path.as_ref())
@@ -94,7 +94,7 @@ fn search_dir(
             #[cfg(not(target_os = "windows"))]
             let icon = None;
 
-            Some(App::new_executable(
+            Some(SimpleApp::new_executable(
                 &name,
                 &name.to_lowercase(),
                 "Application",
@@ -152,7 +152,7 @@ pub fn open_application(path: impl AsRef<Path>) {
     }
 }
 
-pub fn index_installed_apps(config: &Config) -> anyhow::Result<Vec<App>> {
+pub fn index_installed_apps(config: &Config) -> anyhow::Result<Vec<SimpleApp>> {
     tracing::debug!("Indexing installed apps");
     tracing::debug!("Exclude patterns: {:?}", &config.index_exclude_patterns);
     tracing::debug!("Include patterns: {:?}", &config.index_include_patterns);

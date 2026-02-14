@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 #[cfg(target_os = "windows")]
 use crate::cross_platform::windows::app_finding::get_known_paths;
 use crate::{
-    app::apps::{App, AppData},
+    app::apps::{SimpleApp, AppData},
     cross_platform::get_img_handle,
 };
 
@@ -199,13 +199,13 @@ pub struct Shelly {
 
 impl Shelly {
     /// Converts the shelly struct to an app so that it can be added to the app list
-    pub fn to_app(&self) -> App {
+    pub fn to_app(&self) -> SimpleApp {
         let self_clone = self.clone();
         let icon = self_clone.icon_path.map(|x| {
             let x = x.replace('~', &std::env::var("HOME").unwrap());
             get_img_handle(&PathBuf::from(x))
         });
-        App::new(
+        SimpleApp::new(
             &self_clone.alias,
             &self_clone.alias_lc,
             "Shell Command",

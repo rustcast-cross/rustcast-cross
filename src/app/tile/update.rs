@@ -9,7 +9,7 @@ use rayon::slice::ParallelSliceMut;
 
 use crate::app::apps::AppData;
 use crate::app::{
-    ArrowKey, DEFAULT_WINDOW_HEIGHT, Message, Move, Page, WINDOW_WIDTH, apps::App,
+    ArrowKey, DEFAULT_WINDOW_HEIGHT, Message, Move, Page, WINDOW_WIDTH, apps::SimpleApp,
     apps::AppCommand, default_settings, menubar::menu_icon, tile::AppIndex, tile::Tile,
     tile::search_query,
 };
@@ -189,7 +189,7 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
             }
 
             options.extend(new_config.shells.iter().map(crate::config::Shelly::to_app));
-            options.extend(App::basic_apps());
+            options.extend(SimpleApp::basic_apps());
             options.par_sort_by_key(|x| x.name.len());
 
             tile.theme = new_config.theme.clone().into();
