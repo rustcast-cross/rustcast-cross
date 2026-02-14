@@ -22,7 +22,7 @@ use crate::config::Config;
 use crate::utils::index_installed_apps;
 
 pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
-    tracing::trace!("Handling update (message: {:?})", message);
+    tracing::trace!(target: "update", "{:?}", message);
 
     match message {
         Message::OpenWindow => {
