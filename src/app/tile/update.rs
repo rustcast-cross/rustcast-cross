@@ -106,7 +106,7 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
                 _ => 1,
             };
 
-            let task = match (key, &tile.page) {
+            let task = match (&key, &tile.page) {
                 (ArrowKey::Down, _) => {
                     tile.focus_id = (tile.focus_id + change_by) % len;
                     Task::none()
@@ -126,11 +126,24 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
                 _ => Task::none(),
             };
 
-            let direction = if tile.focus_id < old_focus_id { -1 } else { 1 };
             let quantity = match tile.page {
                 Page::Main => 66.5,
                 Page::ClipboardHistory => 50.,
                 Page::EmojiSearch => 5.,
+            };
+
+            let (wrapped_up, wrapped_down) = match &key {
+                ArrowKey::Up => (tile.focus_id > old_focus_id, false),
+                ArrowKey::Down => (false, tile.focus_id < old_focus_id),
+                _ => (false, false),
+            };
+
+            let y = if wrapped_down {
+                0.0
+            } else if wrapped_up {
+                (len.saturating_sub(1)) as f32 * quantity
+            } else {
+                tile.focus_id as f32 * quantity
             };
 
             Task::batch([
@@ -139,7 +152,7 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
                     "results",
                     AbsoluteOffset {
                         x: None,
-                        y: Some((tile.focus_id as f32 * quantity) * direction as f32),
+                        y: Some(y),
                     },
                 ),
             ])
