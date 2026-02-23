@@ -68,7 +68,9 @@ impl Default for Config {
             index_dirs,
             index_exclude_patterns: vec![],
             index_include_patterns: vec![],
-            log: HashMap::new()
+            log: HashMap::from([
+                (String::from("stdout"), Logger::Stdout { level: Level::INFO, use_ansi: true, env_filter: None })
+            ])
         }
     }
 }
@@ -223,17 +225,26 @@ impl Shelly {
     }
 }
 
+// Exists for serde reasons
+const fn true_f() -> bool { true }
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
-#[serde(rename_all = "lowercase")] // so that the type doesn't have to be in pascalcase within the config
-enum Logger {
+#[serde(rename_all = "lowercase")] // so that the type doesn't have to be in PascalCase within the config
+pub enum Logger {
     File {
-        path: String,
+        path: PathBuf,
         #[serde(with = "level")]
-        level: Level
+        level: Level,
+        #[serde(default)]
+        use_ansi: bool,
+        env_filter: Option<String> // cba to make a serde parser for EnvFilter, it's just not necessary
     },
     Stdout {
         #[serde(with = "level")]
-        level: Level
+        level: Level,
+        #[serde(default = "true_f")]
+        use_ansi: bool,
+        env_filter: Option<String>
     }
 }
