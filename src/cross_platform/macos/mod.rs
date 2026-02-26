@@ -3,7 +3,7 @@
 
 pub mod haptics;
 
-use crate::app::apps::{SimpleApp, AppCommand};
+use crate::app::apps::{AppCommand, SimpleApp};
 use crate::commands::Function;
 use crate::config::Config;
 use crate::utils::index_installed_apps;
