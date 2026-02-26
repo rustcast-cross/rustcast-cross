@@ -1,7 +1,7 @@
 //! This has all the utility functions that rustcast uses
 use std::{
     io,
-    path::{Path, PathBuf}
+    path::{Path, PathBuf},
 };
 
 #[cfg(target_os = "macos")]

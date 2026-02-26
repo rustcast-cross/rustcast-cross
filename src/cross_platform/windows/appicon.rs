@@ -101,9 +101,15 @@ fn hicon_to_imghandle(hicon: HICON) -> Result<widget::image::Handle, windows::co
 
     // Won't question why the lint allowing only works right with a block
     #[allow(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
-    { debug_assert_eq!(biWidth * -biHeight * 4, bitmap.len() as i32); }
+    {
+        debug_assert_eq!(biWidth * -biHeight * 4, bitmap.len() as i32);
+    }
 
-    #[allow(clippy::cast_possible_truncation, clippy::cast_possible_wrap, clippy::cast_sign_loss)]
+    #[allow(
+        clippy::cast_possible_truncation,
+        clippy::cast_possible_wrap,
+        clippy::cast_sign_loss
+    )]
     let data = widget::image::Handle::from_rgba(biWidth as u32, (-biHeight) as u32, bitmap);
 
     Ok(data)
@@ -114,7 +120,11 @@ fn get_icon_bitmap(icon_info: &ICONINFOEXW) -> Result<(BITMAPINFO, Vec<u8>), win
     let hdc_mem = unsafe { CreateCompatibleDC(hdc_screen) };
     let hbm_old = unsafe { SelectObject(hdc_mem, icon_info.hbmColor) };
 
-    #[allow(clippy::cast_possible_truncation, clippy::cast_possible_wrap, clippy::cast_sign_loss)]
+    #[allow(
+        clippy::cast_possible_truncation,
+        clippy::cast_possible_wrap,
+        clippy::cast_sign_loss
+    )]
     let mut bmp_info = BITMAPINFO {
         bmiHeader: BITMAPINFOHEADER {
             biSize: std::mem::size_of::<BITMAPINFOHEADER>() as u32,

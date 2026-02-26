@@ -1,7 +1,20 @@
 use std::path::PathBuf;
 
 use lnk::{Encoding, encoding::WINDOWS_1252};
-use windows::{Win32::{Globalization::GetACP, System::Com::CoTaskMemFree, UI::{Shell::{FOLDERID_LocalAppData, FOLDERID_ProgramFiles, FOLDERID_ProgramFilesX86, KF_FLAG_DEFAULT, SHGetKnownFolderPath}, WindowsAndMessaging::GetCursorPos}}, core::GUID};
+use windows::{
+    Win32::{
+        Globalization::GetACP,
+        System::Com::CoTaskMemFree,
+        UI::{
+            Shell::{
+                FOLDERID_LocalAppData, FOLDERID_ProgramFiles, FOLDERID_ProgramFilesX86,
+                KF_FLAG_DEFAULT, SHGetKnownFolderPath,
+            },
+            WindowsAndMessaging::GetCursorPos,
+        },
+    },
+    core::GUID,
+};
 
 pub mod appicon;
 
@@ -46,7 +59,6 @@ pub fn get_acp() -> Encoding {
         WINDOWS_1252
     })
 }
-
 
 /// Wrapper around `SHGetKnownFolderPath` to get paths to known folders
 fn get_windows_path(folder_id: &GUID) -> Option<PathBuf> {

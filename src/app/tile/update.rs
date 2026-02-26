@@ -17,9 +17,9 @@ use crate::app::{
 #[cfg(target_os = "macos")]
 use crate::cross_platform::macos;
 
+use crate::app_finding::index_installed_apps;
 use crate::commands::Function;
 use crate::config::Config;
-use crate::app_finding::index_installed_apps;
 
 #[allow(clippy::too_many_lines)]
 pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {

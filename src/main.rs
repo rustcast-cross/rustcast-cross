@@ -1,8 +1,10 @@
 mod app;
+mod app_finding;
 mod calculator;
 mod clipboard;
 mod commands;
 mod config;
+mod cross_platform;
 mod icon;
 mod styles;
 mod unit_conversion;
