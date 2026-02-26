@@ -3,42 +3,49 @@
   <img src="docs/icon.png" width="128" height="128" alt="RustCast icon" />
 </p>
 
-<h1 align="center">RustCast</h1>
+<h1 align="center">rustcast-cross</h1>
 
 <p align="center">
-  An open-source, Rust-powered alternative to Raycast/PowerToys — a fast popup launcher for apps, utilities, and workflows.
+    A fork of <a href="https://github.com/umangsurana/rustcast">rustcast</a> with active cross platform development
 </p>
 
 <p align="center">
-  <a href="https://github.com/unsecretised/rustcast/releases/latest">
-    <img alt="Latest release" src="https://img.shields.io/github/v/release/unsecretised/rustcast?display_name=tag&sort=semver&style=flat-square" />
-  </a>
-  <a href="https://github.com/unsecretised/rustcast/releases">
-    <img alt="Downloads" src="https://img.shields.io/github/downloads/unsecretised/rustcast/total?style=flat-square" />
-  </a>
-  <a href="https://discord.gg/bDfNYPbnC5">
-    <img alt="Discord" src="https://img.shields.io/discord/1463119282459119844?label=Discord&logo=discord&logoColor=white&style=flat-square" />
-  </a>
-  <a href="https://github.com/unsecretised/rustcast/stargazers">
-    <img alt="Stars" src="https://img.shields.io/github/stars/unsecretised/rustcast?style=flat-square" />
+  <a href="https://github.com/rustcast-cross/rustcast-cross/stargazers">
+    <img alt="Stars" src="https://img.shields.io/github/stars/rustcast-cross/rustcast-cross?style=flat-square" />
   </a>
   <a href="https://github.com/unsecretised/rustcast/blob/main/LICENSE">
     <img alt="License" src="https://img.shields.io/github/license/unsecretised/rustcast?style=flat-square" />
   </a>
 </p>
 
-> RustCast, Raycast and PowerToys are productivity tools. They provide a popup
-> search bar that people can use to do many things, like opening apps,
-> calculators, quick-notes, etc.
+RustCast, Raycast and PowerToys Run are productivity tools. They provide a popup
+search bar that people can use to do many things, like opening apps,
+calculators, quick-notes, etc.
 
 **Community:** https://discord.gg/bDfNYPbnC5
 
+## Why does this fork exist?
+
+The main repo recently stopped having official support for platforms other than MacOS. This fork is
+meant to have that.
+
+It'll probably be less polished than the main repo, at least in the short term, and they probably
+*won't* have perfect feature parity by any means, since that's just not all that important.
+
+
 ![RustCast Demo PreRelease V1](./docs/rustcast-v0-5-0.png)
-## Installation:
 
-### Via Homebrew:
+## Supported platforms
 
-> Requires Homebrew
+- **Windows**
+- **MacOS** \*
+- **Linux** \*
+
+\* Probably rather wonky
+
+## Installation
+
+### Homebrew
 
 ```
 brew tap unsecretised/tap
@@ -52,14 +59,16 @@ use spotlight :) Have fun!)
 
 1. Go to the
    [releases page](https://github.com/unsecretised/rustcast/releases/latest)
-2. Download the `.zip` file or `.dmg` file
-3. If `.dmg` file, open it and drag the `RustCast.app` to your `/Applications/`
+1. Download the `.zip` file or `.dmg` file
+1. If `.dmg` file, open it and drag the `RustCast.app` to your `/Applications/`
    (you should be guided)
-4. If `.zip` file, extract the `RustCast.app` to your `/Applications/`
+1. If `.zip` file, extract the `RustCast.app` to your `/Applications/`
 
-### Build it youself:
+### Building it youself
 
-1. Clone the repo with `git clone https://github.com/unsecretised/rustcast.git`
+#### MacOS
+
+1. Clone the repo with `git clone https://github.com/rustcast-cross/rustcast-cross/rustcast.git`
 1. Install `cargo bundle` with `cargo install cargo-bundle` (Requires cargo to
    be installed)
 1. Run `cargo bundle --release` to build RustCast for your system (The App Dir
@@ -67,7 +76,15 @@ use spotlight :) Have fun!)
 1. Move the `RustCast.app` directory to your `/Applications/` folder, and launch
    RustCast
 
-## Config:
+#### Windows and Linux
+
+1. Clone the repo with `git clone https://github.com/rustcast-cross/rustcast-cross/rustcast.git`
+1. Run `cargo build --release` to build rustcast for your own device
+
+## Config
+
+> [!NOTE]
+> Taken verbatim from the upstream repo
 
 > I have a high chance of forgetting to update the config docs, but even if I
 > do, you will most likely be able to find my config and a list of the latest
@@ -80,9 +97,9 @@ creates the default configuration for you, but it does use its
 configure [The list](docs/config.toml) The blurring is still a bit wonky, and
 will be fixed in the upcoming releases
 
-## Feature list:
+## Feature list
 
-### Finished:
+### Finished
 
 - [x] Autoload installed apps 11/11/2025
 - [x] Search through apps 11/11/2025
@@ -118,6 +135,9 @@ will be fixed in the upcoming releases
 
 ## RustCast wouldn't be possible without these people:
 
+> [!NOTE]
+> Taken verbatim from the upstream repo
+
 - [Nazeofel](https://github.com/Nazeofel) - First sponsor + initiater of windows
   support
 - [Mnem42](https://github.com/mnem42) - Helped add windows support
@@ -134,23 +154,13 @@ All the people who starred my repo!!
 Those who sponsor me also get a free easter egg inside RustCast, so if you want
 a free easter egg, a dollar is all you need!
 
-And the updated list of contributors to the macos version:
+### Contributors
 
-<a href="https://github.com/unsecretised/rustcast/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=unsecretised/rustcast" />
+<a href="https://github.com/rustcast-cross/rustcast-cross/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=rustcast-cross/rustcast-cross" />
 </a>
 
 ### Easter egg list:
 
 - Nazeofel (Random Variable on discord) -> led to the _randomvar_ easter egg
 - Lemon -> led to the _lemon_ easter egg that shows "lemon" on rustcast
-
-## If you like rustcast, consider starring it on github :)
-
-[![Star History Chart](https://api.star-history.com/svg?repos=unsecretised/rustcast&type=date&legend=top-left)](https://www.star-history.com/#unsecretised/rustcast&type=date&legend=top-left)
-
-## Motivations:
-
-I didn't want to pay for raycast + wanted to get better at rust. Raycast in
-itself is one of the most useful productivity apps in my opinion, and it is
-truly an underappreiciated marvel of computer engineering
