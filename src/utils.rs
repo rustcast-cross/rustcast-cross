@@ -84,33 +84,6 @@ pub fn open_application(path: impl AsRef<Path>) {
     }
 }
 
-/// Check if the provided string looks like a valid url
-pub fn is_url_like(s: &str) -> bool {
-    if s.starts_with("http://") || s.starts_with("https://") {
-        return true;
-    }
-    if !s.contains('.') {
-        return false;
-    }
-    let mut parts = s.split('.');
-
-    let Some(tld) = parts.next_back() else {
-        return false;
-    };
-
-    if tld.is_empty() || tld.len() > 63 || !tld.chars().all(|c| c.is_ascii_alphabetic()) {
-        return false;
-    }
-
-    parts.all(|label| {
-        !label.is_empty()
-            && label.len() <= 63
-            && label.chars().all(|c| c.is_ascii_alphanumeric() || c == '-')
-            && !label.starts_with('-')
-            && !label.ends_with('-')
-    })
-}
-
 /// Converts a slice of BGRA data to RGBA using SIMD
 ///
 /// Stolen from <https://stackoverflow.com/a/78190249>/
