@@ -345,11 +345,9 @@ fn handle_recipient() -> impl futures::Stream<Item = Message> {
             .expect("Sender not sent");
         loop {
             let abcd = recipient
-                .try_next()
+                .try_recv()
                 .map(async |msg| {
-                    if let Some(msg) = msg {
-                        output.send(msg).await.unwrap();
-                    }
+                    output.send(msg).await.unwrap();
                 })
                 .ok();
 

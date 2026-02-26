@@ -99,8 +99,7 @@ will be fixed in the upcoming releases
 - [x] Calculator (27/12/2025)
 - [x] Clipboard History (29/12/2025) This works by typing `cbhist` to enter the
       cliboard history page, which allows u to access your clipboard history,
-- [x] Blur / transparent background (7/1/2026) and then use `main` to switch
-      back, or just open an close the app again
+- [x] Blur / transparent background (7/1/2026) 
 - [x] Select the options using arrow keys
 - [x] Tray icons (8/1/2026)
 - [x] Unit Conversions (19/1/2026) thanks to [Hriztam](https://github.com/hriztam)
@@ -109,11 +108,17 @@ will be fixed in the upcoming releases
 ### Planned:
 
 - [ ] Popup note-taking
+- [ ] Settings Panel
 - [ ] Plugin Support (Partially implemented on 15/12/2025)
 - [ ] Hyperkey - Map CMD + OPT + CTRL + SHIFT to a physical key
+- [ ] Image rendering from clipboard history
+- [ ] Better hotkey picking
 - [ ] Ability to pick between tabs in firefox / chromium browsers - using
       [Puppeteer](https://pptr.dev/)
-- [ ] Cross platform support
+
+### Not planned:
+- [ ] Cross platform support 
+    Cancelled for now, as  not within my ability to support and maintain it
 
 ## RustCast wouldn't be possible without these people:
 
@@ -126,13 +131,14 @@ will be fixed in the upcoming releases
   Discord Nitro
 - [Julie / Zoey](https://github.com/zoey-on-github) - Gave me amazing feedback
   and has been using RustCast since almost the first version!
+- [Hriztam](https://github.com/hriztam) - Added support for unit conversions to rustcast
 
 All the people who starred my repo!!
 
 Those who sponsor me also get a free easter egg inside RustCast, so if you want
 a free easter egg, a dollar is all you need!
 
-And the updated list of contributors:
+And the updated list of contributors to the macos version:
 
 <a href="https://github.com/unsecretised/rustcast/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=unsecretised/rustcast" />
