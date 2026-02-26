@@ -1,6 +1,10 @@
 use std::path::Path;
 
-use crate::{app::apps::SimpleApp, config::Config, utils::{get_config_file_path, read_config_file}};
+use crate::{
+    app::apps::SimpleApp,
+    config::Config,
+    utils::{get_config_file_path, read_config_file},
+};
 use rayon::prelude::*;
 
 #[cfg(target_os = "linux")]
@@ -9,7 +13,6 @@ mod linux;
 mod macos;
 #[cfg(target_os = "windows")]
 mod windows;
-
 
 /// Recursively loads apps from a set of folders.
 ///

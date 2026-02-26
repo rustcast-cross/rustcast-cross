@@ -1,7 +1,6 @@
+use crate::{app::apps::App, config::Config, utils::index_installed_apps};
 use std::path::PathBuf;
 use std::process::exit;
-use crate::{app::apps::App, config::Config, utils::index_installed_apps};
-
 
 fn get_installed_apps(dir: impl AsRef<Path>, store_icons: bool) -> Vec<App> {
     let entries: Vec<_> = fs::read_dir(dir.as_ref())

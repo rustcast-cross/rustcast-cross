@@ -1,7 +1,7 @@
 use {
     crate::{app::apps::SimpleApp, cross_platform::windows::get_acp},
     std::path::PathBuf,
-    walkdir::WalkDir
+    walkdir::WalkDir,
 };
 
 /// Loads apps from the registry keys `SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall` and
@@ -83,10 +83,7 @@ pub fn index_start_menu() -> Vec<SimpleApp> {
                             None,
                         ))
                     } else {
-                        tracing::debug!(
-                            "Link at {} has no target, skipped",
-                            path.path().display()
-                        );
+                        tracing::debug!("Link at {} has no target, skipped", path.path().display());
                         None
                     }
                 }
