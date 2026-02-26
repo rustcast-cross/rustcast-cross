@@ -102,7 +102,7 @@ pub fn transform_process_to_ui_element() -> u32 {
     }
 }
 
-fn get_installed_apps(dir: impl AsRef<Path>, store_icons: bool) -> Vec<App> {
+fn get_installed_apps(dir: impl AsRef<Path>, store_icons: bool) -> Vec<SimpleApp> {
     let entries: Vec<_> = fs::read_dir(dir.as_ref())
         .unwrap_or_else(|x| {
             tracing::error!(
@@ -213,7 +213,7 @@ fn get_installed_apps(dir: impl AsRef<Path>, store_icons: bool) -> Vec<App> {
             };
 
             let name = file_name.strip_suffix(".app").unwrap().to_string();
-            Some(App::new_executable(
+            Some(SimpleApp::new_executable(
                 &name,
                 &name.to_lowercase(),
                 "Application",
@@ -224,7 +224,7 @@ fn get_installed_apps(dir: impl AsRef<Path>, store_icons: bool) -> Vec<App> {
         .collect()
 }
 
-pub fn get_installed_macos_apps(config: &Config) -> anyhow::Result<Vec<App>> {
+pub fn get_installed_macos_apps(config: &Config) -> anyhow::Result<Vec<SimpleApp>> {
     let store_icons = config.theme.show_icons;
     let user_local_path = std::env::var("HOME").unwrap() + "/Applications/";
     let paths: Vec<String> = vec![
