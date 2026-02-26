@@ -9,26 +9,20 @@ use rayon::slice::ParallelSliceMut;
 
 use crate::{
     app::{
+        ArrowKey, DEFAULT_WINDOW_HEIGHT, Message, Move, Page, WINDOW_WIDTH,
         apps::{App, AppCommand, AppData},
         default_settings,
         menubar::menu_icon,
         tile::{AppIndex, Tile, search_query},
-        ArrowKey, Message, Move, Page, DEFAULT_WINDOW_HEIGHT, WINDOW_WIDTH, RUSTCAST_DESC_NAME,
     },
-    calculator::Expr,
-    clipboard::ClipBoardContentType,
     commands::Function,
     config::Config,
-    platform::{focus_this_app, get_installed_apps, perform_haptic, HapticPattern},
-    unit_conversion,
-    utils::is_valid_url,
+    platform::get_installed_apps,
 };
 
 #[cfg(target_os = "macos")]
 use crate::cross_platform::macos;
 
-use crate::commands::Function;
-use crate::config::Config;
 use crate::utils::index_installed_apps;
 
 pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {

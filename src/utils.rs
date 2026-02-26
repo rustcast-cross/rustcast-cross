@@ -2,13 +2,19 @@
 use iced::widget::image::Handle;
 use icns::IconFamily;
 use image::RgbaImage;
-use objc2_app_kit::NSWorkspace;
-use objc2_foundation::NSURL;
+use objc2_foundation::NSString;
 use std::{
-    io,
+    fs::File,
+    io::{self, Write},
     path::{Path, PathBuf},
+    process::exit,
+    thread,
     time::Instant,
 };
+
+/// The default error log path (works only on unix systems, and must be changed for windows
+/// support)
+const ERR_LOG_PATH: &str = "/tmp/rustscan-err.log";
 
 use rayon::prelude::*;
 
@@ -24,6 +30,19 @@ pub(crate) fn log_error(msg: &str) {
     if let Ok(mut file) = File::options().create(true).append(true).open(ERR_LOG_PATH) {
         let _ = file.write_all(msg.as_bytes()).ok();
     }
+}
+
+/// Open the settings file with the system default editor
+pub fn open_settings() {
+    #[cfg(target_os = "macos")]
+    thread::spawn(move || {
+        NSWorkspace::new().openURL(&NSURL::fileURLWithPath(
+            &objc2_foundation::NSString::from_str(
+                &(std::env::var("HOME").unwrap_or("".to_string())
+                    + "/.config/rustcast/config.toml"),
+            ),
+        ));
+    });
 }
 
 /// This logs an error to the error log file, and exits the program
@@ -52,9 +71,6 @@ pub(crate) fn handle_from_icns(path: &Path) -> Option<Handle> {
     ))
 }
 
-/// Open the settings file with the system default editor
-pub fn open_settings() {
-    thread::spawn(move || {
 #[cfg(any(target_os = "windows", target_os = "linux"))]
 use std::process::Command;
 

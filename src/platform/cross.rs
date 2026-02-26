@@ -140,12 +140,11 @@ fn discover_apps(
         };
 
         let name = file_name.strip_suffix(".app").unwrap().to_string();
-        Some(App {
-            open_command: AppCommand::Function(Function::OpenApp(path_str)),
-            desc: "Application".to_string(),
-            icons,
-            name_lc: name.to_lowercase(),
-            name,
-        })
+        Some(App::new_builtin(
+            &name,
+            &name.to_lowercase(),
+            "",
+            AppCommand::Function(Function::OpenApp(PathBuf::from(path_str))),
+        ))
     })
 }

@@ -22,6 +22,7 @@ use std::{
 
 use objc2_core_foundation::{CFArray, CFRetained, CFURL};
 use objc2_foundation::{NSBundle, NSNumber, NSString, NSURL, ns_string};
+use rand::random;
 use rayon::iter::{IntoParallelIterator, ParallelIterator as _};
 
 use crate::{
@@ -239,7 +240,7 @@ fn query_app(url: impl AsRef<NSURL>, store_icons: bool) -> Option<App> {
                 .map(|stem| stem.to_string_lossy().into_owned())
         })?;
 
-    let icons = store_icons
+    let icon = store_icons
         .then(|| {
             get_string(ns_string!("CFBundleIconFile")).and_then(|icon| {
                 let mut path = path.join("Contents/Resources").join(&icon);
@@ -252,13 +253,13 @@ fn query_app(url: impl AsRef<NSURL>, store_icons: bool) -> Option<App> {
         })
         .flatten();
 
-    Some(App {
-        name: name.clone(),
-        name_lc: name.to_lowercase(),
-        desc: "Application".to_string(),
-        icons,
-        open_command: AppCommand::Function(Function::OpenApp(path.to_string_lossy().into_owned())),
-    })
+    Some(App::new_executable(
+        &name,
+        &name.to_lowercase(),
+        "Application",
+        path,
+        icon,
+    ))
 }
 
 /// Returns all installed applications discovered via Launch Services.

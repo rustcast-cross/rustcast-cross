@@ -10,7 +10,7 @@ use std::{
     sync::LazyLock,
 };
 
-use crate::platform::HapticPattern;
+pub use crate::platform::HapticPattern;
 
 unsafe extern "C" {
     unsafe fn CFRelease(cf: *mut CFType);
