@@ -116,10 +116,6 @@ will be fixed in the upcoming releases
 - [ ] Ability to pick between tabs in firefox / chromium browsers - using
       [Puppeteer](https://pptr.dev/)
 
-### Not planned:
-- [ ] Cross platform support 
-    Cancelled for now, as  not within my ability to support and maintain it
-
 ## RustCast wouldn't be possible without these people:
 
 - [Nazeofel](https://github.com/Nazeofel) - First sponsor + initiater of windows
