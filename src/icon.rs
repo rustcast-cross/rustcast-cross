@@ -27,7 +27,7 @@ const IMG_256: &[u8] = include_bytes!("../assets/icon/icon256.png");
 // const IMG_512: &[u8] = include_bytes!("../assets/icon/icon512.png");
 
 pub mod iced_icon {
-    use super::*;
+    use super::IMG_256;
 
     // static_geticon!(icon_64, IMG_64, 64);
     // static_geticon!(icon_128, IMG_128, 128);
@@ -36,7 +36,7 @@ pub mod iced_icon {
 }
 
 pub mod iced_img_handle {
-    use super::*;
+    use super::IMG_256;
 
     // static_geticon_imghandle!(icon_64, IMG_64);
     // static_geticon_imghandle!(icon_128, IMG_128);

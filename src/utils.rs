@@ -85,7 +85,7 @@ fn search_dir(
 
                 get_first_icon(path)
                     .inspect_err(|e| {
-                        tracing::error!("Error getting icon for {}: {e}", path.display())
+                        tracing::error!("Error getting icon for {}: {e}", path.display());
                     })
                     .ok()
                     .flatten()
@@ -285,7 +285,7 @@ pub fn is_url_like(s: &str) -> bool {
 
 /// Converts a slice of BGRA data to RGBA using SIMD
 ///
-/// Stolen from https://stackoverflow.com/a/78190249/
+/// Stolen from <https://stackoverflow.com/a/78190249>/
 #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
 pub fn bgra_to_rgba(data: &mut [u8]) {
     use std::arch::x86_64::__m128i;
@@ -309,9 +309,9 @@ pub fn bgra_to_rgba(data: &mut [u8]) {
     };
     // For each 16-byte chunk in your data
     for chunk in data.chunks_exact_mut(16) {
-        let mut vector = unsafe { _mm_loadu_si128(chunk.as_ptr() as *const __m128i) };
+        let mut vector = unsafe { _mm_loadu_si128(chunk.as_ptr().cast::<__m128i>()) };
         vector = unsafe { _mm_shuffle_epi8(vector, mask) };
-        unsafe { _mm_storeu_si128(chunk.as_mut_ptr() as *mut __m128i, vector) };
+        unsafe { _mm_storeu_si128(chunk.as_mut_ptr().cast::<__m128i>(), vector) };
     }
 }
 

@@ -2,7 +2,7 @@
 use arboard::ImageData;
 
 use crate::{
-    app::apps::{SimpleApp, AppCommand},
+    app::apps::{AppCommand, SimpleApp},
     commands::Function,
 };
 

@@ -8,7 +8,7 @@ use super::Tile;
 use crate::{
     app::{
         ArrowKey, DEFAULT_WINDOW_HEIGHT, Message, Page, WINDOW_WIDTH,
-        apps::{SimpleApp, AppCommand},
+        apps::{AppCommand, SimpleApp},
     },
     calculator::Expr,
     clipboard::ClipBoardContentType,

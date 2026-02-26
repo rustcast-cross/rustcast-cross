@@ -62,7 +62,7 @@ pub fn get_apps_from_registry(apps: &mut Vec<SimpleApp>) {
         // if there is something, it will be in the form of
         // "C:\Program Files\Microsoft Office\Office16\WINWORD.EXE",0
         let exe_path = exe_path.to_string_lossy().to_string();
-        let exe = PathBuf::from(exe_path.split(",").next().unwrap());
+        let exe = PathBuf::from(exe_path.split(',').next().unwrap());
 
         // make sure it ends with .exe
         if exe.extension() != Some(&OsString::from("exe")) {
@@ -81,7 +81,7 @@ pub fn get_apps_from_registry(apps: &mut Vec<SimpleApp>) {
                 "Application",
                 exe,
                 icon,
-            ))
+            ));
         }
     }
 }
@@ -158,7 +158,7 @@ fn parse_link(lnk: ShellLink, link_path: impl AsRef<Path>) -> Option<SimpleApp> 
 pub fn index_start_menu() -> Vec<SimpleApp> {
     WalkDir::new(r"C:\ProgramData\Microsoft\Windows\Start Menu\Programs")
         .into_iter()
-        .filter_map(|x| x.ok())
+        .filter_map(std::result::Result::ok)
         .filter_map(|entry| {
             let ext = entry.path().extension();
             let path = entry.path();
