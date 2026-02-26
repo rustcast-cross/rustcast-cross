@@ -5,7 +5,7 @@ use iced::{Font, font::Family, theme::Custom};
 use serde::{Deserialize, Serialize};
 
 #[cfg(target_os = "windows")]
-use crate::cross_platform::windows::app_finding::get_known_paths;
+use crate::cross_platform::windows::get_known_paths;
 use crate::{
     app::apps::{AppData, SimpleApp},
     cross_platform::get_img_handle,
