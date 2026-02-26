@@ -1,10 +1,7 @@
 //! This has all the logic regarding the cliboard history
 use arboard::ImageData;
 
-use crate::{
-    app::apps::{App, AppCommand},
-    commands::Function,
-};
+use crate::{app::apps::App, commands::Function};
 
 /// The kinds of clipboard content that rustcast can handle and their contents
 #[derive(Debug, Clone)]
@@ -28,12 +25,15 @@ impl ClipBoardContentType {
         // only get the first line from the contents
         name = name.lines().next().unwrap_or("").to_string();
 
-        App::new_builtin(
-            &name,
-            &name_lc,
-            "Clipboard Item",
-            AppCommand::Function(Function::CopyToClipboard(self_clone.to_owned())),
-        )
+        App {
+            open_command: crate::app::apps::AppCommand::Function(Function::CopyToClipboard(
+                self_clone.to_owned(),
+            )),
+            desc: "Clipboard Item".to_string(),
+            icons: None,
+            name_lc,
+            name,
+        }
     }
 }
 
