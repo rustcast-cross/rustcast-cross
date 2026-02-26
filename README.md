@@ -13,8 +13,8 @@
   <a href="https://github.com/rustcast-cross/rustcast-cross/stargazers">
     <img alt="Stars" src="https://img.shields.io/github/stars/rustcast-cross/rustcast-cross?style=flat-square" />
   </a>
-  <a href="https://github.com/unsecretised/rustcast/blob/main/LICENSE">
-    <img alt="License" src="https://img.shields.io/github/license/unsecretised/rustcast?style=flat-square" />
+  <a href="https://opensource.org/licenses/MIT">
+    <img alt="Licensed under the MIT license" src="https://img.shields.io/badge/License-MIT-yellow.svg"></img>
   </a>
 </p>
 
