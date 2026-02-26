@@ -9,8 +9,8 @@ use rayon::slice::ParallelSliceMut;
 
 use crate::app::apps::AppData;
 use crate::app::{
-    ArrowKey, DEFAULT_WINDOW_HEIGHT, Message, Move, Page, WINDOW_WIDTH, apps::SimpleApp,
-    apps::AppCommand, default_settings, menubar::menu_icon, tile::AppIndex, tile::Tile,
+    ArrowKey, DEFAULT_WINDOW_HEIGHT, Message, Move, Page, WINDOW_WIDTH, apps::AppCommand,
+    apps::SimpleApp, default_settings, menubar::menu_icon, tile::AppIndex, tile::Tile,
     tile::search_query,
 };
 

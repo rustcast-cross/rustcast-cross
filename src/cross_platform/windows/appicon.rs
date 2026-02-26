@@ -23,7 +23,7 @@ use crate::utils::bgra_to_rgba;
 
 /// Gets the icons from an executable.
 ///
-/// Adapted from an answer to https://stackoverflow.com/questions/7819024
+/// Adapted from an answer to <https://stackoverflow.com/questions/7819024>
 ///
 /// # Errors
 ///
@@ -85,7 +85,7 @@ fn hicon_to_imghandle(hicon: HICON) -> Result<widget::image::Handle, windows::co
         szResName: unsafe { std::mem::zeroed() },
     };
 
-    let result = unsafe { GetIconInfoExW(hicon, &mut icon_info) };
+    let result = unsafe { GetIconInfoExW(hicon, &raw mut icon_info) };
 
     // Nonzero return values indicate ok, while zero means error
     if result.0 == 0 {
@@ -131,8 +131,8 @@ fn get_icon_bitmap(icon_info: ICONINFOEXW) -> Result<(BITMAPINFO, Vec<u8>), wind
             icon_info.hbmColor,
             0,
             icon_info.yHotspot * 2,
-            Some(buffer.as_mut_ptr() as *mut _),
-            &mut bmp_info,
+            Some(buffer.as_mut_ptr().cast()),
+            &raw mut bmp_info,
             DIB_RGB_COLORS,
         )
     };
