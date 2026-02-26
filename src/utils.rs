@@ -1,11 +1,8 @@
 //! This has all the utility functions that rustcast uses
 use std::{
     io,
-    path::{Path, PathBuf},
-    time::Instant,
+    path::{Path, PathBuf}
 };
-
-use rayon::prelude::*;
 
 #[cfg(target_os = "macos")]
 use {objc2_app_kit::NSWorkspace, objc2_foundation::NSURL};
@@ -15,8 +12,6 @@ use crate::cross_platform::linux::get_installed_linux_apps;
 
 #[cfg(any(target_os = "windows", target_os = "linux"))]
 use std::process::Command;
-
-use crate::app::apps::SimpleApp;
 
 pub fn get_config_installation_dir() -> PathBuf {
     if cfg!(target_os = "windows") {
@@ -109,6 +104,7 @@ pub fn bgra_to_rgba(data: &mut [u8]) {
         )
     };
     // For each 16-byte chunk in your data
+    #[allow(clippy::cast_ptr_alignment)] // It's never actually wrong
     for chunk in data.chunks_exact_mut(16) {
         let mut vector = unsafe { _mm_loadu_si128(chunk.as_ptr().cast::<__m128i>()) };
         vector = unsafe { _mm_shuffle_epi8(vector, mask) };
