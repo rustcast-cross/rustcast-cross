@@ -35,7 +35,7 @@ For bug fixes, and helping people to solve their github issues: see
 |   │   ├── icon64.png    # The icon bitmap in various sizes
 |   │   ├── icon128.png   # |
 |   │   ├── icon256.png   # |
-|   │   ├── icon512.png   # |
+|   │   └── icon512.png   # |
 |   |
 │   └── macos         # MacOS stuff, you can look deeper if it's relevant to what you're doing
 ├── bundling          # MacOS stuff
