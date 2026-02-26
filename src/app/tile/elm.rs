@@ -25,10 +25,17 @@ use crate::{app::pages::clipboard::clipboard_view, platform::get_installed_apps}
 use crate::{
     app::{Message, Page, apps::App, default_settings, tile::Tile},
     config::Config,
+    platform::transform_process_to_ui_element,
+};
+
+use crate::utils::index_installed_apps;
+use crate::{
+    app::{Message, Page, apps::App, default_settings, tile::Tile},
+    config::Config,
 };
 
 #[cfg(target_os = "macos")]
-use crate::cross_platform::macos::transform_process_to_ui_element;
+use crate::cross_platform::macos::{self, transform_process_to_ui_element};
 
 pub fn default_app_paths() -> Vec<String> {
     #[cfg(target_os = "macos")]
@@ -112,8 +119,13 @@ pub fn new(
         Message::OpenWindow
     }));
 
-    let store_icons = config.theme.show_icons;
     let mut options = get_installed_apps(store_icons);
+    if let Err(ref e) = options {
+        tracing::error!("Error indexing apps: {e}")
+    }
+
+    // Still try to load the rest
+    let mut options = options.unwrap_or_default();
 
     options.extend(config.shells.iter().map(|x| x.to_app()));
     options.extend(App::basic_apps());

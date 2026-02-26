@@ -14,7 +14,7 @@ use {
     windows::Win32::Foundation::HWND, windows::Win32::UI::WindowsAndMessaging::SetForegroundWindow,
 };
 
-use std::{collections::BTreeMap, fs, ops::Bound, path::Path, time::Duration};
+use std::{collections::BTreeMap, fs, ops::Bound, path::PathBuf, time::Duration};
 
 use iced::{
     Subscription, Theme, event, futures,
@@ -29,10 +29,21 @@ use iced::{
 #[cfg(not(target_os = "linux"))]
 use global_hotkey::{GlobalHotKeyEvent, HotKeyState, hotkey::HotKey};
 
+use crate::{
+    app::{ArrowKey, Message, Move, Page, apps::App, tile::elm::default_app_paths},
+    clipboard::ClipBoardContentType,
+    config::Config,
+    cross_platform::open_settings,
+};
+
 use arboard::Clipboard;
 use rayon::prelude::*;
 use tray_icon::TrayIcon;
 
+use std::fs;
+use std::ops::Bound;
+use std::time::Duration;
+use std::{collections::BTreeMap, path::Path};
 #[cfg(target_os = "macos")]
 use objc2::rc::Retained;
 #[cfg(target_os = "macos")]

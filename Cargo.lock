@@ -4100,7 +4100,6 @@ dependencies = [
  "iced",
  "icns",
  "image",
- "libc",
  "lnk",
  "objc2 0.6.3",
  "objc2-app-kit 0.3.2",
