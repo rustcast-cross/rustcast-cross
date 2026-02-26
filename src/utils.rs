@@ -36,74 +36,6 @@ pub fn get_config_file_path() -> PathBuf {
     }
 }
 
-/// Recursively loads apps from a set of folders.
-///
-/// [`exclude_patterns`] is a set of glob patterns to include, while [`include_patterns`] is a set of
-/// patterns to include ignoring [`exclude_patterns`].
-fn search_dir(
-    path: impl AsRef<Path>,
-    exclude_patterns: &[glob::Pattern],
-    include_patterns: &[glob::Pattern],
-    max_depth: usize,
-) -> impl ParallelIterator<Item = SimpleApp> {
-    use walkdir::WalkDir;
-
-    WalkDir::new(path.as_ref())
-        .follow_links(false)
-        .max_depth(max_depth)
-        .into_iter()
-        .par_bridge()
-        .filter_map(std::result::Result::ok)
-        .filter(|e| e.path().extension().is_some_and(|ext| ext == "exe"))
-        .filter_map(|entry| {
-            let path = entry.path();
-
-            if exclude_patterns.iter().any(|x| x.matches_path(path))
-                && !include_patterns.iter().any(|x| x.matches_path(path))
-            {
-                #[cfg(debug_assertions)]
-                tracing::trace!(
-                    target: "dir_app_search",
-                    "App excluded: {:?}", path.to_str()
-                );
-
-                return None;
-            }
-
-            let file_name = path.file_name().unwrap().to_string_lossy();
-            let name = file_name.replace(".exe", "");
-
-            #[cfg(debug_assertions)]
-            tracing::trace!(
-                target: "dir_app_search",
-                "App added: {:?}", path.to_str()
-            );
-
-            #[cfg(target_os = "windows")]
-            let icon = {
-                use crate::cross_platform::windows::appicon::get_first_icon;
-
-                get_first_icon(path)
-                    .inspect_err(|e| {
-                        tracing::error!("Error getting icon for {}: {e}", path.display());
-                    })
-                    .ok()
-                    .flatten()
-            };
-
-            #[cfg(not(target_os = "windows"))]
-            let icon = None;
-
-            Some(SimpleApp::new_executable(
-                &name,
-                &name.to_lowercase(),
-                "Application",
-                path,
-                icon,
-            ))
-        })
-}
-
 use crate::config::Config;
 
 pub fn read_config_file(file_path: &Path) -> anyhow::Result<Config> {
@@ -254,6 +186,33 @@ pub fn index_installed_apps(config: &Config) -> anyhow::Result<Vec<SimpleApp>> {
 
         Ok(res)
     }
+}
+
+/// Check if the provided string looks like a valid url
+pub fn is_url_like(s: &str) -> bool {
+    if s.starts_with("http://") || s.starts_with("https://") {
+        return true;
+    }
+    if !s.contains('.') {
+        return false;
+    }
+    let mut parts = s.split('.');
+
+    let Some(tld) = parts.next_back() else {
+        return false;
+    };
+
+    if tld.is_empty() || tld.len() > 63 || !tld.chars().all(|c| c.is_ascii_alphabetic()) {
+        return false;
+    }
+
+    parts.all(|label| {
+        !label.is_empty()
+            && label.len() <= 63
+            && label.chars().all(|c| c.is_ascii_alphanumeric() || c == '-')
+            && !label.starts_with('-')
+            && !label.ends_with('-')
+    })
 }
 
 /// Converts a slice of BGRA data to RGBA using SIMD

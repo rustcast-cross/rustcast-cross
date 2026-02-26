@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use tracing::Level;
 
 #[cfg(target_os = "windows")]
-use crate::cross_platform::windows::app_finding::get_known_paths;
+use crate::cross_platform::windows::get_known_paths;
 use crate::{
     app::apps::{AppData, SimpleApp},
     cross_platform::get_img_handle,

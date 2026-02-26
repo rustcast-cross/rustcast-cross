@@ -7,7 +7,7 @@ mod icon;
 mod styles;
 mod unit_conversion;
 mod utils;
-
+mod app_finding;
 mod cross_platform;
 mod logging;
 

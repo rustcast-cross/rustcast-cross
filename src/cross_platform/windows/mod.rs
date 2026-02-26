@@ -1,7 +1,8 @@
-use lnk::{Encoding, encoding::WINDOWS_1252};
-use windows::Win32::{Globalization::GetACP, UI::WindowsAndMessaging::GetCursorPos};
+use std::path::PathBuf;
 
-pub mod app_finding;
+use lnk::{Encoding, encoding::WINDOWS_1252};
+use windows::{Win32::{Globalization::GetACP, System::Com::CoTaskMemFree, UI::{Shell::{FOLDERID_LocalAppData, FOLDERID_ProgramFiles, FOLDERID_ProgramFilesX86, KF_FLAG_DEFAULT, SHGetKnownFolderPath}, WindowsAndMessaging::GetCursorPos}}, core::GUID};
+
 pub mod appicon;
 
 #[allow(clippy::cast_precision_loss)]
@@ -44,4 +45,31 @@ pub fn get_acp() -> Encoding {
         );
         WINDOWS_1252
     })
+}
+
+
+/// Wrapper around `SHGetKnownFolderPath` to get paths to known folders
+fn get_windows_path(folder_id: &GUID) -> Option<PathBuf> {
+    unsafe {
+        let folder = SHGetKnownFolderPath(folder_id, KF_FLAG_DEFAULT, None);
+        if let Ok(folder) = folder {
+            let path = folder.to_string().ok()?;
+            CoTaskMemFree(Some(folder.0.cast()));
+            Some(path.into())
+        } else {
+            None
+        }
+    }
+}
+
+/// Returns the set of known paths
+pub fn get_known_paths() -> Vec<PathBuf> {
+    let paths = vec![
+        get_windows_path(&FOLDERID_ProgramFiles).unwrap_or_default(),
+        get_windows_path(&FOLDERID_ProgramFilesX86).unwrap_or_default(),
+        (get_windows_path(&FOLDERID_LocalAppData)
+            .unwrap_or_default()
+            .join("Programs")),
+    ];
+    paths
 }
