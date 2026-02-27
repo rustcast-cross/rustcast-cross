@@ -31,18 +31,6 @@ use tracing_subscriber::layer::SubscriberExt;
 #[cfg(target_os = "linux")]
 const SOCKET_PATH: &str = "/tmp/rustcast.sock";
 
-fn load_config() -> Result<Config, anyhow::Error> {
-    let file_path = get_config_file_path();
-    let config = read_config_file(&file_path);
-    if let Err(e) = config {
-        // Tracing isn't inited yet
-        preinit_logger::error(&format!("Error parsing config: {e}"));
-        return Err(e.context("Failure to parse config"))
-    }
-
-    config
-}
-
 fn init_loggers(config: &Config) {
     let loggers: Vec<_> = config.log
         .iter()
@@ -104,20 +92,21 @@ fn main() -> iced::Result {
     cross_platform::macos::set_activation_policy_accessory();
 
     let config_dir = get_config_installation_dir();
-    let config = if let Err(e) = std::fs::metadata(config_dir.join("rustcast/")) {
+    
+    if let Err(e) = std::fs::metadata(config_dir.join("rustcast/")) {
         if e.kind() == io::ErrorKind::NotFound {
             let result = create_dir_all(config_dir.join("rustcast/"));
 
             if let Err(e) = result {
-                preinit_logger::error(&format!("{e}"));
+                preinit_logger::error(&format!("Error creating dirs: {e}"));
                 std::process::exit(1);
             }
-            } else {
-                if result.is_err() {
-                    preinit_logger::error(&format!("Error creating dirs: {e}"));
-                }
-            }
-        };
+        }
+        else {
+            preinit_logger::error(&format!("Error getting config dir: {e}"));
+            std::process::exit(1);
+        }
+    }
 
     let file_path = get_config_file_path();
 
