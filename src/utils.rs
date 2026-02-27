@@ -1,9 +1,9 @@
 //! This has all the utility functions that rustcast uses
+use rayon::prelude::*;
 use std::{
     io,
     path::{Path, PathBuf},
 };
-use rayon::prelude::*;
 
 #[cfg(target_os = "macos")]
 use {objc2_app_kit::NSWorkspace, objc2_foundation::NSURL};

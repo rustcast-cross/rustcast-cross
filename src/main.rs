@@ -6,10 +6,10 @@ mod commands;
 mod config;
 mod cross_platform;
 mod icon;
+mod logging;
 mod styles;
 mod unit_conversion;
 mod utils;
-mod logging;
 
 use std::fs::create_dir_all;
 use std::io;
