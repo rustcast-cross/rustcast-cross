@@ -9,88 +9,84 @@ mod unit_conversion;
 mod utils;
 
 mod cross_platform;
+mod logging;
 
-use std::env::temp_dir;
-use std::fs::{File, create_dir_all};
+use std::fs::create_dir_all;
 use std::io;
+use std::path::Path;
 
+use crate::config::Config;
+use crate::logging::init::init_loggers;
 // import from utils
 use crate::utils::{get_config_file_path, get_config_installation_dir, read_config_file};
 
 use crate::app::tile::{self, Tile};
+use logging::preinit_logger;
 
 #[cfg(not(target_os = "linux"))]
 use global_hotkey::GlobalHotKeyManager;
-use tracing::level_filters::LevelFilter;
-use tracing_subscriber::Layer;
-use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::EnvFilter;
 
 #[cfg(target_os = "linux")]
 const SOCKET_PATH: &str = "/tmp/rustcast.sock";
 
-#[allow(clippy::too_many_lines)] // Not reasonably splittable without being less readable
+fn parse_cfg_file(path: impl AsRef<Path>) -> anyhow::Result<Config> {
+    let config = read_config_file(path.as_ref());
+    if let Err(e) = config {
+        return Err(e.context("Failure to parse config"));
+    }
+
+    config
+}
+
+fn load_config() -> Config {
+    let config_dir = get_config_installation_dir().join("rustcast/");
+
+    if let Err(e) = std::fs::metadata(&config_dir) {
+        if e.kind() == io::ErrorKind::NotFound {
+            preinit_logger::info(&format!("Config dir at {}", &config_dir.display()));
+            let result = create_dir_all(config_dir);
+
+            if let Err(e) = result {
+                preinit_logger::error(&format!("Error creating config dirs: {e}"));
+            }
+        } else {
+            preinit_logger::error(&format!("Error getting config dir: {e}"));
+        }
+
+        preinit_logger::warn("Errors opening config dir, using default cfg");
+        return Config::default();
+    }
+
+    let file_path = get_config_file_path();
+
+    match read_config_file(&file_path) {
+        Err(e) => {
+            preinit_logger::warn(&format!(
+                "Failed to load config with error {e}; using default config"
+            ));
+            Config::default()
+        }
+        Ok(config) => {
+            parse_cfg_file(file_path)
+                .inspect_err(|e| {
+                    preinit_logger::warn(&format!(
+                        "Failed to load config with error {e}; using default config"
+                    ));
+                })
+                .unwrap_or_default();
+
+            init_loggers(&config);
+            config
+        }
+    }
+}
+
 fn main() -> iced::Result {
     #[cfg(target_os = "macos")]
     cross_platform::macos::set_activation_policy_accessory();
 
-    let config_dir = get_config_installation_dir();
-    if let Err(e) = std::fs::metadata(config_dir.join("rustcast/")) {
-        if e.kind() == io::ErrorKind::NotFound {
-            let result = create_dir_all(config_dir.join("rustcast/"));
-
-            if let Err(e) = result {
-                eprintln!("{e}");
-                std::process::exit(1);
-            }
-        } else {
-            eprintln!("{e}");
-            std::process::exit(1);
-        }
-    }
-
-    let file_path = get_config_file_path();
-    let config = read_config_file(&file_path);
-    if let Err(e) = config {
-        // Tracing isn't inited yet
-        eprintln!("Error parsing config: {e}");
-        std::process::exit(1);
-    }
-
-    let config = config.unwrap();
-
-    {
-        let temp_dir = temp_dir().join("rustcast");
-        let log_path = temp_dir.join("log.log");
-        let vv_log_path = temp_dir.join("vv_log.log");
-        if !temp_dir.exists() {
-            std::fs::create_dir_all(temp_dir).unwrap();
-        }
-
-        let file = File::create(&log_path).expect("Failed to create logfile");
-        let vv_file = File::create(&vv_log_path).expect("Failed to create logfile");
-
-        let log_file = tracing_subscriber::fmt::layer()
-            .with_ansi(false)
-            .with_writer(file)
-            .with_filter(LevelFilter::DEBUG);
-        let vv_log_file = tracing_subscriber::fmt::layer()
-            .with_ansi(false)
-            .with_writer(vv_file);
-        let console_out = tracing_subscriber::fmt::layer().with_filter(LevelFilter::INFO);
-
-        let subscriber = tracing_subscriber::registry()
-            .with(log_file)
-            .with(vv_log_file)
-            .with(console_out);
-
-        tracing::subscriber::set_global_default(subscriber).expect("Error initing tracing");
-
-        tracing::info!("Main log file at    : {}", &vv_log_path.display());
-        tracing::info!("Verbose log file at : {}", &log_path.display());
-        tracing::info!("Config file at      : {}", &file_path.display());
-    }
-
-    tracing::debug!("Loaded config data: {:#?}", &config);
+    let config = load_config();
 
     #[cfg(target_os = "linux")]
     {

@@ -1,8 +1,9 @@
 //! This is the config file type definitions for rustcast
-use std::{path::PathBuf, sync::Arc};
+use std::{collections::HashMap, path::PathBuf, sync::Arc};
 
 use iced::{Font, font::Family, theme::Custom};
 use serde::{Deserialize, Serialize};
+use tracing::Level;
 
 #[cfg(target_os = "windows")]
 use crate::cross_platform::windows::app_finding::get_known_paths;
@@ -12,6 +13,7 @@ use crate::{
 };
 
 mod include_patterns;
+mod level;
 mod patterns;
 
 /// The main config struct (effectively the config file's "schema")
@@ -37,6 +39,8 @@ pub struct Config {
 
     #[serde(with = "patterns")]
     pub index_include_patterns: Vec<glob::Pattern>,
+
+    pub log: HashMap<String, Logger>,
 }
 
 impl Default for Config {
@@ -64,6 +68,14 @@ impl Default for Config {
             index_dirs,
             index_exclude_patterns: vec![],
             index_include_patterns: vec![],
+            log: HashMap::from([(
+                String::from("stdout"),
+                Logger::Stdout {
+                    level: Level::INFO,
+                    use_ansi: true,
+                    env_filter: None,
+                },
+            )]),
         }
     }
 }
@@ -216,4 +228,30 @@ impl Shelly {
             },
         )
     }
+}
+
+// Exists for serde reasons
+const fn true_f() -> bool {
+    true
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "type")]
+#[serde(rename_all = "lowercase")] // so that the type doesn't have to be in PascalCase within the config
+pub enum Logger {
+    File {
+        path: PathBuf,
+        #[serde(with = "level")]
+        level: Level,
+        #[serde(default)]
+        use_ansi: bool,
+        env_filter: Option<String>, // cba to make a serde parser for EnvFilter, it's just not necessary
+    },
+    Stdout {
+        #[serde(with = "level")]
+        level: Level,
+        #[serde(default = "true_f")]
+        use_ansi: bool,
+        env_filter: Option<String>,
+    },
 }
