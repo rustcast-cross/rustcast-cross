@@ -1,13 +1,18 @@
-use std::fs::File;
+//! Deals with initialising logging
 
 use crate::config::{self, Logger};
 use crate::{Config, EnvFilter, logging::preinit_logger};
+use std::fs::File;
 use anyhow::Context;
 use tracing::Subscriber;
 use tracing_subscriber::filter::LevelFilter;
 use tracing_subscriber::registry::LookupSpan;
 use tracing_subscriber::{Layer, layer::SubscriberExt};
 
+/// Small convenience wrapper around [`EnvFilter::parse`].
+/// 
+/// If `str` is [`None`], propogates it. If there was an error in parsing, logs.
+/// in the preinit logs.
 fn parse_envfilter_logging(str: Option<&str>) -> Option<EnvFilter> {
     str?.parse()
         .inspect_err(|e| {
@@ -16,6 +21,11 @@ fn parse_envfilter_logging(str: Option<&str>) -> Option<EnvFilter> {
         .ok()
 }
 
+/// Initialises an individual logger from its config, and then returns the layer corresponding to
+/// it.
+/// 
+/// Logs with the preinit logger when the file at the set logger path is not there (with the `info`
+/// log level).
 fn init_logger<S>(
     config: &config::Logger,
 ) -> anyhow::Result<Box<dyn Layer<S> + Send + Sync + 'static>>
@@ -59,6 +69,14 @@ where
     }
 }
 
+/// Initialises all the tracing loggers defined in a config.
+/// 
+/// # Logging
+/// 
+/// This logs when
+/// - The file at the set logger path is not there (`info`)
+/// - [`init_logger`] returned an error (`warn` + skips the logger)
+/// - When there was an error running `tracing::set_global_default` (`error` and kills hte program)
 pub fn init_loggers(config: &Config) {
     let loggers: Vec<_> = config
         .log

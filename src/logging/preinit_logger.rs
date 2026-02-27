@@ -7,12 +7,17 @@
 //! to have a few colourless lines than to have incredibly borked output where ANSI escapes can't
 //! be used)
 
+/// Logs at the info level
 pub fn info(text: &str) {
     println!("INFO  {text}");
 }
+
+/// Logs at the warning level
 pub fn warn(text: &str) {
     println!("WARN  {text}");
 }
+
+/// Logs at the error level
 pub fn error(text: &str) {
     println!("ERROR {text}");
 }
