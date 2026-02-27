@@ -72,7 +72,7 @@ fn load_config() -> Config {
                 .inspect_err(|e| {
                     preinit_logger::warn(&format!(
                         "Failed to load config with error {e}; using default config"
-                    ))
+                    ));
                 })
                 .unwrap_or_default();
 

@@ -1,7 +1,6 @@
 //! Parser for log levels
 
-use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Visitor};
-use std::str::FromStr;
+use serde::{Deserializer, Serializer, de::Visitor};
 use tracing::Level;
 
 pub fn deserialize<'de, D>(deserializer: D) -> Result<Level, D::Error>

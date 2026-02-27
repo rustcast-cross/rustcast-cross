@@ -11,7 +11,7 @@ use tracing_subscriber::{Layer, layer::SubscriberExt};
 fn parse_envfilter_logging(str: Option<&str>) -> Option<EnvFilter> {
     str?.parse()
         .inspect_err(|e| {
-            preinit_logger::warn(&format!("Error reading envfilter \"{e}\", skipping"))
+            preinit_logger::warn(&format!("Error reading envfilter \"{e}\", skipping"));
         })
         .ok()
 }
