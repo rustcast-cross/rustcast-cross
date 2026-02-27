@@ -10,7 +10,7 @@ fn get_installed_apps(dir: impl AsRef<Path>, store_icons: bool) -> Vec<App> {
                 dir.as_ref().to_str().unwrap_or(""),
                 x
             );
-            exit(-1)
+            exit(-1);
         })
         .filter_map(|x| x.ok())
         .collect();
@@ -29,17 +29,20 @@ fn get_installed_apps(dir: impl AsRef<Path>, store_icons: bool) -> Vec<App> {
             let file_name_os = x.file_name();
             let file_name = file_name_os.into_string().unwrap_or_else(|e| {
                 tracing::error!("Failed to to get file_name_os: {}", e.to_string_lossy());
-                exit(-1)
+                exit(-1);
             });
             if !file_name.ends_with(".app") {
                 return None;
             }
 
             let path = x.path();
-            let path_str = path.to_str().map(|x| x.to_string()).unwrap_or_else(|| {
-                tracing::error!("Unable to get file_name");
-                exit(-1)
-            });
+            let path_str = path
+                .to_str()
+                .map(|x| x.to_string())
+                .unwrap_or_else(|| {
+                    tracing::error!("Unable to get file_name");
+                    exit(-1);
+                });
 
             let icons = if store_icons {
                 match fs::read_to_string(format!("{}/Contents/Info.plist", path_str)).map(
