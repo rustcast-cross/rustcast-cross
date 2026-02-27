@@ -1,8 +1,10 @@
-use crate::{app::apps::App, config::Config, utils::index_installed_apps};
+use crate::{app::apps::SimpleApp, config::Config, utils::index_installed_apps, cross_platform::macos::handle_from_icns};
 use std::path::PathBuf;
 use std::process::exit;
+use std::fs;
+use std::time::instant;
 
-fn get_installed_apps(dir: impl AsRef<Path>, store_icons: bool) -> Vec<App> {
+fn get_installed_apps(dir: impl AsRef<Path>, store_icons: bool) -> Vec<SimpleApp> {
     let entries: Vec<_> = fs::read_dir(dir.as_ref())
         .unwrap_or_else(|x| {
             tracing::error!(
@@ -20,7 +22,7 @@ fn get_installed_apps(dir: impl AsRef<Path>, store_icons: bool) -> Vec<App> {
         .filter_map(|x| {
             let file_type = x.file_type().unwrap_or_else(|e| {
                 tracing::error!("Failed to get file type: {}", e.to_string());
-                exit(-1)
+                exit(-1);
             });
             if !file_type.is_dir() {
                 return None;
@@ -116,7 +118,7 @@ fn get_installed_apps(dir: impl AsRef<Path>, store_icons: bool) -> Vec<App> {
             };
 
             let name = file_name.strip_suffix(".app").unwrap().to_string();
-            Some(App::new_executable(
+            Some(SimpleApp::new_executable(
                 &name,
                 &name.to_lowercase(),
                 "Application",
@@ -127,7 +129,7 @@ fn get_installed_apps(dir: impl AsRef<Path>, store_icons: bool) -> Vec<App> {
         .collect()
 }
 
-pub fn get_installed_macos_apps(config: &Config) -> anyhow::Result<Vec<App>> {
+pub fn get_installed_macos_apps(config: &Config) -> anyhow::Result<Vec<SimpleApp>> {
     let store_icons = config.theme.show_icons;
     let user_local_path = std::env::var("HOME").unwrap() + "/Applications/";
     let paths: Vec<String> = vec![
@@ -137,13 +139,10 @@ pub fn get_installed_macos_apps(config: &Config) -> anyhow::Result<Vec<App>> {
         "/System/Applications/Utilities/".to_string(),
     ];
 
-    let mut apps = index_installed_apps(config)?;
-    apps.par_extend(
-        paths
-            .par_iter()
-            .map(|path| get_installed_apps(path, store_icons))
-            .flatten(),
-    );
-
-    Ok(apps)
+    Ok(paths
+        .par_iter()
+        .map(|path| get_installed_apps(path, store_icons))
+        .flatten()
+        .collect()
+    )
 }
