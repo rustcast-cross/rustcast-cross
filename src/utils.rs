@@ -3,6 +3,7 @@ use std::{
     io,
     path::{Path, PathBuf},
 };
+use rayon::prelude::*;
 
 #[cfg(target_os = "macos")]
 use {objc2_app_kit::NSWorkspace, objc2_foundation::NSURL};
@@ -31,7 +32,7 @@ pub fn get_config_file_path() -> PathBuf {
     }
 }
 
-use crate::config::Config;
+use crate::{app::apps::SimpleApp, config::Config};
 
 pub fn read_config_file(file_path: &Path) -> anyhow::Result<Config> {
     match std::fs::read_to_string(file_path) {
@@ -77,137 +78,6 @@ pub fn open_application(path: impl AsRef<Path>) {
     {
         Command::new(path).status().ok();
     }
-}
-
-pub fn index_installed_apps(config: &Config) -> anyhow::Result<Vec<SimpleApp>> {
-    tracing::debug!("Indexing installed apps");
-    tracing::debug!("Exclude patterns: {:?}", &config.index_exclude_patterns);
-    tracing::debug!("Include patterns: {:?}", &config.index_include_patterns);
-
-    let path = get_config_file_path();
-    let config = read_config_file(path.as_path())?;
-
-    if config.index_dirs.is_empty() {
-        tracing::debug!("No extra index dirs provided");
-    }
-
-    #[cfg(target_os = "windows")]
-    {
-        use crate::cross_platform::windows::app_finding::get_apps_from_registry;
-        use crate::cross_platform::windows::app_finding::index_start_menu;
-
-        let start = Instant::now();
-
-        let mut other_apps = index_start_menu();
-        get_apps_from_registry(&mut other_apps);
-
-        let res = config
-            .index_dirs
-            .par_iter()
-            .flat_map(|x| {
-                search_dir(
-                    &x.path,
-                    &config.index_exclude_patterns,
-                    &config.index_include_patterns,
-                    x.max_depth,
-                )
-            })
-            .chain(other_apps.into_par_iter())
-            .collect();
-
-        let end = Instant::now();
-        tracing::info!(
-            "Finished indexing apps (t = {}s)",
-            (end - start).as_secs_f32()
-        );
-
-        Ok(res)
-    }
-
-    #[cfg(target_os = "macos")]
-    {
-        let start = Instant::now();
-
-        let res = config
-            .index_dirs
-            .par_iter()
-            .flat_map(|x| {
-                search_dir(
-                    &x.path,
-                    &config.index_exclude_patterns,
-                    &config.index_include_patterns,
-                    x.max_depth,
-                )
-            })
-            .collect();
-
-        let end = Instant::now();
-        tracing::info!(
-            "Finished indexing apps (t = {}s)",
-            (end - start).as_secs_f32()
-        );
-
-        Ok(res)
-    }
-
-    #[cfg(target_os = "linux")]
-    {
-        let start = Instant::now();
-
-        let other_apps = get_installed_linux_apps(&config);
-
-        let start2 = Instant::now();
-
-        let res = config
-            .index_dirs
-            .par_iter()
-            .flat_map(|x| {
-                search_dir(
-                    &x.path,
-                    &config.index_exclude_patterns,
-                    &config.index_include_patterns,
-                    x.max_depth,
-                )
-            })
-            .chain(other_apps.into_par_iter())
-            .collect();
-
-        let end = Instant::now();
-        tracing::info!(
-            "Finished indexing apps (t = {}s) (t2 = {}s)",
-            (end - start).as_secs_f32(),
-            (end - start2).as_secs_f32(),
-        );
-
-        Ok(res)
-    }
-}
-
-/// Check if the provided string looks like a valid url
-pub fn is_url_like(s: &str) -> bool {
-    if s.starts_with("http://") || s.starts_with("https://") {
-        return true;
-    }
-    if !s.contains('.') {
-        return false;
-    }
-    let mut parts = s.split('.');
-
-    let Some(tld) = parts.next_back() else {
-        return false;
-    };
-
-    if tld.is_empty() || tld.len() > 63 || !tld.chars().all(|c| c.is_ascii_alphabetic()) {
-        return false;
-    }
-
-    parts.all(|label| {
-        !label.is_empty()
-            && label.len() <= 63
-            && label.chars().all(|c| c.is_ascii_alphanumeric() || c == '-')
-            && !label.starts_with('-')
-            && !label.ends_with('-')
-    })
 }
 
 /// Converts a slice of BGRA data to RGBA using SIMD
