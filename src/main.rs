@@ -14,6 +14,8 @@ mod preinit_logger;
 use std::env::temp_dir;
 use std::fs::{File, create_dir_all};
 use std::io;
+use std::path::Path;
+use std::str::FromStr;
 
 use crate::config::{Config, Logger};
 // import from utils
@@ -23,13 +25,19 @@ use crate::app::tile::{self, Tile};
 
 #[cfg(not(target_os = "linux"))]
 use global_hotkey::GlobalHotKeyManager;
-use tracing::instrument::WithSubscriber;
 use tracing::level_filters::LevelFilter;
-use tracing_subscriber::Layer;
+use tracing_subscriber::{EnvFilter, Layer};
 use tracing_subscriber::layer::SubscriberExt;
 
 #[cfg(target_os = "linux")]
 const SOCKET_PATH: &str = "/tmp/rustcast.sock";
+
+fn parse_envfilter_logging(str: Option<&str>) -> Option<EnvFilter> {
+    str?
+        .parse()
+        .inspect_err(|e| preinit_logger::warn(&format!("Error reading envfilter \"{e}\", skipping")))
+        .ok()
+}
 
 fn init_loggers(config: &Config) {
     let loggers: Vec<_> = config.log
@@ -40,12 +48,16 @@ fn init_loggers(config: &Config) {
                     Some(tracing_subscriber::fmt::layer()
                         .with_ansi(*use_ansi)
                         .with_filter(LevelFilter::from_level(*level))
+                        .with_filter(parse_envfilter_logging(env_filter.as_deref()))
                         .boxed()),
+                        
                 Logger::File { level, path, use_ansi, env_filter } => {
                     let file = File::create(path)
                         .inspect_err(|e|
                             preinit_logger::error(&format!(
-                                "Failed to create log at path {} with error {e:?}, skipping", path.display()))
+                                "Failed to create log at path {} with error {e:?}, skipping",
+                                path.display()
+                            ))
                         )
                         .ok()?;
 
@@ -53,6 +65,7 @@ fn init_loggers(config: &Config) {
                         .with_ansi(*use_ansi)
                         .with_writer(file)
                         .with_filter(LevelFilter::from_level(*level))
+                        .with_filter(parse_envfilter_logging(env_filter.as_deref()))
                         .boxed()
                     )
                 }
@@ -75,9 +88,8 @@ fn init_loggers(config: &Config) {
     tracing::info!("Inited loggers in config");
 }
 
-fn load_config() -> Result<Config, anyhow::Error> {
-    let file_path = get_config_file_path();
-    let config = read_config_file(&file_path);
+fn parse_cfg_file(path: impl AsRef<Path>) -> anyhow::Result<Config>{
+    let config = read_config_file(path.as_ref());
     if let Err(e) = config {
         // Tracing isn't inited yet
         preinit_logger::error(&format!("Error parsing config: {e}"));
@@ -87,10 +99,7 @@ fn load_config() -> Result<Config, anyhow::Error> {
     config
 }
 
-fn main() -> iced::Result {
-    #[cfg(target_os = "macos")]
-    cross_platform::macos::set_activation_policy_accessory();
-
+fn load_config() -> Config {
     let config_dir = get_config_installation_dir();
     
     if let Err(e) = std::fs::metadata(config_dir.join("rustcast/")) {
@@ -99,31 +108,39 @@ fn main() -> iced::Result {
 
             if let Err(e) = result {
                 preinit_logger::error(&format!("Error creating dirs: {e}"));
-                std::process::exit(1);
             }
         }
         else {
             preinit_logger::error(&format!("Error getting config dir: {e}"));
-            std::process::exit(1);
         }
+        
+        preinit_logger::error("Errors opening config dir, using default cfg");
+        return Config::default()
     }
 
     let file_path = get_config_file_path();
 
-    let config = match read_config_file(&file_path) {
+    match read_config_file(&file_path) {
         Err(e) => {
-            preinit_logger::warn("Failed to load config; using default config");
+            preinit_logger::warn(&format!("Failed to load config with error {e}; using default config"));
             Config::default()
         }
         Ok(config) => {
-            load_config()
+            parse_cfg_file(file_path)
                 .inspect_err(|e| preinit_logger::error(&format!("Failed to load config: {e:?}")))
                 .unwrap_or_default();
             
             init_loggers(&config);
             config
         }
-    };
+    }
+}
+
+fn main() -> iced::Result {
+    #[cfg(target_os = "macos")]
+    cross_platform::macos::set_activation_policy_accessory();
+
+    let config = load_config();
 
     #[cfg(target_os = "linux")]
     {
