@@ -1,2 +1,2 @@
-pub mod preinit_logger;
 pub mod init;
+pub mod preinit_logger;

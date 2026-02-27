@@ -13,8 +13,8 @@ use crate::{
 };
 
 mod include_patterns;
-mod patterns;
 mod level;
+mod patterns;
 
 /// The main config struct (effectively the config file's "schema")
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -40,7 +40,7 @@ pub struct Config {
     #[serde(with = "patterns")]
     pub index_include_patterns: Vec<glob::Pattern>,
 
-    pub log: HashMap<String, Logger>
+    pub log: HashMap<String, Logger>,
 }
 
 impl Default for Config {
@@ -68,9 +68,14 @@ impl Default for Config {
             index_dirs,
             index_exclude_patterns: vec![],
             index_include_patterns: vec![],
-            log: HashMap::from([
-                (String::from("stdout"), Logger::Stdout { level: Level::INFO, use_ansi: true, env_filter: None })
-            ])
+            log: HashMap::from([(
+                String::from("stdout"),
+                Logger::Stdout {
+                    level: Level::INFO,
+                    use_ansi: true,
+                    env_filter: None,
+                },
+            )]),
         }
     }
 }
@@ -226,7 +231,9 @@ impl Shelly {
 }
 
 // Exists for serde reasons
-const fn true_f() -> bool { true }
+const fn true_f() -> bool {
+    true
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
@@ -238,13 +245,13 @@ pub enum Logger {
         level: Level,
         #[serde(default)]
         use_ansi: bool,
-        env_filter: Option<String> // cba to make a serde parser for EnvFilter, it's just not necessary
+        env_filter: Option<String>, // cba to make a serde parser for EnvFilter, it's just not necessary
     },
     Stdout {
         #[serde(with = "level")]
         level: Level,
         #[serde(default = "true_f")]
         use_ansi: bool,
-        env_filter: Option<String>
-    }
+        env_filter: Option<String>,
+    },
 }

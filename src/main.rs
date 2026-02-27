@@ -30,10 +30,10 @@ use tracing_subscriber::EnvFilter;
 #[cfg(target_os = "linux")]
 const SOCKET_PATH: &str = "/tmp/rustcast.sock";
 
-fn parse_cfg_file(path: impl AsRef<Path>) -> anyhow::Result<Config>{
+fn parse_cfg_file(path: impl AsRef<Path>) -> anyhow::Result<Config> {
     let config = read_config_file(path.as_ref());
     if let Err(e) = config {
-        return Err(e.context("Failure to parse config"))
+        return Err(e.context("Failure to parse config"));
     }
 
     config
@@ -41,7 +41,7 @@ fn parse_cfg_file(path: impl AsRef<Path>) -> anyhow::Result<Config>{
 
 fn load_config() -> Config {
     let config_dir = get_config_installation_dir().join("rustcast/");
-    
+
     if let Err(e) = std::fs::metadata(&config_dir) {
         if e.kind() == io::ErrorKind::NotFound {
             preinit_logger::info(&format!("Config dir at {}", &config_dir.display()));
@@ -50,27 +50,32 @@ fn load_config() -> Config {
             if let Err(e) = result {
                 preinit_logger::error(&format!("Error creating config dirs: {e}"));
             }
-        }
-        else {
+        } else {
             preinit_logger::error(&format!("Error getting config dir: {e}"));
         }
-        
+
         preinit_logger::warn("Errors opening config dir, using default cfg");
-        return Config::default()
+        return Config::default();
     }
 
     let file_path = get_config_file_path();
 
     match read_config_file(&file_path) {
         Err(e) => {
-            preinit_logger::warn(&format!("Failed to load config with error {e}; using default config"));
+            preinit_logger::warn(&format!(
+                "Failed to load config with error {e}; using default config"
+            ));
             Config::default()
         }
         Ok(config) => {
             parse_cfg_file(file_path)
-                .inspect_err(|e| preinit_logger::warn(&format!("Failed to load config with error {e}; using default config")))
+                .inspect_err(|e| {
+                    preinit_logger::warn(&format!(
+                        "Failed to load config with error {e}; using default config"
+                    ))
+                })
                 .unwrap_or_default();
-            
+
             init_loggers(&config);
             config
         }
