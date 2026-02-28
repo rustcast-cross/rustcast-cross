@@ -8,7 +8,7 @@ use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
 use crate::{
     app::{
-        apps::{SimpleApp, AppCommand, AppData},
+        apps::{AppCommand, AppData, SimpleApp},
         tile::elm::default_app_paths,
     },
     config::Config,
