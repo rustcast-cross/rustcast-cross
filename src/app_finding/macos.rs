@@ -1,8 +1,10 @@
-use crate::{app::apps::SimpleApp, config::Config, utils::index_installed_apps, cross_platform::macos::handle_from_icns};
-use std::path::PathBuf;
-use std::process::exit;
-use std::fs;
-use std::time::instant;
+use crate::{app::apps::SimpleApp, config::Config, cross_platform::macos::handle_from_icns};
+use rayon::prelude::*;
+use std::{
+    fs,
+    path::{Path, PathBuf},
+    process::exit,
+};
 
 fn get_installed_apps(dir: impl AsRef<Path>, store_icons: bool) -> Vec<SimpleApp> {
     let entries: Vec<_> = fs::read_dir(dir.as_ref())
@@ -38,13 +40,10 @@ fn get_installed_apps(dir: impl AsRef<Path>, store_icons: bool) -> Vec<SimpleApp
             }
 
             let path = x.path();
-            let path_str = path
-                .to_str()
-                .map(|x| x.to_string())
-                .unwrap_or_else(|| {
-                    tracing::error!("Unable to get file_name");
-                    exit(-1);
-                });
+            let path_str = path.to_str().map(|x| x.to_string()).unwrap_or_else(|| {
+                tracing::error!("Unable to get file_name");
+                exit(-1);
+            });
 
             let icons = if store_icons {
                 match fs::read_to_string(format!("{}/Contents/Info.plist", path_str)).map(
@@ -129,7 +128,7 @@ fn get_installed_apps(dir: impl AsRef<Path>, store_icons: bool) -> Vec<SimpleApp
         .collect()
 }
 
-pub fn get_installed_macos_apps(config: &Config) -> anyhow::Result<Vec<SimpleApp>> {
+pub(super) fn get_installed_macos_apps(config: &Config) -> anyhow::Result<Vec<SimpleApp>> {
     let store_icons = config.theme.show_icons;
     let user_local_path = std::env::var("HOME").unwrap() + "/Applications/";
     let paths: Vec<String> = vec![
@@ -143,6 +142,5 @@ pub fn get_installed_macos_apps(config: &Config) -> anyhow::Result<Vec<SimpleApp
         .par_iter()
         .map(|path| get_installed_apps(path, store_icons))
         .flatten()
-        .collect()
-    )
+        .collect())
 }

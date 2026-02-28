@@ -1,5 +1,5 @@
 //! This has all the utility functions that rustcast uses
-use rayon::prelude::*;
+
 use std::{
     io,
     path::{Path, PathBuf},
@@ -32,7 +32,7 @@ pub fn get_config_file_path() -> PathBuf {
     }
 }
 
-use crate::{app::apps::SimpleApp, config::Config};
+use crate::config::Config;
 
 pub fn read_config_file(file_path: &Path) -> anyhow::Result<Config> {
     match std::fs::read_to_string(file_path) {

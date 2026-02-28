@@ -131,9 +131,11 @@ pub fn index_installed_apps(config: &Config) -> anyhow::Result<Vec<SimpleApp>> {
 
     #[cfg(target_os = "macos")]
     {
+        use std::time::Instant;
+
         let start = Instant::now();
 
-        let res = config
+        let mut res: Vec<_> = config
             .index_dirs
             .par_iter()
             .flat_map(|x| {
@@ -145,6 +147,8 @@ pub fn index_installed_apps(config: &Config) -> anyhow::Result<Vec<SimpleApp>> {
                 )
             })
             .collect();
+
+        res.extend(macos::get_installed_macos_apps(&config)?);
 
         let end = Instant::now();
         tracing::info!(

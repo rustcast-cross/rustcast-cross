@@ -3,29 +3,26 @@
 
 pub mod haptics;
 
-use crate::app::apps::{AppCommand, SimpleApp};
-use crate::commands::Function;
+use crate::app::apps::SimpleApp;
 use crate::config::Config;
-use crate::utils::index_installed_apps;
 use icns::IconFamily;
-use rayon::iter::ParallelExtend;
+use std::path::{Path, PathBuf};
+use std::process::exit;
+use std::{fs, thread};
 use {
     iced::wgpu::rwh::RawWindowHandle,
     iced::wgpu::rwh::WindowHandle,
     iced::widget::image::Handle,
     objc2::MainThreadMarker,
     objc2::rc::Retained,
-    objc2_app_kit::NSView,
-    objc2_app_kit::{NSApp, NSApplicationActivationPolicy},
-    objc2_app_kit::{NSFloatingWindowLevel, NSWindowCollectionBehavior},
+    objc2_app_kit::{
+        NSApp, NSApplicationActivationPolicy, NSFloatingWindowLevel, NSView,
+        NSWindowCollectionBehavior, NSWorkspace,
+    },
     objc2_foundation::NSURL,
 };
 
-use objc2_app_kit::NSWorkspace;
-use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator, ParallelIterator};
-use std::path::{Path, PathBuf};
-use std::process::exit;
-use std::{fs, thread};
+use rayon::prelude::*;
 
 /// This sets the activation policy of the app to Accessory, allowing rustcast to be visible ontop
 /// of fullscreen apps
@@ -234,15 +231,11 @@ pub fn get_installed_macos_apps(config: &Config) -> anyhow::Result<Vec<SimpleApp
         "/System/Applications/Utilities/".to_string(),
     ];
 
-    let mut apps = index_installed_apps(config)?;
-    apps.par_extend(
-        paths
-            .par_iter()
-            .map(|path| get_installed_apps(path, store_icons))
-            .flatten(),
-    );
-
-    Ok(apps)
+    Ok(paths
+        .par_iter()
+        .map(|path| get_installed_apps(path, store_icons))
+        .flatten()
+        .collect())
 }
 
 /// Open the settings file with the system default editor

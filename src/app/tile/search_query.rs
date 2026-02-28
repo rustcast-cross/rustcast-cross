@@ -140,16 +140,12 @@ pub(super) fn handle_change(tile: &mut Tile, input: &str, id: Id) -> iced::Task<
         ));
     } else if tile.results.is_empty() && tile.query_lc == "lemon" {
         #[cfg(target_os = "macos")]
-        {
-            use std::path::Path;
-
-            tile.results.push(SimpleApp::new_builtin(
-                "Easter Egg",
-                "Lemon",
-                "",
-                AppCommand::Display,
-            ));
-        }
+        tile.results.push(SimpleApp::new_builtin(
+            "Easter Egg",
+            "Lemon",
+            "",
+            AppCommand::Display,
+        ));
     }
     if !tile.query_lc.is_empty() && tile.page == Page::EmojiSearch {
         tile.results = tile
