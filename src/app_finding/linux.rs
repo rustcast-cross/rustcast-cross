@@ -8,17 +8,17 @@ use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
 use crate::{
     app::{
-        apps::{App, AppCommand, AppData},
+        apps::{SimpleApp, AppCommand, AppData},
         tile::elm::default_app_paths,
     },
     config::Config,
 };
 
-pub fn get_installed_linux_apps(config: &Config) -> Vec<App> {
+pub(super) fn get_installed_linux_apps(config: &Config) -> Vec<SimpleApp> {
     let paths = default_app_paths();
     let store_icons = config.theme.show_icons;
 
-    let apps: Vec<App> = paths
+    let apps: Vec<SimpleApp> = paths
         .par_iter()
         .map(|path| {
             let mut pattern = path.clone();
@@ -35,7 +35,7 @@ pub fn get_installed_linux_apps(config: &Config) -> Vec<App> {
     apps
 }
 
-fn get_installed_apps_glob(pattern: &str, store_icons: bool) -> Vec<App> {
+fn get_installed_apps_glob(pattern: &str, store_icons: bool) -> Vec<SimpleApp> {
     glob(pattern)
         .unwrap()
         .flatten()
@@ -43,7 +43,7 @@ fn get_installed_apps_glob(pattern: &str, store_icons: bool) -> Vec<App> {
         .collect()
 }
 
-fn get_installed_apps(path: &Path, store_icons: bool) -> Vec<App> {
+fn get_installed_apps(path: &Path, store_icons: bool) -> Vec<SimpleApp> {
     let mut apps = Vec::new();
 
     let Ok(content) = fs::read_to_string(path) else {
@@ -83,7 +83,7 @@ fn get_installed_apps(path: &Path, store_icons: bool) -> Vec<App> {
         None
     };
 
-    apps.push(App::new(
+    apps.push(SimpleApp::new_executable(
         &name,
         &name.to_lowercase(),
         &desc,

@@ -1,4 +1,5 @@
 use std::path::Path;
+use std::time::Instant;
 
 use crate::{
     app::apps::SimpleApp,
@@ -96,8 +97,6 @@ pub fn index_installed_apps(config: &Config) -> anyhow::Result<Vec<SimpleApp>> {
 
     #[cfg(target_os = "windows")]
     {
-        use std::time::Instant;
-
         use windows::get_apps_from_registry;
         use windows::index_start_menu;
 
@@ -131,8 +130,6 @@ pub fn index_installed_apps(config: &Config) -> anyhow::Result<Vec<SimpleApp>> {
 
     #[cfg(target_os = "macos")]
     {
-        use std::time::Instant;
-
         let start = Instant::now();
 
         let mut res: Vec<_> = config
@@ -163,7 +160,7 @@ pub fn index_installed_apps(config: &Config) -> anyhow::Result<Vec<SimpleApp>> {
     {
         let start = Instant::now();
 
-        let other_apps = get_installed_linux_apps(&config);
+        let other_apps = linux::get_installed_linux_apps(&config);
 
         let start2 = Instant::now();
 
