@@ -83,7 +83,7 @@ fn get_installed_apps(path: &Path, store_icons: bool) -> Vec<SimpleApp> {
         None
     };
 
-    apps.push(SimpleApp::new_executable(
+    apps.push(SimpleApp::new(
         &name,
         &name.to_lowercase(),
         &desc,
