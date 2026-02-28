@@ -342,11 +342,13 @@ fn count_dirs_in_dir(dir: &PathBuf) -> usize {
 #[cfg(not(target_os = "linux"))]
 fn handle_hotkeys() -> impl futures::Stream<Item = Message> {
     stream::channel(100, async |mut output| {
+        tracing::debug!(target: "init", "Initing hotkey event receiver");
         let receiver = GlobalHotKeyEvent::receiver();
         loop {
             if let Ok(event) = receiver.recv()
                 && event.state == HotKeyState::Pressed
             {
+                tracing::debug!(target: "hotkey", "Hotkey press received");
                 output.try_send(Message::HotkeyPressed(event.id)).unwrap();
             }
             tokio::time::sleep(Duration::from_millis(10)).await;

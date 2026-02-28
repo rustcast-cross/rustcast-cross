@@ -87,6 +87,7 @@ fn main() -> iced::Result {
     cross_platform::macos::set_activation_policy_accessory();
 
     let config = load_config();
+    tracing::debug!(target: "init", "Loaded config: {config:#?}");
 
     #[cfg(target_os = "linux")]
     {
@@ -135,7 +136,7 @@ fn main() -> iced::Result {
                 // It probably should give up here.
                 panic!("Couldn't register the key to open ({key})")
             } else {
-                tracing::warn!("Couldn't register hotkey {}", key);
+                tracing::warn!(target: "init", "Couldn't register hotkey {}", key);
             }
         } else if let Err(e) = result {
             tracing::error!("{}", e.to_string());
