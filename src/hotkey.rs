@@ -6,9 +6,6 @@ use {
     global_hotkey::{self, GlobalHotKeyManager, hotkey::HotKey},
 };
 
-#[cfg(target_os = "linux")]
-const SOCKET_PATH: &str = "/tmp/rustcast.sock";
-
 /// Initialises the hotkey manager.
 ///
 /// **IMPORTANT:** If the hotkey manager returned dies, it will stop sending out events.
@@ -47,6 +44,7 @@ pub fn init_hotkey_manager(config: &Config) -> (GlobalHotKeyManager, HotKey) {
 #[cfg(target_os = "linux")]
 pub fn init_socket() {
     // All this code is by kybe, idk what it does very specifically
+    const SOCKET_PATH: &str = "/tmp/rustcast.sock";
 
     // error handling should really be improved soon (tm)
     use std::fs;

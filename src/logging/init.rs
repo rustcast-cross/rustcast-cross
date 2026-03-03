@@ -1,13 +1,17 @@
 //! Deals with initialising logging
 
 use crate::config::{self, Logger};
-use crate::{Config, EnvFilter, logging::preinit_logger};
+use crate::{Config, logging::preinit_logger};
 use anyhow::Context;
 use std::fs::File;
 use tracing::Subscriber;
-use tracing_subscriber::filter::LevelFilter;
-use tracing_subscriber::registry::LookupSpan;
-use tracing_subscriber::{Layer, layer::SubscriberExt};
+use tracing_subscriber::{
+    filter::LevelFilter,
+    registry::LookupSpan,
+    Layer, 
+    layer::SubscriberExt,
+    EnvFilter
+};
 
 /// Small convenience wrapper around [`EnvFilter::parse`].
 ///
