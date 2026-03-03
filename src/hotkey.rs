@@ -44,13 +44,13 @@ pub fn init_hotkey_manager(config: &Config) -> (GlobalHotKeyManager, HotKey) {
 #[cfg(target_os = "linux")]
 pub fn init_socket() {
     // All this code is by kybe, idk what it does very specifically
-    const SOCKET_PATH: &str = "/tmp/rustcast.sock";
 
     // error handling should really be improved soon (tm)
     use std::fs;
     use std::os::unix::net::UnixListener;
     use std::{io::Write, os::unix::net::UnixStream};
     use tracing::info;
+    use crate::platform::linux::SOCKET_PATH;
 
     if UnixListener::bind(SOCKET_PATH).is_err() {
         match UnixStream::connect(SOCKET_PATH) {

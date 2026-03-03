@@ -356,6 +356,8 @@ fn handle_hotkeys() -> impl futures::Stream<Item = Message> {
 
 #[cfg(target_os = "linux")]
 fn handle_socket() -> impl futures::Stream<Item = Message> {
+    use crate::platform::linux::SOCKET_PATH;
+    
     stream::channel(100, async |mut output| {
         let clipboard = env::args().any(|arg| arg.trim() == "--cphist");
         if clipboard {

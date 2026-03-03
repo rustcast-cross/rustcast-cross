@@ -14,6 +14,8 @@ use crate::{
     config::Config,
 };
 
+pub const SOCKET_PATH: &str = "/tmp/rustcast.sock";
+
 pub fn get_installed_linux_apps(config: &Config) -> Vec<SimpleApp> {
     let paths = default_app_paths();
     let store_icons = config.theme.show_icons;
