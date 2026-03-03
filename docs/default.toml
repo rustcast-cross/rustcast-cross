@@ -1,11 +1,12 @@
-# Default Config
-
-toggle_hotkey = "ALT+SPACE"
+toggle_hotkey = "Ctrl+Space"
 placeholder = "Time to be productive!"
 search_url = "https://google.com/search?q=%s"
 haptic_feedback = false
-show_trayicon = true
+show_trayicon = false
 shells = []
+index_dirs = [] # Not actually empty, it's just far too user specific
+index_exclude_patterns = []
+index_include_patterns = []
 
 [buffer_rules]
 clear_on_hide = true
@@ -14,10 +15,11 @@ clear_on_enter = true
 [theme]
 text_color = [0.95, 0.95, 0.96]
 background_color = [0.09, 0.09, 0.09]
-# Background opacity should / can be omitted from 0.4.5 onwards, 
-# as rustcast doesn't support custom opacity's anymore, 
-# this field will have no effect on rustcast
-background_opacity = 0.0
 blur = false
 show_icons = true
 show_scroll_bar = true
+
+[log.stdout]
+type = "stdout"
+level = "info"
+use_ansi = true
