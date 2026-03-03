@@ -1,4 +1,4 @@
-use crate::{app::apps::SimpleApp, config::Config, cross_platform::macos::handle_from_icns};
+use crate::{app::apps::SimpleApp, config::Config, platform::macos::handle_from_icns};
 use rayon::prelude::*;
 use std::{
     fs,

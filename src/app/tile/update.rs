@@ -15,7 +15,7 @@ use crate::app::{
 };
 
 #[cfg(target_os = "macos")]
-use crate::cross_platform::macos;
+use crate::platform::macos;
 
 use crate::app_finding::index_installed_apps;
 use crate::commands::Function;

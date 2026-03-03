@@ -28,7 +28,7 @@ use crate::{
     app::{ArrowKey, Message, Move, Page, apps::SimpleApp, tile::elm::default_app_paths},
     clipboard::ClipBoardContentType,
     config::Config,
-    cross_platform::open_settings,
+    platform::open_settings,
 };
 
 use arboard::Clipboard;

@@ -1,5 +1,5 @@
 use {
-    crate::{app::apps::SimpleApp, cross_platform::windows::get_acp},
+    crate::{app::apps::SimpleApp, platform::windows::get_acp},
     std::path::PathBuf,
     walkdir::WalkDir,
 };

@@ -60,7 +60,7 @@ fn search_dir(
 
             #[cfg(target_os = "windows")]
             let icon = {
-                use crate::cross_platform::windows::appicon::get_first_icon;
+                use crate::platform::windows::appicon::get_first_icon;
 
                 get_first_icon(path)
                     .inspect_err(|e| {

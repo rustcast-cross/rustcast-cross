@@ -4,7 +4,7 @@ mod calculator;
 mod clipboard;
 mod commands;
 mod config;
-mod cross_platform;
+mod platform;
 mod icon;
 mod logging;
 mod styles;
@@ -117,7 +117,7 @@ fn init_hotkey_manager(config: &Config) -> (GlobalHotKeyManager, HotKey) {
 
 fn main() -> iced::Result {
     #[cfg(target_os = "macos")]
-    cross_platform::macos::set_activation_policy_accessory();
+    platform::macos::set_activation_policy_accessory();
 
     let config = load_config();
     tracing::debug!(target: "init", "Loaded config: {config:#?}");

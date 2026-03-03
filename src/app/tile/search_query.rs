@@ -17,7 +17,7 @@ use crate::{
 };
 
 #[cfg(target_os = "macos")]
-use crate::cross_platform::macos::haptics::{HapticPattern, perform_haptic};
+use crate::platform::macos::haptics::{HapticPattern, perform_haptic};
 
 #[allow(clippy::too_many_lines)]
 pub(super) fn handle_change(tile: &mut Tile, input: &str, id: Id) -> iced::Task<Message> {
