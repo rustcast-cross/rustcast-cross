@@ -29,7 +29,7 @@
 - `placeholder`  
   This is a string that contains the search input placeholder text, e.g.
   
-  ![Displayed search input where placeholder is set to "Time!"](../assets/placeholder_example.png)
+  ![Displayed search input where placeholder is set to "Time!"](../../assets/placeholder_example.png)
 
   (yeah, I was feeling a bit goofy when setting this)
 
