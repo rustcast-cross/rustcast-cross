@@ -4,13 +4,13 @@ mod calculator;
 mod clipboard;
 mod commands;
 mod config;
+mod hotkey;
 mod icon;
 mod logging;
 mod platform;
 mod styles;
 mod unit_conversion;
 mod utils;
-mod hotkey;
 
 use std::fs::create_dir_all;
 use std::io;
@@ -28,8 +28,6 @@ use crate::hotkey::init_hotkey_manager;
 
 #[cfg(target_os = "linux")]
 use crate::hotkey::init_socket;
-
-
 
 fn parse_cfg_file(path: impl AsRef<Path>) -> anyhow::Result<Config> {
     let config = read_config_file(path.as_ref());

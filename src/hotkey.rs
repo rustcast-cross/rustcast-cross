@@ -3,7 +3,7 @@
 #[cfg(not(target_os = "linux"))]
 use {
     crate::config::Config,
-    global_hotkey::{GlobalHotKeyManager, hotkey::HotKey, self}
+    global_hotkey::{self, GlobalHotKeyManager, hotkey::HotKey},
 };
 
 #[cfg(target_os = "linux")]
