@@ -6,11 +6,7 @@ use anyhow::Context;
 use std::fs::File;
 use tracing::Subscriber;
 use tracing_subscriber::{
-    filter::LevelFilter,
-    registry::LookupSpan,
-    Layer, 
-    layer::SubscriberExt,
-    EnvFilter
+    EnvFilter, Layer, filter::LevelFilter, layer::SubscriberExt, registry::LookupSpan,
 };
 
 /// Small convenience wrapper around [`EnvFilter::parse`].
