@@ -1,23 +1,9 @@
 # Configuring rustcast
 
-## Contents
-
-- [Configuring modes](modes.md)
-- [Configuring shells](shells.md)
-- [Configuring theming](theme.md)
-
 ## "Root" configs
+
 ```toml
-toggle_hotkey = "Ctrl+Space"
-# clipboard_hotkey (optional)
-placeholder = "Time to be productive!"
-search_url = "https://google.com/search?q=%s"
-haptic_feedback = false
-show_trayicon = false
-shells = []
-index_dirs = []
-index_exclude_patterns = []
-index_include_patterns = []
+{{#include ../default.toml::9}}
 ```
 
 - `Toggle Hotkey`, `clipboard_hotkey`  

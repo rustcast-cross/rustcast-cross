@@ -5,13 +5,11 @@
 > These docs are probably incomplete and wonky. The most up to date docs are in the docstrings,
 > which is kinda suboptimal, but it is what it is
 
-## Contents
+## Default config
 
-- [Configuration](config/index.md)
-  - [Modes](config/modes.md)
-  - [Shells](config/shells.md)
-  - [Theme](config/theme.md)
-- [Example config](default.toml)
+```toml
+{{#include default.toml}}
+```
 
 ## Config file:
 The path for the config file is: 

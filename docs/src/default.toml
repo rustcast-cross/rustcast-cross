@@ -1,4 +1,4 @@
-toggle_hotkey = "Ctrl+Space"
+toggle_hotkey = "ALT+Space"
 placeholder = "Time to be productive!"
 search_url = "https://google.com/search?q=%s"
 haptic_feedback = false
