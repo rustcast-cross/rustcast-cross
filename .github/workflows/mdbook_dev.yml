@@ -30,7 +30,7 @@ jobs:
       - name: Build Book
         run: |
           cd book
-          MDBOOK_html__site_url="/rustcast-cross/book/" mdbook build --dest-dir ../site/book
+          MDBOOK_html__site_url="/book/" mdbook build --dest-dir ../site/book
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact
