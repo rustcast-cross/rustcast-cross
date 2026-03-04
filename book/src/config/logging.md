@@ -37,8 +37,8 @@ logging. The properties are
   files.
 
 - `env_filter` (optional string)
-  An envfilter to apply to the data. For more info, see [tracing_subscriber's docs]
-  (https://docs.rs/tracing-subscriber/latest/tracing_subscriber/filter/struct.EnvFilter.html)
+  An envfilter to apply to the data. For more info, see
+  [tracing_subscriber's docs](https://docs.rs/tracing-subscriber/latest/tracing_subscriber/filter/struct.EnvFilter.html)
 
 - `path` (only when `type` is `file`)
   The path to output the logs to 
