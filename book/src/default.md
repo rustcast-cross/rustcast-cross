@@ -1,3 +1,0 @@
-```toml
-{{#include default.toml}}
-```

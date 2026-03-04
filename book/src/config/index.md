@@ -1,9 +1,19 @@
 # Configuring rustcast
 
+Rustcast is designed to be reasonably configurable in general. Because of this, there's a config
+file you can edit to change how it does things™.
+
+If rustcast can't find the config file at
+
+- `~/.config/rustcast/config.toml` on linux/macos
+- `%LOCALAPPDATA%/rustcast/config.toml` on windows
+
+it creates a new one at the location, with the data in [the default config](default.md)
+
 ## "Root" configs
 
 ```toml
-{{#include ../default.toml::9}}
+{{#include ../assets/default.toml::9}}
 ```
 
 - `toggle_hotkey`, `clipboard_hotkey`  
@@ -30,7 +40,7 @@
 - `placeholder`  
   This is a string that contains the search input placeholder text, e.g.
   
-  ![Displayed search input where placeholder is set to "Time!"](../../assets/placeholder_example.png)
+  ![Displayed search input where placeholder is set to "Time!"](../assets/placeholder_example.png)
 
   (yeah, I was feeling a bit goofy when setting this)
 

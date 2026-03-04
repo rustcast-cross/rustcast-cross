@@ -81,22 +81,6 @@ use spotlight :) Have fun!)
 1. Clone the repo with `git clone https://github.com/rustcast-cross/rustcast-cross/rustcast.git`
 1. Run `cargo build --release` to build rustcast for your own device
 
-## Config
-
-> [!NOTE]
-> Taken verbatim from the upstream repo
-
-> I have a high chance of forgetting to update the config docs, but even if I
-> do, you will most likely be able to find my config and a list of the latest
-> config options easily
-> [here](https://github.com/unsecretised/rustcast-dotfiles)
-
-The config file should be located at: `~/.config/rustcast/config.toml` RustCast
-creates the default configuration for you, but it does use its
-[default options](docs/default.toml) Here's a full list of what all you can
-configure [The list](docs/config.toml) The blurring is still a bit wonky, and
-will be fixed in the upcoming releases
-
 ## Feature list
 
 ### Finished

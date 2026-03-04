@@ -2,7 +2,7 @@
 
 ## Default config
 ```toml
-{{#include ../default.toml:15:20}}
+{{#include ../assets/default.toml:15:20}}
 ```
 - `text_color`   
   This is the text color that rustcast should use inside the app with the format

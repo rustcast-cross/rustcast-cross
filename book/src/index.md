@@ -5,16 +5,6 @@
 > These docs are probably incomplete and wonky. The most up to date docs are in the doc comments,
 > which is kinda suboptimal, but it is what it is
 
-## Default config
-
-```toml
-{{#include default.toml}}
-```
-
-## Config file
-The path for the config file is
-`~/.config/rustcast/config.toml`
-
 ## Intro to the config
 
 A manual setup is not required, as rustcast will create the config file for you upon loading.

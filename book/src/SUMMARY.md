@@ -7,4 +7,4 @@
   - [Shells](config/shells.md)
   - [Theme](config/theme.md)
   - [Logging](config/logging.md)
-  - [Example config](default.md)
+  - [Default configuration](config/default.md)
