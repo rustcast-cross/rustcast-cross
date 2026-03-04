@@ -5,9 +5,10 @@ on:
   push:
     branches:
       - dev
-      - doc # Smol temporary patch
-    # paths:
-    #   - "docs/**"
+    paths:
+      - "docs/**"
+      - "CONTRIBUTING.md"
+      - "CHANGELOG.md"
 
 jobs:
   deploy:
