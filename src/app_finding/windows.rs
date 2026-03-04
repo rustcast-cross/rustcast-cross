@@ -53,8 +53,8 @@ pub fn get_apps_from_registry(apps: &mut Vec<SimpleApp>) {
                 apps.push(SimpleApp::new_executable(
                     &display_name.clone().to_string_lossy(),
                     &display_name.clone().to_string_lossy().to_lowercase(),
-                    "Application",
-                    exe_path,
+                    exe_string,
+                    &exe_path,
                     None,
                 ));
             }
@@ -78,7 +78,7 @@ pub fn index_start_menu() -> Vec<SimpleApp> {
                         Some(SimpleApp::new_executable(
                             &file_name,
                             &file_name,
-                            file,
+                            &target,
                             PathBuf::from(target.clone()),
                             None,
                         ))

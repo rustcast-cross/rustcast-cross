@@ -120,7 +120,7 @@ fn get_installed_apps(dir: impl AsRef<Path>, store_icons: bool) -> Vec<SimpleApp
             Some(SimpleApp::new_executable(
                 &name,
                 &name.to_lowercase(),
-                "Application",
+                path_str,
                 path,
                 icons,
             ))

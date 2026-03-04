@@ -76,7 +76,7 @@ fn search_dir(
             Some(SimpleApp::new_executable(
                 &name,
                 &name.to_lowercase(),
-                "Application",
+                &path.to_string_lossy(),
                 path,
                 icon,
             ))

@@ -92,7 +92,7 @@ pub struct SimpleApp {
 
 impl PartialEq for SimpleApp {
     fn eq(&self, other: &Self) -> bool {
-        self.data == other.data && self.name == other.name
+        self.data == other.data && self.name == other.name && self.desc == other.desc
     }
 }
 
