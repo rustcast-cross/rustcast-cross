@@ -1,6 +1,6 @@
 # RUSTCAST EXTENSIONS
 
-## Preamble:
+## Preamble
 
 RustCast doesn't support extensions yet.
 
@@ -9,7 +9,7 @@ However, it is in my todo list to support them.
 This page is currently about methods that might be used to add extensions to
 RustCast.
 
-## Methods:
+## Methods
 
 1. Using an MCP server.
    - MCP Servers are used by GenAI to call functions and retrieve data.

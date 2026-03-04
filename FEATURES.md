@@ -1,4 +1,4 @@
-## List of features in rustcast:
+## List of features in rustcast
 
 1. Application launching
 1. Website opening (google search + regular websites)

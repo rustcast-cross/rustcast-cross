@@ -123,7 +123,7 @@ will be fixed in the upcoming releases
 - [x] Unit Conversions (19/1/2026) thanks to [Hriztam](https://github.com/hriztam)
 - [x] Emoji Searching (19/1/2026) Allows people to search for emojis through rustcast
 
-### Planned:
+### Planned
 
 - [ ] Popup note-taking
 - [ ] Plugin Support (Partially implemented on 15/12/2025)
@@ -157,7 +157,7 @@ a free easter egg, a dollar is all you need!
   <img src="https://contrib.rocks/image?repo=rustcast-cross/rustcast-cross" />
 </a>
 
-### Easter egg list:
+### Easter egg list
 
 - Nazeofel (Random Variable on discord) -> led to the _randomvar_ easter egg
 - Lemon -> led to the _lemon_ easter egg that shows "lemon" on rustcast

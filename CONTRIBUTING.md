@@ -13,7 +13,7 @@ For bug fixes, and helping people to solve their github issues: see
 [the planned features in the README](README.md) or
 [the existing feature list](FEATURES.md)
 
-## Code Guidelines:
+## Code Guidelines
 
 1. All code must be formatted with `cargo fmt`
 1. Code must not be malicious or be intended to harm someones device
@@ -26,7 +26,7 @@ For bug fixes, and helping people to solve their github issues: see
 1. Please follow [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/)
 1. Please add to the [changelog](CHANGELOG.md)
 
-## Codebase:
+## Codebase
 
 ```
 .

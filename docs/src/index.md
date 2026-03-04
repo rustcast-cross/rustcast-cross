@@ -11,11 +11,11 @@
 {{#include default.toml}}
 ```
 
-## Config file:
-The path for the config file is: 
+## Config file
+The path for the config file is
 `~/.config/rustcast/config.toml`
 
-## Intro to the config:
+## Intro to the config
 
 A manual setup is not required, as rustcast will create the config file for you upon loading.
 Deleting the file will also cause a recreation of the file when rustcast launches. If the file gets
