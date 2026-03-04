@@ -1,5 +1,7 @@
 [Introduction](index.md)
 
+- [Contributing](contributing.md)
+- [Changelog](changelog.md)
 - [Configuration](config/index.md)
   - [Modes](config/modes.md)
   - [Shells](config/shells.md)
