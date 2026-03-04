@@ -23,7 +23,7 @@ pub fn get_apps_from_registry(apps: &mut Vec<SimpleApp>) {
     for reg in registers {
         reg.enum_keys().for_each(|key| {
             // Not debug only just because it doesn't run too often
-            tracing::trace!("App added [reg]: {:?}", key);
+            tracing::trace!(target: "indexing", "App added [reg]: {:?}", key);
 
             // https://learn.microsoft.com/en-us/windows/win32/msi/uninstall-registry-key
             let name = key.unwrap();
@@ -78,17 +78,22 @@ pub fn index_start_menu() -> Vec<SimpleApp> {
                         Some(SimpleApp::new_executable(
                             &file_name,
                             &file_name,
-                            "",
+                            file,
                             PathBuf::from(target.clone()),
                             None,
                         ))
                     } else {
-                        tracing::debug!("Link at {} has no target, skipped", path.path().display());
+                        tracing::trace!(
+                            target: "indexing",
+                            "Link at {} has no target, skipped",
+                            path.path().display()
+                        );
                         None
                     }
                 }
                 Err(e) => {
-                    tracing::debug!(
+                    tracing::trace!(
+                        target: "indexing",
                         "Error opening link {} ({e}), skipped",
                         path.path().to_string_lossy()
                     );

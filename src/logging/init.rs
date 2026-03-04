@@ -101,5 +101,5 @@ pub fn init_loggers(config: &Config) {
         // the app with no logs at all
     }
 
-    tracing::info!("Inited loggers in config");
+    tracing::info!(target: "init", "Inited loggers in config");
 }

@@ -31,7 +31,7 @@ pub enum Function {
 impl Function {
     /// Run the command
     pub fn execute(&self, config: &Config, query: &str) {
-        tracing::debug!("Executing command: {:?}", self);
+        tracing::debug!(target: "event", "Executing command: {:?}", self);
         match self {
             Function::OpenApp(path) => open_application(path.clone()), // I think the clone is necessary
             Function::RunShellCommand(command, alias) => {

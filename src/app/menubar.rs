@@ -79,7 +79,7 @@ fn get_image() -> DynamicImage {
 }
 
 fn init_event_handler(sender: ExtSender) {
-    tracing::debug!("Initing event handler");
+    tracing::debug!(target: "init", "Initing event handler");
     let runtime = Runtime::new().unwrap();
 
     MenuEvent::set_event_handler(Some(move |x: MenuEvent| {

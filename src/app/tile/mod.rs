@@ -427,7 +427,7 @@ fn handle_recipient() -> impl futures::Stream<Item = Message> {
     stream::channel(100, async |mut output| {
         let (sender, mut recipient) = channel(100);
         let msg = Message::SetSender(ExtSender(sender));
-        tracing::debug!("Sending ExtSender");
+        tracing::debug!(target: "init", "Sending ExtSender");
         output.send(msg).await.expect("Sender not sent");
         loop {
             let abcd = recipient

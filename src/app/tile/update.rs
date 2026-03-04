@@ -287,8 +287,8 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
 
         #[cfg(not(target_os = "linux"))]
         Message::HotkeyPressed(hk_id) => {
-            tracing::debug!(target: "update", "Received hotkey event (Hotkey ID {})", hk_id);
-            tracing::debug!(target: "update", "Open hotkey ID: {}", tile.hotkey.id);
+            tracing::debug!(target: "event", "Received hotkey event (Hotkey ID {})", hk_id);
+            tracing::debug!(target: "event", "Open hotkey ID: {}", tile.hotkey.id);
 
             // Linux Clipboard and Open Hotkey are gonna be handled via a socket
             let is_clipboard_hotkey = tile

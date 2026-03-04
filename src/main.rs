@@ -94,7 +94,7 @@ fn main() -> iced::Result {
     #[cfg(target_os = "linux")]
     init_socket();
 
-    tracing::info!("Starting.");
+    tracing::info!(target: "init", "Starting rustcast");
 
     iced::daemon(
         move || {
