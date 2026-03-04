@@ -68,7 +68,7 @@ it creates a new one at the location, with the data in [the default config](defa
   See [the associated file on the format](shells.md)
 
 - `index_dirs`
-  > [!NOTE]
+  > [!IMPORTANT]
   >
   > Only really known to work on windows
 
