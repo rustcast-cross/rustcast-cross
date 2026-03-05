@@ -45,13 +45,15 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v4
-        
         with:
           fetch-depth: 0
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Download artifacts
         uses: actions/download-artifact@v5
+        with:
+          name: compiled_mdbook
+          path: site/book
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
