@@ -43,8 +43,6 @@ jobs:
           fetch-depth: 0
       - name: Set up Rust (stable)
         uses: dtolnay/rust-toolchain@stable
-      - name: Rust cache
-        uses: Swatinem/rust-cache@v2
       - name: Run rustdoc
         run: cargo doc --no-deps --target-dir site
       - name: Upload artifacts
