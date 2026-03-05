@@ -1,17 +1,19 @@
 # Ripped from https://github.com/rust-lang/mdBook/wiki/Automated-Deployment%3A-GitHub-Actions
+# Used in site.yml
 
 name: MDBook (dev)
 on:
   push:
     branches:
       - dev
+      - doc
     paths:
       - "docs/**"
       - "CONTRIBUTING.md"
       - "CHANGELOG.md"
 
 jobs:
-  deploy:
+  workflow_call:
     runs-on: ubuntu-latest
     permissions:
       contents: write  # To push a branch 
@@ -32,13 +34,3 @@ jobs:
         run: |
           cd book
           MDBOOK_html__site_url="/book/" MDBOOK_book__title="Rustcast-cross docs [DEV]" mdbook build --dest-dir ../site/book
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # Upload entire repository
-          path: 'site'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4

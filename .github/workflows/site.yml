@@ -1,0 +1,37 @@
+# Ripped from https://github.com/rust-lang/mdBook/wiki/Automated-Deployment%3A-GitHub-Actions
+
+name: MDBook (dev)
+on:
+  push:
+    branches:
+      - dev
+      - doc
+
+jobs:
+  mdbook:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Compile MDBook"
+        uses: "./.github/workflows/mdbook.yml"
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: compiled_mdbook
+          path: site/book
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # To push a branch 
+      pages: write  # To push to a GitHub Pages site
+      id-token: write # To update the deployment status
+    steps:
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload entire repository
+          path: 'site'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
