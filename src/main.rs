@@ -1,7 +1,6 @@
 mod app;
 mod app_finding;
-mod calculator;
-mod clipboard;
+mod functions;
 mod commands;
 mod config;
 mod hotkey;

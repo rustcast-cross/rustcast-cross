@@ -26,7 +26,7 @@ use global_hotkey::{GlobalHotKeyEvent, HotKeyState, hotkey::HotKey};
 
 use crate::{
     app::{ArrowKey, Message, Move, Page, apps::SimpleApp, tile::elm::default_app_paths},
-    clipboard::ClipBoardContentType,
+    functions::clipboard::ClipBoardContentType,
     config::Config,
     platform::open_settings,
 };

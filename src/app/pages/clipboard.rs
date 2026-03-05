@@ -3,7 +3,7 @@ use iced::widget::{
     scrollable::{Direction, Scrollbar},
 };
 
-use crate::{app::pages::prelude::*, clipboard::ClipBoardContentType};
+use crate::{app::pages::prelude::*, functions::clipboard::ClipBoardContentType};
 
 pub fn clipboard_view(
     clipboard_content: &[ClipBoardContentType],

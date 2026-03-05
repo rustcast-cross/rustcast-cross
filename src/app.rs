@@ -3,7 +3,7 @@
 use crate::commands::Function;
 use iced::window::{self, Id, Settings};
 
-use crate::{app::tile::ExtSender, clipboard::ClipBoardContentType};
+use crate::{app::tile::ExtSender, functions::clipboard::ClipBoardContentType};
 
 pub mod apps;
 pub mod menubar;

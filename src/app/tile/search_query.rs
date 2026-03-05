@@ -10,8 +10,8 @@ use crate::{
         ArrowKey, DEFAULT_WINDOW_HEIGHT, Message, Page, WINDOW_WIDTH,
         apps::{AppCommand, SimpleApp},
     },
-    calculator::Expr,
-    clipboard::ClipBoardContentType,
+    functions::calculator::Expr,
+    functions::clipboard::ClipBoardContentType,
     commands::Function,
     unit_conversion,
 };

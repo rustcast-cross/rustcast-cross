@@ -15,7 +15,7 @@ use iced::{
 
 use crate::{
     app::{Message, Page, RUSTCAST_DESC_NAME},
-    clipboard::ClipBoardContentType,
+    functions::clipboard::ClipBoardContentType,
     commands::Function,
     platform::get_img_handle,
     styles::{result_button_style, result_row_container_style},
