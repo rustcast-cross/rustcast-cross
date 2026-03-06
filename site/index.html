@@ -1,19 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        <title>Rustcast-cross</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" href="icon64.png"/>
         <link rel="stylesheet" href="main.css"/>
+        <meta name="description" content="Rustcast-cross landing page"/>
     </head>
     <body>
-        <h1>Rustcast-cross</h1>
+        <h1><svg width="50" height="50" viewbox="0 0 64 64"><image href="icon_opt.svg"></image></svg>Rustcast-cross</h1>
 
-        <p>
-            A reasonably functional fork of <a href = "https://rustcast.app/">rustcast</a> with active
-            development on cross platform support
-        </p>
+        <main>
+            <p>
+                A reasonably functional fork of <a href = "https://rustcast.app/">rustcast</a> with active development
+                on cross platform support.
+            </p>
+
+            <section>
+                <h2>Elaborate?</h2>
+
+                <p>
+                    Rustcast is a launcher like
+                    <a href="https://learn.microsoft.com/en-us/windows/powertoys/run">PowerToys Run</a>,
+                    <a href="https://www.raycast.com/">Raycast</a>, or
+                    <a href="https://github.com/vicinaehq/vicinae">Vicinae</a>.
+                </p>
+                
+                <p>
+                    It has some features like
+                    <ul>
+                        <li>Opening an installed app by name</li>
+                        <li>Calculations</li>
+                        <li>Clipboard history</li>
+                        <li>Modes (not implemented in this fork)</li>
+                        <li>Running a search with a given web browser</li>
+                    </ul>
+                </p>
+
+                <p>
+                    What it <i>doesn't</i> have is cross platform stuff, since the owner (secretised)
+                    understandably decided that he doesn't want to deal with that mess.
+                </p>
+
+                <p>
+                    That is what this fork is meant to have.
+                </p>
+            </section>
+
+            <section>
+                <h2>How do I get it?</h2>
+
+                <p>
+                    For now, you have to clone the <code>dev</code> branch (<code>master</code> doesn't have the cross
+                    platform stuff you get on the <code>dev</code> branch) and then compile it all with
+                    <a href="https://doc.rust-lang.org/cargo">cargo</a>.
+                </p>
+
+                <p>
+                    There will eventually be releases where you can just get the compiled executables
+                    from.
+                </p>
+            </section>
+
+            <section>
+                <h2>Where are the docs?</h2>
+
+                <p>
+                    The docs for end users are in the <a href="book">MDBook</a>.
+                </p>
+
+                <p>
+                    The docs about internals are in the <a href="doc/rustcast">rustdocs</a>.
+                </p>
+            </section>
+        </main>
 
         <nav>
-            <a href = "book">MDBook</a>
-            <a href = "doc/rustcast">Rustdoc</a>
+            <a href="book">MDBook</a>
+            <a href="doc/rustcast">Rustdoc</a>
+            <a href="https://github.com/rustcast-cross/rustcast-cross">Github repo</a>
         </nav>
     </body>
 </html>

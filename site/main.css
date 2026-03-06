@@ -1,8 +1,45 @@
 body {
     font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
 }
 
 h1 {
+    position: sticky;
+    top: 0;
+    margin-top: 0;
+    padding: 0.3em;
+
+    display: flex;
+    align-items: center;
+
     background-color: black;
     color: white;
+
+    svg {
+        margin-right: 0.3em;
+    }
+}
+
+nav {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    background-color: black;
+    color: white;
+    padding: 0.5em;
+
+    a {
+        color: white;
+        text-decoration: none;
+        margin-right: 1em;
+    }
+    a:hover {
+        text-decoration: underline;
+    }
+}
+
+main {
+    margin-left: 0.5em;
 }
