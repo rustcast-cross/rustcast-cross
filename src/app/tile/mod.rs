@@ -3,12 +3,15 @@ pub mod elm;
 pub mod update;
 
 mod search_query;
+mod test;
 
 #[cfg(target_os = "windows")]
 use {
     windows::Win32::Foundation::HWND, windows::Win32::UI::WindowsAndMessaging::SetForegroundWindow,
 };
 
+use fuzzy_matcher::FuzzyMatcher;
+use fuzzy_matcher::skim::SkimMatcherV2;
 use std::{collections::BTreeMap, fs, ops::Bound, path::PathBuf, time::Duration};
 
 use iced::{
@@ -35,6 +38,7 @@ use arboard::Clipboard;
 use rayon::prelude::*;
 use tray_icon::TrayIcon;
 
+#[cfg(target_os = "macos")]
 #[cfg(target_os = "macos")]
 use objc2::rc::Retained;
 #[cfg(target_os = "macos")]
@@ -152,13 +156,13 @@ impl Tile {
         });
         Subscription::batch([
             #[cfg(not(target_os = "linux"))]
-            Subscription::run(handle_hotkeys),
+            Subscription::run(Self::handle_hotkeys),
             #[cfg(target_os = "linux")]
-            Subscription::run(handle_socket),
+            Subscription::run(Self::handle_socket),
             keyboard,
-            Subscription::run(handle_recipient),
-            Subscription::run(handle_hot_reloading),
-            Subscription::run(handle_clipboard_history),
+            Subscription::run(Self::handle_recipient),
+            Subscription::run(Self::handle_hot_reloading),
+            Subscription::run(Self::handle_clipboard_history),
             window::close_events().map(Message::HideWindow),
             keyboard::listen().filter_map(|event| {
                 if let keyboard::Event::KeyPressed { key, modifiers, .. } = event {
@@ -220,19 +224,30 @@ impl Tile {
     /// function to handle the search query changed event.
     pub fn handle_search_query_changed(&mut self) {
         let query = self.query_lc.clone();
+
         let options = if self.page == Page::Main {
             &self.options
         } else if self.page == Page::EmojiSearch {
             &self.emoji_apps
         } else {
-            &AppIndex::from_apps(vec![])
+            return;
         };
-        let results: Vec<SimpleApp> = options
-            .search_prefix(&query)
-            .map(std::borrow::ToOwned::to_owned)
+
+        let matcher = SkimMatcherV2::default();
+
+        let mut scored_results: Vec<(i64, SimpleApp)> = options
+            .by_name
+            .values()
+            .filter_map(|app| {
+                matcher
+                    .fuzzy_match(&app.alias, &query)
+                    .map(|score| (score, app.clone()))
+            })
             .collect();
 
-        self.results = results;
+        scored_results.sort_by(|a, b| b.0.cmp(&a.0));
+
+        self.results = scored_results.into_iter().map(|(_, app)| app).collect();
     }
 
     // Unused, keeping it for now
@@ -266,183 +281,182 @@ impl Tile {
     #[allow(deprecated, unused)]
     pub fn restore_frontmost(&mut self) {
         #[cfg(target_os = "macos")]
+        use objc2_app_kit::NSApplicationActivationOptions;
+        #[cfg(target_os = "macos")]
         {
             if let Some(app) = self.frontmost.take() {
-                use objc2_app_kit::NSApplicationActivationOptions;
-
                 app.activateWithOptions(NSApplicationActivationOptions::ActivateIgnoringOtherApps);
             }
-        }
-
-        #[cfg(target_os = "windows")]
-        {
-            if let Some(handle) = self.frontmost {
-                unsafe {
-                    let _ = SetForegroundWindow(handle);
+            #[cfg(target_os = "windows")]
+            {
+                if let Some(handle) = self.frontmost {
+                    unsafe {
+                        let _ = SetForegroundWindow(handle);
+                    }
                 }
             }
         }
     }
-}
 
-/// This is the subscription function that handles hot reloading of the config
-fn handle_hot_reloading() -> impl futures::Stream<Item = Message> {
-    stream::channel(100, async |mut output| {
-        let mut content = fs::read_to_string(
-            std::env::var("HOME").unwrap_or_default() + "/.config/rustcast/config.toml",
-        )
-        .unwrap_or_default();
-
-        let paths = default_app_paths();
-        let mut total_files: usize = paths
-            .par_iter()
-            .map(|dir| count_dirs_in_dir(&dir.to_owned().into()))
-            .sum();
-
-        loop {
-            let current_content = fs::read_to_string(
+    /// This is the subscription function that handles hot reloading of the config
+    fn handle_hot_reloading() -> impl futures::Stream<Item = Message> {
+        stream::channel(100, async |mut output| {
+            let mut content = fs::read_to_string(
                 std::env::var("HOME").unwrap_or_default() + "/.config/rustcast/config.toml",
             )
             .unwrap_or_default();
 
-            let current_total_files: usize = paths
+            let paths = default_app_paths();
+            let mut total_files: usize = paths
                 .par_iter()
-                .map(|dir| count_dirs_in_dir(&dir.to_owned().into()))
+                .map(|dir| Self::count_dirs_in_dir(&dir.to_owned().into()))
                 .sum();
 
-            if current_content != content {
-                content = current_content;
-                output.send(Message::ReloadConfig).await.unwrap();
-            } else if total_files != current_total_files {
-                total_files = current_total_files;
-                output.send(Message::ReloadConfig).await.unwrap();
-            }
+            loop {
+                let current_content = fs::read_to_string(
+                    std::env::var("HOME").unwrap_or_default() + "/.config/rustcast/config.toml",
+                )
+                .unwrap_or_default();
 
-            tokio::time::sleep(Duration::from_millis(10)).await;
-        }
-    })
-}
+                let current_total_files: usize = paths
+                    .par_iter()
+                    .map(|dir| Self::count_dirs_in_dir(&dir.to_owned().into()))
+                    .sum();
 
-fn count_dirs_in_dir(dir: &PathBuf) -> usize {
-    // Read the directory; if it fails, treat as empty
-    let Ok(entries) = fs::read_dir(dir) else {
-        return 0;
-    };
-
-    entries
-        .filter_map(std::result::Result::ok)
-        .filter(|entry| entry.file_type().map(|t| t.is_dir()).unwrap_or(false))
-        .count()
-}
-
-/// This is the subscription function that handles hotkeys for hiding / showing the window
-#[cfg(not(target_os = "linux"))]
-fn handle_hotkeys() -> impl futures::Stream<Item = Message> {
-    stream::channel(100, async |mut output| {
-        tracing::debug!(target: "init", "Initing hotkey event receiver");
-        let receiver = GlobalHotKeyEvent::receiver();
-
-        loop {
-            if let Ok(event) = receiver.recv()
-                && event.state == HotKeyState::Pressed
-            {
-                tracing::debug!(target: "hotkey", "Hotkey press received");
-                output.try_send(Message::HotkeyPressed(event.id)).unwrap();
-            }
-            tokio::time::sleep(Duration::from_millis(10)).await;
-        }
-    })
-}
-
-#[cfg(target_os = "linux")]
-fn handle_socket() -> impl futures::Stream<Item = Message> {
-    use crate::platform::linux::SOCKET_PATH;
-
-    stream::channel(100, async |mut output| {
-        let clipboard = env::args().any(|arg| arg.trim() == "--cphist");
-        if clipboard {
-            output
-                .try_send(Message::OpenToPage(Page::ClipboardHistory))
-                .unwrap();
-        }
-
-        use std::env;
-
-        use tokio::net::UnixListener;
-
-        let _ = fs::remove_file(SOCKET_PATH);
-        let listener = UnixListener::bind(SOCKET_PATH).unwrap();
-
-        while let Ok((mut stream, _address)) = listener.accept().await {
-            let mut output = output.clone();
-            tokio::spawn(async move {
-                use tokio::io::AsyncReadExt;
-                use tracing::info;
-
-                let mut s = String::new();
-                let _ = stream.read_to_string(&mut s).await;
-                info!("received socket command {s}");
-                if s.trim() == "toggle" {
-                    output.try_send(Message::OpenToPage(Page::Main)).unwrap();
-                } else if s.trim() == "clipboard" {
-                    output
-                        .try_send(Message::OpenToPage(Page::ClipboardHistory))
-                        .unwrap();
+                if current_content != content {
+                    content = current_content;
+                    output.send(Message::ReloadConfig).await.unwrap();
+                } else if total_files != current_total_files {
+                    total_files = current_total_files;
+                    output.send(Message::ReloadConfig).await.unwrap();
                 }
-            });
-        }
-    })
-}
 
-/// This is the subscription function that handles the change in clipboard history
-fn handle_clipboard_history() -> impl futures::Stream<Item = Message> {
-    stream::channel(100, async |mut output| {
-        let mut clipboard = Clipboard::new().unwrap();
-        let mut prev_byte_rep: Option<ClipBoardContentType> = None;
+                tokio::time::sleep(Duration::from_millis(10)).await;
+            }
+        })
+    }
 
-        loop {
-            let byte_rep = if let Ok(a) = clipboard.get_image() {
-                Some(ClipBoardContentType::Image(a))
-            } else if let Ok(a) = clipboard.get_text() {
-                Some(ClipBoardContentType::Text(a))
-            } else {
-                None
-            };
+    fn count_dirs_in_dir(dir: &PathBuf) -> usize {
+        // Read the directory; if it fails, treat as empty
+        let Ok(entries) = fs::read_dir(dir) else {
+            return 0;
+        };
 
-            if byte_rep != prev_byte_rep
-                && let Some(content) = &byte_rep
-            {
+        entries
+            .filter_map(std::result::Result::ok)
+            .filter(|entry| entry.file_type().map(|t| t.is_dir()).unwrap_or(false))
+            .count()
+    }
+
+    /// This is the subscription function that handles hotkeys for hiding / showing the window
+    #[cfg(not(target_os = "linux"))]
+    fn handle_hotkeys() -> impl futures::Stream<Item = Message> {
+        stream::channel(100, async |mut output| {
+            tracing::debug!(target: "init", "Initing hotkey event receiver");
+            let receiver = GlobalHotKeyEvent::receiver();
+
+            loop {
+                if let Ok(event) = receiver.recv()
+                    && event.state == HotKeyState::Pressed
+                {
+                    tracing::debug!(target: "hotkey", "Hotkey press received");
+                    output.try_send(Message::HotkeyPressed(event.id)).unwrap();
+                }
+                tokio::time::sleep(Duration::from_millis(10)).await;
+            }
+        })
+    }
+
+    #[cfg(target_os = "linux")]
+    fn handle_socket() -> impl futures::Stream<Item = Message> {
+        use crate::platform::linux::SOCKET_PATH;
+
+        stream::channel(100, async |mut output| {
+            let clipboard = env::args().any(|arg| arg.trim() == "--cphist");
+            if clipboard {
                 output
-                    .send(Message::ClipboardHistory(content.to_owned()))
-                    .await
-                    .ok();
-                prev_byte_rep = byte_rep;
+                    .try_send(Message::OpenToPage(Page::ClipboardHistory))
+                    .unwrap();
             }
-            tokio::time::sleep(Duration::from_millis(10)).await;
-        }
-    })
-}
 
-fn handle_recipient() -> impl futures::Stream<Item = Message> {
-    stream::channel(100, async |mut output| {
-        let (sender, mut recipient) = channel(100);
-        let msg = Message::SetSender(ExtSender(sender));
-        tracing::debug!(target: "init", "Sending ExtSender");
-        output.send(msg).await.expect("Sender not sent");
-        loop {
-            let abcd = recipient
-                .try_next()
-                .map(async |msg| {
-                    if let Some(msg) = msg {
-                        output.send(msg).await.unwrap();
+            use std::env;
+
+            use tokio::net::UnixListener;
+
+            let _ = fs::remove_file(SOCKET_PATH);
+            let listener = UnixListener::bind(SOCKET_PATH).unwrap();
+
+            while let Ok((mut stream, _address)) = listener.accept().await {
+                let mut output = output.clone();
+                tokio::spawn(async move {
+                    use tokio::io::AsyncReadExt;
+                    use tracing::info;
+
+                    let mut s = String::new();
+                    let _ = stream.read_to_string(&mut s).await;
+                    info!("received socket command {s}");
+                    if s.trim() == "toggle" {
+                        output.try_send(Message::OpenToPage(Page::Main)).unwrap();
+                    } else if s.trim() == "clipboard" {
+                        output
+                            .try_send(Message::OpenToPage(Page::ClipboardHistory))
+                            .unwrap();
                     }
-                })
-                .ok();
-
-            if let Some(abcd) = abcd {
-                abcd.await;
+                });
             }
-            tokio::time::sleep(Duration::from_nanos(10)).await;
-        }
-    })
+        })
+    }
+
+    /// This is the subscription function that handles the change in clipboard history
+    fn handle_clipboard_history() -> impl futures::Stream<Item = Message> {
+        stream::channel(100, async |mut output| {
+            let mut clipboard = Clipboard::new().unwrap();
+            let mut prev_byte_rep: Option<ClipBoardContentType> = None;
+
+            loop {
+                let byte_rep = if let Ok(a) = clipboard.get_image() {
+                    Some(ClipBoardContentType::Image(a))
+                } else if let Ok(a) = clipboard.get_text() {
+                    Some(ClipBoardContentType::Text(a))
+                } else {
+                    None
+                };
+
+                if byte_rep != prev_byte_rep
+                    && let Some(content) = &byte_rep
+                {
+                    output
+                        .send(Message::ClipboardHistory(content.to_owned()))
+                        .await
+                        .ok();
+                    prev_byte_rep = byte_rep;
+                }
+                tokio::time::sleep(Duration::from_millis(10)).await;
+            }
+        })
+    }
+
+    fn handle_recipient() -> impl futures::Stream<Item = Message> {
+        stream::channel(100, async |mut output| {
+            let (sender, mut recipient) = channel(100);
+            let msg = Message::SetSender(ExtSender(sender));
+            tracing::debug!(target: "init", "Sending ExtSender");
+            output.send(msg).await.expect("Sender not sent");
+            loop {
+                let abcd = recipient
+                    .try_next()
+                    .map(async |msg| {
+                        if let Some(msg) = msg {
+                            output.send(msg).await.unwrap();
+                        }
+                    })
+                    .ok();
+
+                if let Some(abcd) = abcd {
+                    abcd.await;
+                }
+                tokio::time::sleep(Duration::from_nanos(10)).await;
+            }
+        })
+    }
 }

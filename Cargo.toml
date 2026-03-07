@@ -18,14 +18,6 @@ windows = { version = "0.58", features = [
 ]}
 
 [target.'cfg(target_os = "macos")'.dependencies]
-objc2 = "0.6.3"
-objc2-app-kit = { version = "0.3.2", features = ["NSImage"] }
-objc2-application-services = { version = "0.3.2", default-features = false, features = [
-    "HIServices",
-    "Processes",
-] }
-objc2-core-foundation = "0.3.2"
-objc2-foundation = { version = "0.3.2", features = ["NSString"] }
 icns = "0.3.1"
 
 [target.'cfg(target_os = "linux")'.dependencies]
@@ -58,6 +50,7 @@ regex = "1.12.2"
 lnk = "0.6.3"
 codepage = "0.1.2"
 widestring = "1.2.1"
+fuzzy-matcher = "0.3.7"
 
 [package.metadata.bundle]
 name = "RustCast"

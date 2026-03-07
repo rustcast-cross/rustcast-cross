@@ -8,9 +8,6 @@ use std::{
 #[cfg(target_os = "macos")]
 use {objc2_app_kit::NSWorkspace, objc2_foundation::NSURL};
 
-#[cfg(target_os = "linux")]
-use crate::platform::linux::get_installed_linux_apps;
-
 #[cfg(any(target_os = "windows", target_os = "linux"))]
 use std::process::Command;
 

@@ -10,8 +10,7 @@ use rayon::slice::ParallelSliceMut;
 use crate::app::apps::AppData;
 use crate::app::{
     ArrowKey, DEFAULT_WINDOW_HEIGHT, Message, Move, Page, WINDOW_WIDTH, apps::AppCommand,
-    apps::SimpleApp, default_settings, menubar::menu_icon, tile::AppIndex, tile::Tile,
-    tile::search_query,
+    apps::SimpleApp, default_settings, tile::AppIndex, tile::Tile,
 };
 
 #[cfg(target_os = "macos")]
@@ -306,85 +305,11 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
             }
         }
 
-        Message::SwitchToPage(page) => {
-            tile.page = page;
-            Task::batch([
-                Task::done(Message::ClearSearchQuery),
-                Task::done(Message::ClearSearchResults),
-            ])
-        }
-
-        Message::RunFunction(command) => {
-            command.execute(&tile.config, &tile.query);
-
-            let return_focus_task = match &command {
-                Function::OpenApp(_) | Function::OpenPrefPane | Function::GoogleSearch(_) => {
-                    Task::none()
-                }
-                _ => Task::done(Message::ReturnFocus),
-            };
-
-            if tile.config.buffer_rules.clear_on_enter {
-                window::latest()
-                    .map(|x| x.unwrap())
-                    .map(Message::HideWindow)
-                    .chain(Task::done(Message::ClearSearchQuery))
-                    .chain(return_focus_task)
-            } else {
-                Task::none()
-            }
-        }
-
-        Message::HideWindow(a) => {
-            tile.visible = false;
-            tile.focused = false;
-            tile.page = Page::Main;
-            Task::batch([window::close(a), Task::done(Message::ClearSearchResults)])
-        }
-
-        Message::ReturnFocus => {
-            tile.restore_frontmost();
+        _ => {
+            // TODO: finish this match statement
+            // Do nothing for now
             Task::none()
         }
-
-        Message::FocusTextInput(update_query_char) => {
-            match update_query_char {
-                Move::Forwards(query_char) => {
-                    tile.query += &query_char.clone();
-                    tile.query_lc += &query_char.clone().to_lowercase();
-                }
-                Move::Back => {
-                    tile.query.pop();
-                    tile.query_lc.pop();
-                }
-            }
-            let updated_query = tile.query.clone();
-            Task::batch([
-                operation::focus("query"),
-                window::latest()
-                    .map(|x| x.unwrap())
-                    .map(move |x| Message::SearchQueryChanged(updated_query.clone(), x)),
-            ])
-        }
-
-        Message::WindowFocusChanged(wid, focused) => {
-            tile.focused = focused;
-            if focused {
-                Task::none()
-            } else if cfg!(target_os = "macos") {
-                Task::done(Message::HideWindow(wid)).chain(Task::done(Message::ClearSearchQuery))
-            } else {
-                // linux seems to not wanna unfocus it on start making it not show
-                Task::none()
-            }
-        }
-
-        Message::ClipboardHistory(content) => {
-            tile.clipboard_content.insert(0, content);
-            Task::none()
-        }
-
-        Message::SearchQueryChanged(input, id) => search_query::handle_change(tile, &input, id),
     }
 }
 

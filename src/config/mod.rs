@@ -15,6 +15,7 @@ use crate::{
 mod include_patterns;
 mod level;
 mod patterns;
+mod test;
 
 /// The main config struct (effectively the config file's "schema")
 #[derive(Debug, Clone, Deserialize, Serialize)]
