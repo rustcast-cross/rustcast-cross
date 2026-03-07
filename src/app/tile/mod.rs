@@ -3,12 +3,15 @@ pub mod elm;
 pub mod update;
 
 mod search_query;
+mod test;
 
 #[cfg(target_os = "windows")]
 use {
     windows::Win32::Foundation::HWND, windows::Win32::UI::WindowsAndMessaging::SetForegroundWindow,
 };
 
+use fuzzy_matcher::FuzzyMatcher;
+use fuzzy_matcher::skim::SkimMatcherV2;
 use std::{collections::BTreeMap, fs, ops::Bound, path::PathBuf, time::Duration};
 
 use iced::{
@@ -221,19 +224,30 @@ impl Tile {
     /// function to handle the search query changed event.
     pub fn handle_search_query_changed(&mut self) {
         let query = self.query_lc.clone();
+
         let options = if self.page == Page::Main {
             &self.options
         } else if self.page == Page::EmojiSearch {
             &self.emoji_apps
         } else {
-            &AppIndex::from_apps(vec![])
+            return;
         };
-        let results: Vec<SimpleApp> = options
-            .search_prefix(&query)
-            .map(std::borrow::ToOwned::to_owned)
+
+        let matcher = SkimMatcherV2::default();
+
+        let mut scored_results: Vec<(i64, SimpleApp)> = options
+            .by_name
+            .values()
+            .filter_map(|app| {
+                matcher
+                    .fuzzy_match(&app.alias, &query)
+                    .map(|score| (score, app.clone()))
+            })
             .collect();
 
-        self.results = results;
+        scored_results.sort_by(|a, b| b.0.cmp(&a.0));
+
+        self.results = scored_results.into_iter().map(|(_, app)| app).collect();
     }
 
     // Unused, keeping it for now
