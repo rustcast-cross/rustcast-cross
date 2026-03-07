@@ -36,6 +36,7 @@ use rayon::prelude::*;
 use tray_icon::TrayIcon;
 
 #[cfg(target_os = "macos")]
+#[cfg(target_os = "macos")]
 use objc2::rc::Retained;
 #[cfg(target_os = "macos")]
 use objc2_app_kit::NSRunningApplication;
@@ -265,6 +266,12 @@ impl Tile {
     /// Restores the frontmost application.
     #[allow(deprecated, unused)]
     pub fn restore_frontmost(&mut self) {
+        use objc2_app_kit::NSApplicationActivationOptions;
+        #[cfg(target_os = "macos")]
+        {
+            if let Some(app) = self.frontmost.take() {
+                app.activateWithOptions(NSApplicationActivationOptions::ActivateIgnoringOtherApps);
+            }
         #[cfg(target_os = "macos")]
         {
             if let Some(app) = self.frontmost.take() {
