@@ -309,7 +309,7 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
 
         Message::ClipboardHistory(text) => {
             tile.clipboard_content.insert(0, text);
-            
+
             // Length limit for clipboard content list
             if tile.clipboard_content.len() > 50 {
                 tile.clipboard_content.pop();

@@ -2,14 +2,13 @@
 //! copying to clipboard, etc.
 use std::path::PathBuf;
 use std::process::Command;
-#[cfg(target_os = "macos")]
+
+#[cfg(any(target_os = "macos", target_os = "linux"))]
 use std::thread;
 
 use arboard::Clipboard;
 #[cfg(target_os = "macos")]
-#[cfg(target_os = "macos")]
 use objc2_app_kit::NSWorkspace;
-#[cfg(target_os = "macos")]
 #[cfg(target_os = "macos")]
 use objc2_foundation::NSURL;
 
@@ -87,11 +86,11 @@ impl Function {
             }
 
             Function::OpenWebsite(url) => {
-                    let open_url = url.to_owned();
+                let open_url = url.to_owned();
 
-                    // Should never get here without it being validated first
-                    open::that(open_url).unwrap();
-                }
+                // Should never get here without it being validated first
+                open::that(open_url).unwrap();
+            }
 
             Function::Calculate(expr) => {
                 Clipboard::new()
@@ -109,7 +108,7 @@ impl Function {
                 }
             },
 
-            #[cfg(target_os = "macos")]
+            #[cfg(any(target_os = "macos", target_os = "linux"))]
             Function::OpenPrefPane => {
                 thread::spawn(move || {
                     let config_path = format!(

@@ -41,12 +41,12 @@ mod tests {
     #[test]
     fn test_parse_config() {
         use crate::config::Config;
-        
+
         let original_config = Config::default();
 
-        let toml_string = toml::to_string(&original_config)
-            .expect("Should be able to turn config into a string");
-        
+        let toml_string =
+            toml::to_string(&original_config).expect("Should be able to turn config into a string");
+
         let recovered_config: Config = toml::from_str(&toml_string)
             .expect("Should be able to read that string back into a Config");
 
