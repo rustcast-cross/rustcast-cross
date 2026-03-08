@@ -13,10 +13,11 @@ mod utils;
 
 use std::fs::create_dir_all;
 use std::io;
+use std::path::Path;
 
 use crate::config::Config;
 use crate::logging::init::init_loggers;
-use crate::utils::{get_config_file_path, get_config_installation_dir, read_config_file};
+use crate::utils::{get_config_file_path, get_config_installation_dir };
 
 use crate::app::tile::{self, Tile};
 use logging::preinit_logger;
@@ -26,6 +27,22 @@ use crate::hotkey::init_hotkey_manager;
 
 #[cfg(target_os = "linux")]
 use crate::hotkey::init_socket;
+
+/// Convenience function to open and parse the config file
+fn read_config_file(file_path: &Path) -> anyhow::Result<Config> {
+    match std::fs::read_to_string(file_path) {
+        Ok(a) => Ok(toml::from_str(&a)?),
+        Err(e) if e.kind() == io::ErrorKind::NotFound => {
+            let cfg = Config::default();
+            std::fs::write(
+                file_path,
+                toml::to_string(&cfg).unwrap_or_else(|x| x.to_string()),
+            )?;
+            Ok(cfg)
+        }
+        Err(e) => Err(e.into()),
+    }
+}
 
 fn load_config() -> Config {
     let config_dir = get_config_installation_dir().join("rustcast/");

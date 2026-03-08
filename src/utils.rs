@@ -29,23 +29,6 @@ pub fn get_config_file_path() -> PathBuf {
     }
 }
 
-use crate::config::Config;
-
-pub fn read_config_file(file_path: &Path) -> anyhow::Result<Config> {
-    match std::fs::read_to_string(file_path) {
-        Ok(a) => Ok(toml::from_str(&a)?),
-        Err(e) if e.kind() == io::ErrorKind::NotFound => {
-            let cfg = Config::default();
-            std::fs::write(
-                file_path,
-                toml::to_string(&cfg).unwrap_or_else(|x| x.to_string()),
-            )?;
-            Ok(cfg)
-        }
-        Err(e) => Err(e.into()),
-    }
-}
-
 // TODO: this should also work with args
 pub fn open_application(path: impl AsRef<Path>) {
     let path = path.as_ref();
