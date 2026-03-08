@@ -307,6 +307,26 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
             }
         }
 
+        Message::ClipboardHistory(text) => {
+            tile.clipboard_content.insert(0, text);
+            
+            // Length limit for clipboard content list
+            if tile.clipboard_content.len() > 50 {
+                tile.clipboard_content.pop()
+            }
+            Task::none();
+        }
+
+        Message::SocketMessage(msg) => {
+            if msg == "open" {
+                handle_update(tile, Message::OpenToPage(Page::Main))
+            } else if msg == "clipboard" {
+                handle_update(tile, Message::OpenToPage(Page::ClipboardHistory))
+            } else {
+                Task::none()
+            }
+        }
+
         _ => {
             // TODO: finish this match statement
             // Do nothing for now
