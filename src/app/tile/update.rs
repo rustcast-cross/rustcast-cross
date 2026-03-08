@@ -314,7 +314,7 @@ pub fn handle_update(tile: &mut Tile, message: Message) -> Task<Message> {
             if tile.clipboard_content.len() > 50 {
                 tile.clipboard_content.pop()
             }
-            Task::none();
+            Task::none()
         }
 
         Message::SocketMessage(msg) => {
