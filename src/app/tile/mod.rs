@@ -267,7 +267,7 @@ impl Tile {
     // }
 
     /// Gets the frontmost application to focus later.
-    #[cfg(target_os = "macos")]
+    #[cfg(any(doc, target_os = "macos"))]
     pub fn capture_frontmost(&mut self) {
         use objc2_app_kit::NSWorkspace;
 
@@ -365,7 +365,7 @@ impl Tile {
         })
     }
 
-    #[cfg(target_os = "linux")]
+    #[cfg(any(doc, target_os = "linux"))]
     fn handle_socket() -> impl futures::Stream<Item = Message> {
         use crate::platform::linux::SOCKET_PATH;
 

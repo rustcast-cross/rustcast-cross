@@ -11,11 +11,11 @@ use crate::{
 };
 use rayon::prelude::*;
 
-#[cfg(target_os = "linux")]
+#[cfg(any(doc, target_os = "linux"))]
 mod linux;
-#[cfg(target_os = "macos")]
+#[cfg(any(doc, target_os = "macos"))]
 mod macos;
-#[cfg(target_os = "windows")]
+#[cfg(any(doc, target_os = "windows"))]
 mod windows;
 
 /// Recursively loads apps from a set of folders.
