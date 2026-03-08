@@ -28,6 +28,7 @@ pub enum Function {
 }
 
 /// Opens a path in an editor.
+#[cfg(any(target_os = "linux", target_os = "macos"))]
 fn sys_open(path: &str) {
     #[cfg(target_os = "macos")]
     {
