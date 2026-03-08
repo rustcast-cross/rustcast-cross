@@ -6,9 +6,7 @@ mod search_query;
 mod test;
 
 #[cfg(target_os = "windows")]
-use {
-    windows::Win32::Foundation::HWND, windows::Win32::UI::WindowsAndMessaging::SetForegroundWindow,
-};
+use windows::Win32::Foundation::HWND;
 
 use fuzzy_matcher::FuzzyMatcher;
 use fuzzy_matcher::skim::SkimMatcherV2;

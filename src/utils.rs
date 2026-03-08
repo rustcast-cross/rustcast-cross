@@ -1,9 +1,6 @@
 //! This has all the utility functions that rustcast uses
 
-use std::{
-    io,
-    path::{Path, PathBuf},
-};
+use std::path::{Path, PathBuf};
 
 #[cfg(target_os = "macos")]
 use {objc2_app_kit::NSWorkspace, objc2_foundation::NSURL};
@@ -98,9 +95,6 @@ pub fn bgra_to_rgba(data: &mut [u8]) {
 #[cfg(not(any(target_arch = "x86", target_arch = "x86_64")))]
 pub fn bgra_to_rgba(data: &mut [u8]) {
     for i in (0..data.len()).step_by(4) {
-        let r = data[i + 2];
-
-        data[i + 2] = data[i];
-        data[i] = r;
+        data.swap(i + 2, i);
     }
 }

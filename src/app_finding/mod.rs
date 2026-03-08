@@ -142,7 +142,7 @@ pub fn index_installed_apps(config: &Config) -> anyhow::Result<Vec<SimpleApp>> {
             })
             .collect();
 
-        res.extend(macos::get_installed_macos_apps(&config)?);
+        res.extend(macos::get_installed_macos_apps(config)?);
 
         let end = Instant::now();
         tracing::info!(
