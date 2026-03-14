@@ -1,5 +1,5 @@
 [package]
-name = "rustcast"
+name = "rustcast-cross"
 version = "0.6.0"
 edition = "2024"
 
@@ -65,18 +65,16 @@ winresource = "0.1.30"
 
 [package.metadata.bundle]
 name = "RustCast"
-identifier = "com.umangsurana.rustcast"
+identifier = "com.rustcast-cross.rustcast"
 icon = ["bundling/icon.icns"]
 version = "1.0.0"
 resources = []
-copyright = "Copyright Umang Surana (c) 2025"
 category = "Developer Tool"
-short_description = "An open source alternative to Raycast, and in rust"
+short_description = "A cross platform fork of rustcast"
 osx_minimum_system_version = "10.15"
 
 [package.metadata.winresource]
 name = "Rustcast-cross"
-legalCopyright = "Copyright Umang Surana (c) 2025"
 icon = "assets/icon.ico"
 
 [package.metadata.bundle.osx]
